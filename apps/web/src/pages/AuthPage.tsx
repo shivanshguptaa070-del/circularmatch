@@ -48,6 +48,72 @@ const MODE_OPTIONS: { id: ActiveMode; label: string; subtitle: string; icon: typ
   { id: 'both', label: 'Both', subtitle: 'Full platform access for circular businesses', icon: CheckCircle2 },
 ]
 
+const BLOCKED_DOMAINS = new Set([
+  'example.com',
+  'test.com',
+  'testexample.com',
+  'testemail.com',
+  'testing.com',
+  'sample.com',
+  'dummy.com',
+  'fake.com',
+  'fakemail.com',
+  'tempmail.com',
+  'mailinator.com',
+  '10minutemail.com',
+  'guerrillamail.com',
+  'throwawaymail.com',
+  'trashmail.com',
+  'yopmail.com',
+  'dispostable.com',
+  'sharklasers.com',
+  'dfghj.com',
+  'snjxsn.com',
+  'asdf.com',
+  'qwerty.com',
+  'zxcv.com',
+  'xyz.com',
+  'abc.com',
+])
+
+function validateAuthenticEmail(rawEmail: string): string | null {
+  const email = rawEmail.trim().toLowerCase()
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+  if (!emailRegex.test(email)) {
+    return 'Please enter a valid, authentic email address (e.g., name@company.com).'
+  }
+
+  const [, domain] = email.split('@')
+  if (!domain || !domain.includes('.')) {
+    return 'Invalid domain in email address.'
+  }
+
+  if (BLOCKED_DOMAINS.has(domain)) {
+    return `The domain "${domain}" is not allowed. Please use your real personal or work email.`
+  }
+
+  const domainParts = domain.split('.')
+  const domainName = domainParts[0]
+  const tld = domainParts[domainParts.length - 1]
+
+  if (domainName.length < 2 || tld.length < 2) {
+    return 'Please provide a legitimate company or personal email domain.'
+  }
+
+  // Check for gibberish domain names with no vowels (e.g. "snjxsn", "dfghj", "qwrtyp")
+  const hasVowels = /[aeiouy]/.test(domainName)
+  if (!hasVowels && domainName.length > 3) {
+    return `"${domain}" does not appear to be an authentic domain. Please use a valid email.`
+  }
+
+  // Check for repeated keyboard mashing (e.g., "asdfgh", "zxcvbn")
+  if (/^(asdf|qwer|zxcv|hjkl|1234|dfgh)/i.test(domainName)) {
+    return 'Random test domains are not permitted. Please use a verified email.'
+  }
+
+  return null
+}
+
 export function AuthPage({ onAuth }: { onAuth: () => void }) {
   const [step, setStep] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
@@ -63,22 +129,30 @@ export function AuthPage({ onAuth }: { onAuth: () => void }) {
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
     setError(null)
     setSuccessMsg(null)
+
+    // Strict authentic email validation
+    const emailValidationError = validateAuthenticEmail(email)
+    if (emailValidationError) {
+      setError(emailValidationError)
+      return
+    }
+
+    setLoading(true)
     try {
       if (step === 'signin') {
-        const { error: err } = await supabase.auth.signInWithPassword({ email, password })
+        const { error: err } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
         if (err) throw err
         onAuth()
       } else {
         const { data, error: err } = await supabase.auth.signUp({
-          email,
+          email: email.trim(),
           password,
           options: {
             data: {
-              full_name: fullName,
-              company_name: companyName,
+              full_name: fullName.trim(),
+              company_name: companyName.trim(),
               active_mode: activeMode,
             },
           },
@@ -87,11 +161,16 @@ export function AuthPage({ onAuth }: { onAuth: () => void }) {
         if (data.session) {
           onAuth()
         } else {
-          setSuccessMsg('Account created! If email confirmation is enabled, please check your inbox to confirm.')
+          setSuccessMsg('Account created! Please check your email inbox to verify your account.')
         }
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Authentication failed. Please try again.')
+      const msg = err instanceof Error ? err.message : 'Authentication failed.'
+      if (msg.toLowerCase().includes('rate limit')) {
+        setError('Supabase email rate limit reached. Please use "Continue with Google" for instant login, or disable email confirmation in your Supabase dashboard.')
+      } else {
+        setError(msg)
+      }
     } finally {
       setLoading(false)
     }
