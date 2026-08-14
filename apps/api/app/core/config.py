@@ -37,7 +37,7 @@ class Settings:
             errors.append("SUPABASE_URL is required in production.")
         if not self.supabase_service_role_key:
             errors.append("SUPABASE_SERVICE_ROLE_KEY is required in production.")
-        if self.frontend_origin == "http://localhost:5173":
+        if self.frontend_origin.startswith("http://localhost") or self.frontend_origin.startswith("http://127.0.0.1"):
             errors.append("FRONTEND_ORIGIN must be set to your production domain in production mode.")
 
         if errors:

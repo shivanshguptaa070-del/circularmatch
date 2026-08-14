@@ -64,6 +64,7 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
         <Route path="/buyer-requirements/:requirementId/acceptance-spec" element={<BuyerAcceptanceSpecPage role={legacyRole} />} />
         <Route path="/matches/:matchId" element={<MatchDetailPage role={legacyRole} />} />
         <Route path="/map" element={<MapPage />} />
+        <Route path="/supply" element={<ListingsPage role="buyer" />} />
         <Route path="/admin" element={<AdminPage role={legacyRole} />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
