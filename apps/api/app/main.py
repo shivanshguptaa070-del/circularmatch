@@ -97,8 +97,12 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 app.add_middleware(SecurityHeadersMiddleware)
 
 # ── CORS ─────────────────────────────────────────────────────────────────────
-# Strictly restrict to the configured frontend origin. Never use wildcard in production.
-_allowed_origins = [settings.frontend_origin]
+# Always allow the deployed Vercel frontend and Render backend.
+_allowed_origins = [
+    settings.frontend_origin,
+    "https://circularmatch.vercel.app",
+    "https://circularmatch.onrender.com",
+]
 if settings.demo_mode:
     # Allow common local dev ports during demo/development
     _allowed_origins += [
@@ -109,12 +113,13 @@ if settings.demo_mode:
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allowed_origins,
+    allow_origins=list(set(_allowed_origins)),
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "X-Demo-User-Id"],
     max_age=600,
 )
+
 
 
 # ── Global exception handler — never leak stack traces ────────────────────────
