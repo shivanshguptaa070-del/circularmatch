@@ -32,7 +32,7 @@ function SplashScreen() {
 }
 
 function RoutedApp({ session, profile }: { session: Session; profile: UserProfile }) {
-  const [activeMode, setActiveMode] = useState<ActiveMode>(profile.active_mode || 'both')
+  const [activeMode, setActiveMode] = useState<ActiveMode>(profile.active_mode === 'both' ? 'selling' : profile.active_mode || 'selling')
 
   const switchMode = async (mode: ActiveMode) => {
     setActiveMode(mode)
@@ -108,7 +108,7 @@ export default function App() {
           email: s.user.email ?? '',
           full_name: meta?.full_name ?? meta?.name ?? s.user.email?.split('@')[0] ?? 'User',
           company_name: meta?.company_name ?? '',
-          active_mode: (meta?.active_mode as ActiveMode) ?? 'both',
+          active_mode: (meta?.active_mode as ActiveMode) ?? 'selling',
           avatar_url: meta?.avatar_url ?? null,
         }
         // Try to upsert the profile
@@ -125,7 +125,7 @@ export default function App() {
         email: s.user.email ?? '',
         full_name: meta?.full_name ?? meta?.name ?? 'User',
         company_name: meta?.company_name ?? '',
-        active_mode: 'both',
+        active_mode: 'selling',
         avatar_url: meta?.avatar_url ?? null,
       })
     } finally {

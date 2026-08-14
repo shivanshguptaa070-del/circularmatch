@@ -32,7 +32,7 @@ const ALL_NAV: NavItem[] = [
   { label: 'Buyer requirements', path: '/buyer-requirements', icon: ClipboardList, modes: ['sourcing', 'both'] },
   { label: 'Supply opportunities', path: '/supply', icon: PackageSearch, modes: ['sourcing', 'both'] },
   { label: 'Map', path: '/map', icon: Map, modes: ['selling', 'sourcing', 'both'] },
-  { label: 'Scoring rules', path: '/admin', icon: Settings2, modes: ['selling', 'sourcing', 'both'] },
+  { label: 'Scoring rules', path: '/admin', icon: Settings2, modes: ['both'] },
 ]
 
 const MODE_CONFIG: Record<ActiveMode, { label: string; icon: typeof Recycle; description: string }> = {
@@ -110,7 +110,7 @@ export function AppShell({
 
           {showModeMenu && (
             <div className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-2xl border border-white/12 bg-[#0a2e28] shadow-[0_16px_40px_rgba(0,20,16,.5)]">
-              {(Object.entries(MODE_CONFIG) as [ActiveMode, typeof MODE_CONFIG[ActiveMode]][]).map(([mode, info]) => {
+              {(Object.entries(MODE_CONFIG) as [ActiveMode, typeof MODE_CONFIG[ActiveMode]][]).filter(([mode]) => mode !== 'both').map(([mode, info]) => {
                 const Icon = info.icon
                 return (
                   <button
