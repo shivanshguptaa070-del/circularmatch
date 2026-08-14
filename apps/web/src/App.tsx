@@ -32,7 +32,9 @@ function SplashScreen() {
 }
 
 function RoutedApp({ session, profile }: { session: Session; profile: UserProfile }) {
-  const [activeMode, setActiveMode] = useState<ActiveMode>(profile.active_mode === 'both' ? 'selling' : profile.active_mode || 'selling')
+  const [activeMode, setActiveMode] = useState<ActiveMode>(profile.active_mode || 'selling')
+  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL as string | undefined
+  const isAdmin = !!(ADMIN_EMAIL && profile.email === ADMIN_EMAIL)
 
   const switchMode = async (mode: ActiveMode) => {
     setActiveMode(mode)
@@ -50,7 +52,7 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
   const legacyRole: 'generator' | 'buyer' | 'admin' = activeMode === 'sourcing' ? 'buyer' : 'generator'
 
   return (
-    <AppShell profile={currentProfile} onSwitchMode={switchMode} onSignOut={handleSignOut}>
+    <AppShell profile={currentProfile} onSwitchMode={switchMode} onSignOut={handleSignOut} isAdmin={isAdmin}>
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<DashboardPage role={legacyRole} />} />

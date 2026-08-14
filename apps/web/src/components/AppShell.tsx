@@ -10,6 +10,7 @@ import {
   PackageSearch,
   PlusCircle,
   Recycle,
+  RefreshCw,
   Settings2,
   ShieldCheck,
   X,
@@ -32,13 +33,13 @@ const ALL_NAV: NavItem[] = [
   { label: 'Buyer requirements', path: '/buyer-requirements', icon: ClipboardList, modes: ['sourcing', 'both'] },
   { label: 'Supply opportunities', path: '/supply', icon: PackageSearch, modes: ['sourcing', 'both'] },
   { label: 'Map', path: '/map', icon: Map, modes: ['selling', 'sourcing', 'both'] },
-  { label: 'Scoring rules', path: '/admin', icon: Settings2, modes: ['both'] },
+  { label: 'Scoring rules', path: '/admin', icon: Settings2, modes: ['__admin__'] },
 ]
 
 const MODE_CONFIG: Record<ActiveMode, { label: string; icon: typeof Recycle; description: string }> = {
   selling: { label: 'Selling Waste', icon: Recycle, description: 'You are listing industrial by-products.' },
   sourcing: { label: 'Sourcing Materials', icon: PackageSearch, description: 'You are finding secondary materials.' },
-  both: { label: 'Full Access', icon: ShieldCheck, description: 'Both selling and sourcing enabled.' },
+  both: { label: 'Sell & Buy', icon: RefreshCw, description: 'Both selling and sourcing enabled.' },
 }
 
 export function AppShell({
@@ -46,18 +47,22 @@ export function AppShell({
   children,
   onSwitchMode,
   onSignOut,
+  isAdmin = false,
 }: {
   profile: UserProfile
   children: ReactNode
   onSwitchMode: (mode: ActiveMode) => Promise<void>
   onSignOut: () => Promise<void>
+  isAdmin?: boolean
 }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [modeSwitching, setModeSwitching] = useState(false)
   const [showModeMenu, setShowModeMenu] = useState(false)
   const location = useLocation()
 
-  const navItems = ALL_NAV.filter((item) => item.modes.includes(profile.active_mode))
+  const navItems = ALL_NAV.filter((item) =>
+    item.modes.includes('__admin__') ? isAdmin : item.modes.includes(profile.active_mode)
+  )
   const modeInfo = MODE_CONFIG[profile.active_mode]
   const ModeIcon = modeInfo.icon
 
@@ -110,7 +115,7 @@ export function AppShell({
 
           {showModeMenu && (
             <div className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-2xl border border-white/12 bg-[#0a2e28] shadow-[0_16px_40px_rgba(0,20,16,.5)]">
-              {(Object.entries(MODE_CONFIG) as [ActiveMode, typeof MODE_CONFIG[ActiveMode]][]).filter(([mode]) => mode !== 'both').map(([mode, info]) => {
+              {(Object.entries(MODE_CONFIG) as [ActiveMode, typeof MODE_CONFIG[ActiveMode]][]).map(([mode, info]) => {
                 const Icon = info.icon
                 return (
                   <button
