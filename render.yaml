@@ -17,7 +17,7 @@ services:
       - key: SUPABASE_JWT_SECRET
         sync: false
       - key: DEMO_MODE
-        value: false
+        value: "true"
       - key: PYTHON_VERSION
         value: 3.11.9
       - key: FRONTEND_ORIGIN
