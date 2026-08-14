@@ -253,6 +253,17 @@ class ImpactMethodology(BaseModel):
     is_demo: bool = True
 
 
+class Notification(BaseModel):
+    id: str
+    user_id: str
+    type: Literal["new_match"]
+    title: str
+    message: str
+    reference_url: str | None = None
+    is_read: bool = False
+    created_at: str
+
+
 class AuditEvent(BaseModel):
     id: str
     entity_type: str

@@ -7,8 +7,47 @@ on:
     branches: [ main ]
 
 jobs:
-  test-backend:
+  # ── Backend security scan ──────────────────────────────────────────────────
+  security-backend:
+    name: Backend Security Scan (Bandit)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Bandit
+        run: pip install bandit[toml]
+      - name: Run Bandit SAST scan
+        # -ll reports medium+ severity, -ii reports medium+ confidence
+        # Exit non-zero on any finding so CI blocks the merge.
+        run: bandit -r app/ -ll -ii --format txt
+
+  # ── Secret scanning ────────────────────────────────────────────────────────
+  secret-scan:
+    name: Secret Scan (TruffleHog)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history needed for diff scanning
+      - name: TruffleHog OSS scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified
+
+  # ── Backend tests ──────────────────────────────────────────────────────────
+  test-backend:
+    name: Backend Tests (pytest)
+    runs-on: ubuntu-latest
+    needs: [security-backend]
     defaults:
       run:
         working-directory: apps/api
@@ -26,7 +65,9 @@ jobs:
         run: |
           PYTHONPATH=. python -m pytest -vv
 
+  # ── Frontend build & audit ─────────────────────────────────────────────────
   build-frontend:
+    name: Frontend Build & npm Audit
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -39,5 +80,8 @@ jobs:
           node-version: '20'
       - name: Install dependencies
         run: npm ci
+      - name: npm audit (high+ severity)
+        # Fail CI on high or critical npm vulnerabilities
+        run: npm audit --audit-level=high
       - name: TypeScript check & Vite build
         run: npm run build

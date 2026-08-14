@@ -32,6 +32,14 @@ export const post = <T>(path: string, body?: unknown) =>
 export const patch = <T>(path: string, body: unknown) =>
   api<T>(path, { method: 'PATCH', body: JSON.stringify(body) })
 
+export async function getNotifications() {
+  return get<{ notifications: import('../types').Notification[] }>('/api/notifications')
+}
+
+export async function markNotificationRead(notificationId: string) {
+  return patch<{ notification: import('../types').Notification }>(`/api/notifications/${notificationId}/read`, {})
+}
+
 // Legacy compatibility — no-op, auth is handled by Supabase
 export function getStoredUser() { return null }
 export function setStoredUser(_user: unknown) { void _user }

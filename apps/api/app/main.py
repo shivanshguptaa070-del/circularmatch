@@ -1,11 +1,23 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.util import get_remote_address
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.config import settings
+
+# Abort startup if production secrets are missing
+settings.validate_production()
+
+logger = logging.getLogger(__name__)
 from app.core.dependencies import get_current_user, get_store, require_roles
 from app.repositories.demo_store import DemoStore
 from app.schemas.models import (
@@ -23,6 +35,7 @@ from app.schemas.models import (
     ExtractWasteRequest,
     MaterialLot,
     MatchRecord,
+    Notification,
     Offer,
     QualityEvidence,
     ReviewEvidenceRequest,
@@ -47,19 +60,71 @@ from app.services.calculators import (
 from app.services.extraction import extract_waste
 from app.services.matching import EVIDENCE_RANK, calculate_match, match_explanation
 
+# In production, /docs and /redoc are disabled entirely.
+# They are only available during local development (DEMO_MODE=true).
 app = FastAPI(
     title="CircularMatch API",
     version="0.2.0",
     description="Explainable industrial waste-to-secondary-material matching with a trusted-pilot material passport workflow.",
+    docs_url="/docs" if settings.demo_mode else None,
+    redoc_url="/redoc" if settings.demo_mode else None,
+    openapi_url="/openapi.json" if settings.demo_mode else None,
 )
+
+# ── Rate Limiting ────────────────────────────────────────────────────────────
+limiter = Limiter(key_func=get_remote_address, default_limits=["100/minute"])
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
+
+# ── Security Headers Middleware ───────────────────────────────────────────────
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    """Adds defensive HTTP security headers to every response."""
+
+    async def dispatch(self, request: Request, call_next: Any) -> Any:
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Permissions-Policy"] = "geolocation=(), camera=(), microphone=()"
+        if not settings.demo_mode:
+            # Only send HSTS on production HTTPS endpoints
+            response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains; preload"
+        return response
+
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+# ── CORS ─────────────────────────────────────────────────────────────────────
+# Strictly restrict to the configured frontend origin. Never use wildcard in production.
+_allowed_origins = [settings.frontend_origin]
+if settings.demo_mode:
+    # Allow common local dev ports during demo/development
+    _allowed_origins += [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+    ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=_allowed_origins,
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Demo-User-Id"],
+    max_age=600,
 )
+
+
+# ── Global exception handler — never leak stack traces ────────────────────────
+@app.exception_handler(Exception)
+async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "An internal error occurred. Please try again later."},
+    )
 
 DEMO_LABEL = "Illustrative / Demo Data"
 ELIGIBILITY_ORDER = {"eligible": 0, "needs_sample": 1, "missing_evidence": 2, "blocked": 3}
@@ -75,6 +140,18 @@ def envelope(data: Any) -> dict[str, Any]:
 
 def not_found(resource: str) -> HTTPException:
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{resource} was not found.")
+
+
+def send_notification_email(user_email: str, title: str, message: str) -> None:
+    """
+    Simulates sending an email by printing to the server console.
+    In a real MVP, this would integrate with SendGrid, SES, or Postmark.
+    """
+    logger.info("=" * 60)
+    logger.info(f"📧 EMAIL SENT TO: {user_email}")
+    logger.info(f"SUBJECT: {title}")
+    logger.info(f"BODY: {message}")
+    logger.info("=" * 60)
 
 
 def company_view(store: DemoStore, company_id: str | None) -> dict[str, Any] | None:
@@ -328,6 +405,31 @@ def recompute_listing_matches(store: DemoStore, listing: WasteListing) -> list[M
         if computed:
             store.save_match(computed)
             matches.append(computed)
+            
+            # TRIGGER NOTIFICATION FOR BUYER
+            if computed.total_score >= 60:
+                buyer = store.get_company(requirement.company_id)
+                buyer_user = store.get_user(buyer.owner_user_id) if buyer and buyer.owner_user_id else None
+                if buyer_user:
+                    notification_id = f"notif-match-{computed.id}-buyer"
+                    # Prevent duplicate notifications for the same match
+                    if not any(n.id == notification_id for n in store.notifications.values()):
+                        notification = Notification(
+                            id=notification_id,
+                            user_id=buyer_user.id,
+                            type="new_match",
+                            title=f"New {computed.total_score:.0f}% Match Found",
+                            message=f"A new listing for {material.canonical_name} matches your requirement.",
+                            reference_url=f"/matches/{computed.id}",
+                            created_at=store.timestamp()
+                        )
+                        store.create_notification(notification)
+                        send_notification_email(
+                            user_email=buyer_user.email,
+                            title=notification.title,
+                            message=notification.message + f"\nView it here: {settings.frontend_origin}{notification.reference_url}"
+                        )
+                        
     return sort_matches(matches)
 
 
@@ -361,6 +463,30 @@ def recompute_requirement_matches(store: DemoStore, requirement: BuyerRequiremen
         if computed:
             store.save_match(computed)
             matches.append(computed)
+            
+            # TRIGGER NOTIFICATION FOR SELLER/GENERATOR
+            if computed.total_score >= 60:
+                seller = store.get_company(listing.company_id)
+                seller_user = store.get_user(seller.owner_user_id) if seller and seller.owner_user_id else None
+                if seller_user:
+                    notification_id = f"notif-match-{computed.id}-seller"
+                    if not any(n.id == notification_id for n in store.notifications.values()):
+                        notification = Notification(
+                            id=notification_id,
+                            user_id=seller_user.id,
+                            type="new_match",
+                            title=f"New {computed.total_score:.0f}% Match Found",
+                            message=f"A buyer requirement matches your listing for {material.canonical_name}.",
+                            reference_url=f"/matches/{computed.id}",
+                            created_at=store.timestamp()
+                        )
+                        store.create_notification(notification)
+                        send_notification_email(
+                            user_email=seller_user.email,
+                            title=notification.title,
+                            message=notification.message + f"\nView it here: {settings.frontend_origin}{notification.reference_url}"
+                        )
+
     return sort_matches(matches)
 
 
@@ -443,6 +569,34 @@ def demo_login(request: DemoLoginRequest, store: DemoStore = Depends(get_store))
         raise not_found("Demo persona")
     return envelope({"user": user.model_dump(), "company": company_view(store, user.company_id)})
 
+
+# ── Notifications ──────────────────────────────────────────────────────────
+
+@app.get("/api/notifications")
+def get_notifications(
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    notifications = store.get_user_notifications(current_user.id)
+    return envelope({"notifications": [n.model_dump() for n in notifications]})
+
+
+@app.patch("/api/notifications/{notification_id}/read")
+def mark_notification_read(
+    notification_id: str,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    notification = store.notifications.get(notification_id)
+    if not notification:
+        raise not_found("Notification")
+    if notification.user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to read this notification.")
+    updated = store.mark_notification_read(notification_id)
+    return envelope({"notification": updated.model_dump() if updated else None})
+
+
+# ── Demo / Session ─────────────────────────────────────────────────────────
 
 @app.post("/api/demo/reset")
 def demo_reset(current_user: User = Depends(require_roles("admin")), store: DemoStore = Depends(get_store)) -> dict[str, Any]:

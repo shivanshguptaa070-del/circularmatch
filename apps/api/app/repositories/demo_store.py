@@ -14,6 +14,7 @@ from app.schemas.models import (
     Material,
     MaterialLot,
     MatchRecord,
+    Notification,
     Offer,
     QualityEvidence,
     SampleRequest,
@@ -79,6 +80,7 @@ class DemoStore:
                 for item in seed.get("audit_events", [])
             ]
             self.matches: dict[str, MatchRecord] = {}
+            self.notifications: dict[str, Notification] = {}
             self.transactions: list[dict[str, Any]] = seed["transactions"]
             self.scoring_config: ScoringConfig = seed["scoring_config"]
 
@@ -316,7 +318,7 @@ class DemoStore:
             self.shipments[shipment_id] = updated
             return updated
 
-    def add_audit_event(self, *, entity_type: str, entity_id: str, action: str, actor_id: str | None, summary: str) -> AuditEvent:
+    def add_audit_event(self, entity_type: str, entity_id: str, action: str, summary: str, actor_id: str | None = None) -> AuditEvent:
         event = AuditEvent(
             id=self.new_id("audit"),
             entity_type=entity_type,
@@ -330,6 +332,25 @@ class DemoStore:
         with self._lock:
             self.audit_events.append(event)
         return event
+
+    def create_notification(self, notification: Notification) -> None:
+        with self._lock:
+            self.notifications[notification.id] = notification
+
+    def get_user_notifications(self, user_id: str) -> list[Notification]:
+        with self._lock:
+            return sorted(
+                [n for n in self.notifications.values() if n.user_id == user_id],
+                key=lambda x: x.created_at,
+                reverse=True,
+            )
+
+    def mark_notification_read(self, notification_id: str) -> Notification | None:
+        with self._lock:
+            if notification_id in self.notifications:
+                self.notifications[notification_id].is_read = True
+                return self.notifications[notification_id]
+            return None
 
     def add_transaction(self, *, match_id: str, listing_id: str, initiated_by: str, note: str) -> dict[str, Any]:
         transaction = {

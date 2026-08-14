@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import {
   BarChart3,
@@ -14,9 +14,12 @@ import {
   Settings2,
   ShieldCheck,
   X,
+  Bell,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { ActiveMode, UserProfile } from '../lib/supabase'
+import type { Notification } from '../types'
+import { getNotifications, markNotificationRead } from '../lib/api'
 import { CircularMark } from './ui'
 
 interface NavItem {
@@ -58,7 +61,16 @@ export function AppShell({
   const [mobileOpen, setMobileOpen] = useState(false)
   const [modeSwitching, setModeSwitching] = useState(false)
   const [showModeMenu, setShowModeMenu] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [showNotifications, setShowNotifications] = useState(false)
   const location = useLocation()
+
+  useEffect(() => {
+    // Fetch notifications on mount
+    getNotifications()
+      .then((res) => setNotifications(res.data.notifications))
+      .catch(console.error)
+  }, [location.pathname]) // Refresh slightly when navigating
 
   const navItems = ALL_NAV.filter((item) =>
     item.modes.includes('__admin__') ? isAdmin : item.modes.includes(profile.active_mode)
@@ -207,6 +219,53 @@ export function AppShell({
             </div>
           </div>
           <div className="flex items-center gap-2.5">
+            <div className="relative mr-2">
+              <button
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="relative grid h-10 w-10 place-items-center rounded-xl border border-[#d8e4dc] bg-white text-forest shadow-sm hover:bg-gray-50 transition"
+              >
+                <Bell size={18} />
+                {notifications.some((n) => !n.is_read) && (
+                  <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-red-500 shadow-sm" />
+                )}
+              </button>
+
+              {showNotifications && (
+                <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl border border-[#d8e4dc] bg-white shadow-2xl">
+                  <div className="bg-forest px-4 py-3 text-sm font-bold text-white">Notifications</div>
+                  <div className="max-h-96 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-center text-sm text-gray-500">No notifications</div>
+                    ) : (
+                      notifications.map((n) => (
+                        <div
+                          key={n.id}
+                          onClick={async () => {
+                            if (!n.is_read) {
+                              await markNotificationRead(n.id).catch(console.error)
+                              setNotifications((prev) =>
+                                prev.map((p) => (p.id === n.id ? { ...p, is_read: true } : p))
+                              )
+                            }
+                            if (n.reference_url) {
+                              window.location.href = n.reference_url
+                            }
+                            setShowNotifications(false)
+                          }}
+                          className={`cursor-pointer border-b border-gray-100 p-4 transition hover:bg-gray-50 ${
+                            n.is_read ? 'opacity-60' : 'bg-[#e9f8ee]/20'
+                          }`}
+                        >
+                          <p className="text-sm font-bold text-forest">{n.title}</p>
+                          <p className="mt-1 text-xs text-gray-600">{n.message}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="hidden text-right sm:block">
               <p className="text-xs font-semibold text-ink">{profile.full_name}</p>
               <p className="mt-0.5 text-[10px] font-medium text-[#73877f]">{profile.company_name}</p>

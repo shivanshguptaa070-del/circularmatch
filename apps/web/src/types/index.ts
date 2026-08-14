@@ -17,6 +17,17 @@ export interface User {
   is_demo: boolean
 }
 
+export interface Notification {
+  id: string
+  user_id: string
+  type: 'new_match'
+  title: string
+  message: string
+  reference_url?: string | null
+  is_read: boolean
+  created_at: string
+}
+
 export interface Company {
   id: string
   owner_user_id?: string | null

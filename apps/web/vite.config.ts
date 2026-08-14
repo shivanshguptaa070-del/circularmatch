@@ -4,9 +4,12 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: '0.0.0.0',
+    host: '127.0.0.1',  // Bind to loopback only — do not expose dev server to LAN
     port: 5173,
-    allowedHosts: true,
+    // 'auto' allows only localhost/127.0.0.1. Previously `true` (any host)
+    // which allows DNS rebinding attacks where an attacker tricks the browser
+    // into making requests to the dev server from a malicious page.
+    allowedHosts: 'auto',
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',
