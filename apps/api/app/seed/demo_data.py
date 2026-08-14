@@ -44,7 +44,7 @@ def city_coordinates(city: str) -> tuple[float, float] | None:
     return None
 
 
-def build_seed_data() -> dict[str, Any]:
+def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
     pet_uses = [
         MaterialUse(
             id="use-pet-recycling",
@@ -713,15 +713,27 @@ def build_seed_data() -> dict[str, Any]:
 
     return {
         "materials": materials,
-        "companies": [],
-        "users": [],
-        "listings": [],
-        "requirements": [],
-        "lots": [],
-        "evidence": [],
-        "acceptance_specs": [],
+        "companies": companies if include_sample_entities else [],
+        "users": users if include_sample_entities else [],
+        "listings": listings if include_sample_entities else [],
+        "requirements": requirements if include_sample_entities else [],
+        "lots": lots if include_sample_entities else [],
+        "evidence": evidence if include_sample_entities else [],
+        "acceptance_specs": acceptance_specs if include_sample_entities else [],
         "impact_methodologies": impact_methodologies,
-        "sample_requests": [],
+        "sample_requests": [
+            {
+                "id": "sample-pet-demo",
+                "match_id": "match-listing-pet-demo-req-pet-top",
+                "requested_by": "user-buyer",
+                "requested_quantity_kg": 25,
+                "status": "requested",
+                "note": "Sample request for testing",
+                "created_at": DEMO_TIMESTAMP,
+                "updated_at": DEMO_TIMESTAMP,
+                "is_demo": True,
+            }
+        ] if include_sample_entities else [],
         "offers": [],
         "shipments": [],
         "audit_events": [],
@@ -730,6 +742,7 @@ def build_seed_data() -> dict[str, Any]:
     }
 
 
-def fresh_seed_data() -> dict[str, Any]:
-    """Return a deep copy so a demo reset starts from a predictable dataset."""
-    return deepcopy(build_seed_data())
+def fresh_seed_data(include_sample_entities: bool = True) -> dict[str, Any]:
+    """Return a deep copy so unit tests and demo mode have sample records, while live mode can pass False."""
+    return deepcopy(build_seed_data(include_sample_entities=include_sample_entities))
+

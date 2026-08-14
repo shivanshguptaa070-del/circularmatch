@@ -70,13 +70,34 @@ def get_current_user(
         except Exception:
             pass
 
-    # 2. Fallback to demo persona header if provided or default
+    # 2. Fallback to header user if provided or default
     user_id = x_demo_user_id or "user-generator"
     user = demo_store.get_user(user_id)
     if user is None:
-        user = list(demo_store.users.values())[0] if demo_store.users else None
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User session not found.")
+        role = "admin" if "admin" in user_id else "buyer" if "buyer" in user_id else "generator"
+        company_id = f"company-{user_id}"
+        if not demo_store.get_company(company_id):
+            demo_store.companies[company_id] = Company(
+                id=company_id,
+                owner_user_id=user_id,
+                name=f"Company {user_id.title()}",
+                company_type=role if role != "admin" else "processor",
+                city="Delhi",
+                address_label="Industrial Zone",
+                latitude=28.6139,
+                longitude=77.2090,
+                verification_status="verified",
+                is_demo=False,
+            )
+        user = User(
+            id=user_id,
+            full_name=user_id.replace("user-", "").title() + " User",
+            email=f"{user_id}@circularmatch.com",
+            role=role,
+            company_id=company_id,
+            is_demo=False,
+        )
+        demo_store.users[user_id] = user
     return user
 
 

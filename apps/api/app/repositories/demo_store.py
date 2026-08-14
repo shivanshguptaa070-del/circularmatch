@@ -41,9 +41,9 @@ class DemoStore:
     def timestamp() -> str:
         return datetime.now(timezone.utc).isoformat()
 
-    def reset(self) -> None:
+    def reset(self, include_sample_entities: bool = True) -> None:
         with self._lock:
-            seed = fresh_seed_data()
+            seed = fresh_seed_data(include_sample_entities=include_sample_entities)
             self.materials: dict[str, Material] = {item.id: item for item in seed["materials"]}
             self.companies: dict[str, Company] = {item.id: item for item in seed["companies"]}
             self.users: dict[str, User] = {item.id: item for item in seed["users"]}
