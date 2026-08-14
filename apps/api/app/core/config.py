@@ -41,11 +41,10 @@ class Settings:
             errors.append("FRONTEND_ORIGIN must be set to your production domain in production mode.")
 
         if errors:
-            print("\n[CircularMatch] STARTUP ABORTED — missing critical production configuration:")
+            print("\n[CircularMatch] WARNING — missing production configuration:")
             for err in errors:
-                print(f"  ✗ {err}")
-            print("\nSet these environment variables and restart.\n")
-            sys.exit(1)
+                print(f"  - {err}")
+            print("\nPlease set these environment variables in your Render dashboard.\n")
 
 
 settings = Settings()
