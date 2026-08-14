@@ -742,7 +742,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
     }
 
 
-def fresh_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
-    """Return a deep copy so unit tests and demo mode have sample records, while live mode can pass False."""
+def fresh_seed_data(include_sample_entities: bool = True) -> dict[str, Any]:
+    """Return a deep copy so unit tests and demo mode have sample records."""
     return deepcopy(build_seed_data(include_sample_entities=include_sample_entities))
 

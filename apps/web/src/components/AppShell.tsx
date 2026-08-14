@@ -66,11 +66,11 @@ export function AppShell({
   const location = useLocation()
 
   useEffect(() => {
-    // Fetch notifications on mount
+    // Fetch notifications — silently ignore errors so a backend issue never crashes the UI
     getNotifications()
-      .then((res) => setNotifications(res.data.notifications))
-      .catch(console.error)
-  }, [location.pathname]) // Refresh slightly when navigating
+      .then((res) => setNotifications(res.data?.notifications ?? []))
+      .catch(() => { /* ignore — notifications are non-critical */ })
+  }, [location.pathname])
 
   const navItems = ALL_NAV.filter((item) =>
     item.modes.includes('__admin__') ? isAdmin : item.modes.includes(profile.active_mode)
