@@ -13,7 +13,7 @@ load_dotenv()
 class Settings:
     app_name: str = "CircularMatch API"
     demo_mode: bool = field(default_factory=lambda: os.getenv("DEMO_MODE", "true").lower() == "true")
-    frontend_origin: str = field(default_factory=lambda: os.getenv("FRONTEND_ORIGIN", "http://localhost:5173"))
+    frontend_origin: str = field(default_factory=lambda: os.getenv("FRONTEND_ORIGIN", "https://circularmatch.vercel.app"))
     gemini_api_key: str | None = field(default_factory=lambda: os.getenv("GEMINI_API_KEY"))
     supabase_url: str | None = field(default_factory=lambda: os.getenv("SUPABASE_URL"))
     supabase_anon_key: str | None = field(default_factory=lambda: os.getenv("SUPABASE_ANON_KEY"))

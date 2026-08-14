@@ -20,3 +20,5 @@ services:
         value: false
       - key: PYTHON_VERSION
         value: 3.11.9
+      - key: FRONTEND_ORIGIN
+        value: https://circularmatch.vercel.app
