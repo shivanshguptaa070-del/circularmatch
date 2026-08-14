@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: circularmatch-api
+    runtime: python
+    region: singapore
+    plan: free
+    rootDir: apps/api
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: SUPABASE_URL
+        value: https://zqigcnhesfpthiguzqjy.supabase.co
+      - key: SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxaWdjbmhlc2ZwdGhpZ3V6cWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY3MjExNjgsImV4cCI6MjEwMjI5NzE2OH0.As2KnQOVF1mJNPZ_XDUsqS8Amdf6mOIw8ysbgF1yI2g
+      - key: DEMO_MODE
+        value: false
+      - key: PYTHON_VERSION
+        value: 3.11.9
