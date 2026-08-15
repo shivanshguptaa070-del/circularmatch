@@ -91,6 +91,7 @@ export function ListWastePage({ role }: { role: Role }) {
         storage_condition: 'Covered indoor storage',
         sample_available: true,
         compliance_triage: 'not_assessed',
+        document_name: '',
       })
       setStep(2)
     } catch (cause) {
@@ -199,7 +200,7 @@ export function ListWastePage({ role }: { role: Role }) {
         </section>
       ) : (
         <section className="space-y-5">
-          {extraction && <Disclosure title={extraction.provider === 'gemini' ? 'AI-assisted draft' : 'Demo extraction — rule-based fallback'}>{extraction.provider_disclosure}</Disclosure>}
+          {extraction && <Disclosure title={extraction.provider === 'gemini' ? 'AI-assisted draft' : 'Standard extraction — rule-based fallback'}>{extraction.provider_disclosure}</Disclosure>}
           <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
             <div className="card p-5 sm:p-7">
               <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#e4ece6] pb-5"><div><div className="flex items-center gap-2"><ClipboardCheck size={19} className="text-spruce" /><h2 className="text-lg font-semibold tracking-[-0.03em] text-ink">Review structured listing</h2></div><p className="mt-1 text-sm text-[#6a8078]">Edit the draft before it becomes available for matching.</p></div><button className="btn-secondary !py-2" onClick={() => setStep(1)}><ArrowLeft size={15} />Edit description</button></div>

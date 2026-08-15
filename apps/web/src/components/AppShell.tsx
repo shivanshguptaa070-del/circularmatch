@@ -26,7 +26,7 @@ interface NavItem {
   label: string
   path: string
   icon: typeof LayoutDashboard
-  modes: ActiveMode[]
+  modes: Array<ActiveMode | '__admin__'>
 }
 
 const ALL_NAV: NavItem[] = [

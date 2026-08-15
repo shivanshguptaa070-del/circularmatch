@@ -109,12 +109,12 @@ def rule_based_extract(description: str, materials: list[Material], *, provider_
     if quantity_kg is None:
         missing_fields.append("Add an approximate quantity.")
     if city is None:
-        missing_fields.append("Add a city or demo location.")
+        missing_fields.append("Add a city or location.")
 
     return {
-        "provider": "demo-rule-based-fallback",
+        "provider": "rule-based-fallback",
         "provider_disclosure": provider_note
-        or "Demo extraction — rule-based fallback. It is not AI-verified and must be reviewed before publishing.",
+        or "Standard extraction — rule-based fallback. It is not AI-verified and must be reviewed before publishing.",
         "status": "needs_review",
         "structured": {
             "material_id": material.id if material else None,
