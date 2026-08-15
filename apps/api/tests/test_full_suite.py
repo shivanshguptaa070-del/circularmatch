@@ -137,11 +137,23 @@ record(len(results) + 1, "Calculators", "Logistics cost estimation", 0.5 <= logi
 store.reset(include_sample_entities=True)
 pet_listing = store.listings["listing-pet-demo"]
 top_req = store.requirements["req-pet-top"]
-nearby_req = store.requirements["req-pet-nearby"]
-steel_req = store.requirements["req-steel"]
 material = store.get_material(pet_listing.material_id)
 
 # 4.1 Incompatible material filter
+steel_req = BuyerRequirement(
+    id="req-steel-test",
+    company_id="comp-test",
+    material_id="mat-steel-scrap",
+    minimum_quantity_kg_week=1000,
+    maximum_quantity_kg_week=5000,
+    minimum_quality_grade="industrial",
+    maximum_distance_km=100,
+    target_price_per_kg=34.0,
+    city="Faridabad",
+    latitude=28.34,
+    longitude=77.33,
+    created_at="2026-08-12T09:30:00+05:30"
+)
 m_score_steel = material_score(pet_listing, steel_req)
 record(len(results) + 1, "Matching Engine", "Incompatible material rejected", m_score_steel is None, "PET vs Steel returns None")
 
