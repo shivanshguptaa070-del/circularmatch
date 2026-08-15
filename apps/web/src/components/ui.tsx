@@ -106,7 +106,7 @@ export function ScoreRing({ score, label = 'match score', size = 86 }: { score: 
         />
       </svg>
       <div className="absolute inset-0 grid place-items-center">
-        <span className="text-[1.35rem] font-bold tracking-[-0.04em] text-ink">{score}%</span>
+        <span className="text-[1.15rem] font-bold tracking-[-0.04em] text-ink">{score}%</span>
       </div>
     </div>
   )
