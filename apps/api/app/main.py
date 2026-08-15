@@ -742,6 +742,7 @@ def create_listing(
         issuer=store.get_company(listing.company_id).name if store.get_company(listing.company_id) else "Supplier",
         status="self_declared",
         summary=request.quality_notes or "Supplier-provided material statement; not independently verified.",
+        document_name=request.document_name,
         created_at=store.timestamp(),
         is_demo=True,
     )

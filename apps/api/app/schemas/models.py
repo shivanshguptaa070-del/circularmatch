@@ -333,6 +333,7 @@ class CreateListingRequest(BaseModel):
     storage_condition: str = Field(default="Not specified", max_length=240)
     sample_available: bool = False
     compliance_triage: ComplianceTriage = "not_assessed"
+    document_name: str | None = Field(default=None, max_length=200)
 
 
 class UpdateListingRequest(BaseModel):

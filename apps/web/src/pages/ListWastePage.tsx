@@ -26,6 +26,7 @@ interface ListingFormState {
   storage_condition: string
   sample_available: boolean
   compliance_triage: 'not_assessed' | 'ordinary_secondary_material' | 'needs_compliance_review' | 'regulated_or_hazardous_route'
+  document_name: string
 }
 
 const initialForm: ListingFormState = {
@@ -46,6 +47,7 @@ const initialForm: ListingFormState = {
   storage_condition: 'Covered indoor storage',
   sample_available: true,
   compliance_triage: 'not_assessed',
+  document_name: '',
 }
 
 export function ListWastePage({ role }: { role: Role }) {
@@ -126,6 +128,7 @@ export function ListWastePage({ role }: { role: Role }) {
         storage_condition: form.storage_condition,
         sample_available: form.sample_available,
         compliance_triage: form.compliance_triage,
+        document_name: form.document_name || undefined,
       })
       navigate(`/listings/${response.data.listing.id}/matches`, { state: { created: true } })
     } catch (cause) {
@@ -211,6 +214,7 @@ export function ListWastePage({ role }: { role: Role }) {
                 <label><span className="field-label">Target asking price <span className="font-normal text-[#82968e]">₹/kg</span></span><input type="number" min="0" value={form.asking_price_per_kg} className="field-input" onChange={(event) => update('asking_price_per_kg', event.target.value)} /></label>
                 <label><span className="field-label">Current disposal cost <span className="font-normal text-[#82968e]">₹/kg</span></span><input type="number" min="0" value={form.disposal_cost_per_kg} className="field-input" onChange={(event) => update('disposal_cost_per_kg', event.target.value)} /></label>
                 <label className="sm:col-span-2"><span className="field-label">Quality note</span><input value={form.quality_notes} className="field-input" onChange={(event) => update('quality_notes', event.target.value)} /></label>
+                <label className="sm:col-span-2"><span className="field-label">Supporting document (Name or URL)</span><input value={form.document_name} className="field-input" placeholder="e.g. lab_results_batch42.pdf" onChange={(event) => update('document_name', event.target.value)} /></label>
                 <div className="sm:col-span-2 mt-2 rounded-2xl border border-[#d8e7dc] bg-[#f7fbf8] p-4">
                   <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-ink">Material Passport starter</p><p className="mt-1 text-xs leading-5 text-[#6e837a]">These are supplier-declared lot details. They improve matching but do not verify composition or legal status.</p></div><span className="badge-neutral">lot data</span></div>
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -224,7 +228,7 @@ export function ListWastePage({ role }: { role: Role }) {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 flex flex-col gap-3 border-t border-[#e4ece6] pt-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2"><QualityPill verified={false} grade={titleCase(form.quality_grade)} /><span className="text-xs text-[#748981]">No supporting certificate is currently attached.</span></div><button className="btn-primary" disabled={publishing} onClick={() => void publish()}>{publishing ? <Loader2 className="animate-spin" size={17} /> : <Check size={17} />}{publishing ? 'Publishing…' : 'Publish listing'}<ArrowRight size={16} /></button></div>
+              <div className="mt-6 flex flex-col gap-3 border-t border-[#e4ece6] pt-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2"><QualityPill verified={false} grade={titleCase(form.quality_grade)} /><span className="text-xs text-[#748981]">{form.document_name ? `Document attached: ${form.document_name}` : 'No supporting certificate is currently attached.'}</span></div><button className="btn-primary" disabled={publishing} onClick={() => void publish()}>{publishing ? <Loader2 className="animate-spin" size={17} /> : <Check size={17} />}{publishing ? 'Publishing…' : 'Publish listing'}<ArrowRight size={16} /></button></div>
             </div>
             <aside className="space-y-5">
               <div className="card p-5"><div className="flex items-center gap-2"><Recycle className="text-spruce" size={18} /><h2 className="font-semibold text-ink">Potential industrial uses</h2></div><p className="mt-2 text-xs leading-5 text-[#70857e]">Catalog-backed pathways—not guaranteed suitability.</p><div className="mt-4 space-y-2">{potentialUses.length ? potentialUses.map((use) => <label key={use.id} className={`block cursor-pointer rounded-xl border p-3 transition ${form.selected_use_id === use.id ? 'border-spruce bg-[#f2fbf5]' : 'border-[#deebe3] hover:border-[#b5d3c2]'}`}><input type="radio" className="sr-only" checked={form.selected_use_id === use.id} onChange={() => update('selected_use_id', use.id)} /><div className="flex items-start gap-2"><span className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border ${form.selected_use_id === use.id ? 'border-spruce bg-spruce text-white' : 'border-[#abc0b4]'}`}>{form.selected_use_id === use.id && <Check size={10} />}</span><div><p className="text-sm font-semibold text-ink">{use.title}</p><p className="mt-1 text-[11px] leading-4 text-[#71867e]">{use.description}</p><p className="mt-2 text-[10px] font-bold uppercase tracking-[0.09em] text-spruce">Potential use</p></div></div></label>) : <p className="rounded-xl bg-[#f4f6f4] p-3 text-xs text-[#73877f]">Select a controlled material to reveal plausible potential uses.</p>}</div></div>
