@@ -252,6 +252,6 @@ async def extract_waste(description: str, materials: list[Material], gemini_api_
             return rule_based_extract(
                 description,
                 materials,
-                provider_note="Gemini extraction was unavailable; demo rule-based fallback was used. Review all fields before publishing.",
+                provider_note="Gemini extraction was unavailable; rule-based fallback was used. Review all fields before publishing.",
             )
     return rule_based_extract(description, materials)

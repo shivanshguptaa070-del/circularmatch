@@ -14,7 +14,7 @@ def test_sample_pet_sentence_becomes_reviewable_draft() -> None:
         )
     )
     structured = result["structured"]
-    assert result["provider"] == "demo-rule-based-fallback"
+    assert result["provider"] == "rule-based-fallback"
     assert structured["material_id"] == "mat-pet"
     assert structured["quantity_kg"] == 3000
     assert structured["normalized_kg_per_week"] == 3000

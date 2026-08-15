@@ -561,7 +561,7 @@ def health() -> dict[str, Any]:
     return envelope({
         "status": "ok",
         "mode": "demo" if settings.demo_mode else "production",
-        "ai_provider": "gemini" if settings.gemini_api_key else "demo-rule-based-fallback",
+        "ai_provider": "gemini" if settings.gemini_api_key else "rule-based-fallback",
         "notice": "Demo mode uses fictional Delhi NCR data and illustrative calculations.",
         "pilot_core": "Material passport, evidence, buyer templates, eligibility checks, and demo transaction timeline are enabled.",
     })
