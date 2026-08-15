@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check, ChevronRight, ClipboardCheck, FileText, Info, Loader2, MapPin, Recycle, Sparkles, WandSparkles } from 'lucide-react'
 import { get, post } from '../lib/api'
-import { DELHI_NCR_CITIES, DEMO_GENERATOR_TEXT, QUALITY_OPTIONS } from '../lib/constants'
+import { DELHI_NCR_CITIES, SAMPLE_GENERATOR_TEXT, QUALITY_OPTIONS } from '../lib/constants'
 import { titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { ExtractionResult, Listing, Material, Role } from '../types'
-import { DemoBadge, Disclosure, ErrorPanel, LoadingPanel, PageHeader, QualityPill } from '../components/ui'
+import { StatusBadge, Disclosure, ErrorPanel, LoadingPanel, PageHeader, QualityPill } from '../components/ui'
 
 interface ListingFormState {
   material_id: string
@@ -52,7 +52,7 @@ export function ListWastePage({ role }: { role: Role }) {
   const navigate = useNavigate()
   const materials = useAsync(() => get<Material[]>('/api/materials').then((response) => response.data), [])
   const [step, setStep] = useState<1 | 2>(1)
-  const [description, setDescription] = useState(DEMO_GENERATOR_TEXT)
+  const [description, setDescription] = useState(SAMPLE_GENERATOR_TEXT)
   const [extraction, setExtraction] = useState<ExtractionResult | null>(null)
   const [form, setForm] = useState<ListingFormState>(initialForm)
   const [analyzing, setAnalyzing] = useState(false)
@@ -101,7 +101,7 @@ export function ListWastePage({ role }: { role: Role }) {
   const publish = async () => {
     setError(null)
     if (!form.material_id || !Number(form.quantity_kg) || !form.city) {
-      setError('Please choose a material, enter quantity, and select a demo city before publishing.')
+      setError('Please choose a material, enter quantity, and select a city before publishing.')
       return
     }
     setPublishing(true)
@@ -145,7 +145,7 @@ export function ListWastePage({ role }: { role: Role }) {
         eyebrow="Generator workflow"
         title="List a secondary-material opportunity"
         description="Describe the waste in your own words. CircularMatch returns a structured profile and runs deterministic matching once published."
-        actions={<DemoBadge>Active Stream</DemoBadge>}
+        actions={<StatusBadge>Active Stream</StatusBadge>}
       />
 
       <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
@@ -166,7 +166,7 @@ export function ListWastePage({ role }: { role: Role }) {
                 <div className="flex items-center gap-2"><WandSparkles size={18} className="text-spruce" /><h2 className="text-lg font-semibold tracking-[-0.03em] text-ink">Describe the material stream</h2></div>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-[#617770]">Include approximate quantity, frequency, location, quality descriptor and availability if known. You will edit every field before publishing.</p>
               </div>
-              <button className="btn-secondary !px-3 !py-2 text-xs" onClick={() => setDescription(DEMO_GENERATOR_TEXT)}><Sparkles size={14} />Use PET demo input</button>
+              <button className="btn-secondary !px-3 !py-2 text-xs" onClick={() => setDescription(SAMPLE_GENERATOR_TEXT)}><Sparkles size={14} />Use sample input</button>
             </div>
             <textarea
               value={description}
@@ -205,14 +205,14 @@ export function ListWastePage({ role }: { role: Role }) {
                 <label><span className="field-label">Controlled material</span><select value={form.material_id} className="field-input" onChange={(event) => { update('material_id', event.target.value); const use = catalog.find((item) => item.id === event.target.value)?.uses[0]?.id || ''; update('selected_use_id', use) }}><option value="">Select material</option>{catalog.map((material) => <option key={material.id} value={material.id}>{material.canonical_name} · {material.category}</option>)}</select></label>
                 <label><span className="field-label">Quantity available</span><div className="relative"><input type="number" min="1" value={form.quantity_kg} className="field-input pr-12" onChange={(event) => update('quantity_kg', event.target.value)} /><span className="absolute right-3 top-3.5 text-xs font-semibold text-[#758b82]">kg</span></div></label>
                 <label><span className="field-label">Frequency</span><select value={form.frequency} className="field-input" onChange={(event) => update('frequency', event.target.value)}><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="one_time">One-time lot</option></select></label>
-                <label><span className="field-label">Demo city</span><select value={form.city} className="field-input" onChange={(event) => update('city', event.target.value)}>{DELHI_NCR_CITIES.map((city) => <option key={city}>{city}</option>)}</select></label>
+                <label><span className="field-label">City</span><select value={form.city} className="field-input" onChange={(event) => update('city', event.target.value)}>{DELHI_NCR_CITIES.map((city) => <option key={city}>{city}</option>)}</select></label>
                 <label><span className="field-label">Stated quality grade</span><select value={form.quality_grade} className="field-input" onChange={(event) => update('quality_grade', event.target.value)}>{QUALITY_OPTIONS.map((option) => <option key={option} value={option}>{titleCase(option)}</option>)}</select></label>
                 <label><span className="field-label">Availability</span><input value={form.availability} className="field-input" onChange={(event) => update('availability', event.target.value)} /></label>
-                <label><span className="field-label">Illustrative asking price <span className="font-normal text-[#82968e]">₹/kg</span></span><input type="number" min="0" value={form.asking_price_per_kg} className="field-input" onChange={(event) => update('asking_price_per_kg', event.target.value)} /></label>
+                <label><span className="field-label">Target asking price <span className="font-normal text-[#82968e]">₹/kg</span></span><input type="number" min="0" value={form.asking_price_per_kg} className="field-input" onChange={(event) => update('asking_price_per_kg', event.target.value)} /></label>
                 <label><span className="field-label">Current disposal cost <span className="font-normal text-[#82968e]">₹/kg</span></span><input type="number" min="0" value={form.disposal_cost_per_kg} className="field-input" onChange={(event) => update('disposal_cost_per_kg', event.target.value)} /></label>
                 <label className="sm:col-span-2"><span className="field-label">Quality note</span><input value={form.quality_notes} className="field-input" onChange={(event) => update('quality_notes', event.target.value)} /></label>
                 <div className="sm:col-span-2 mt-2 rounded-2xl border border-[#d8e7dc] bg-[#f7fbf8] p-4">
-                  <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-ink">Material Passport starter</p><p className="mt-1 text-xs leading-5 text-[#6e837a]">These are supplier-declared lot details. They improve matching but do not verify composition or legal status.</p></div><span className="badge-demo">lot data</span></div>
+                  <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-ink">Material Passport starter</p><p className="mt-1 text-xs leading-5 text-[#6e837a]">These are supplier-declared lot details. They improve matching but do not verify composition or legal status.</p></div><span className="badge-neutral">lot data</span></div>
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
                     <label><span className="field-label">Material form</span><input value={form.material_form} className="field-input" onChange={(event) => update('material_form', event.target.value)} /></label>
                     <label><span className="field-label">Source status</span><select value={form.source_status} className="field-input" onChange={(event) => update('source_status', event.target.value)}><option value="pre_consumer">Pre-consumer</option><option value="post_consumer">Post-consumer</option><option value="unknown">Unknown</option></select></label>
@@ -224,11 +224,11 @@ export function ListWastePage({ role }: { role: Role }) {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 flex flex-col gap-3 border-t border-[#e4ece6] pt-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2"><QualityPill verified={false} grade={titleCase(form.quality_grade)} /><span className="text-xs text-[#748981]">No supporting certificate is attached in this demo.</span></div><button className="btn-primary" disabled={publishing} onClick={() => void publish()}>{publishing ? <Loader2 className="animate-spin" size={17} /> : <Check size={17} />}{publishing ? 'Publishing…' : 'Publish listing'}<ArrowRight size={16} /></button></div>
+              <div className="mt-6 flex flex-col gap-3 border-t border-[#e4ece6] pt-5 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-2"><QualityPill verified={false} grade={titleCase(form.quality_grade)} /><span className="text-xs text-[#748981]">No supporting certificate is currently attached.</span></div><button className="btn-primary" disabled={publishing} onClick={() => void publish()}>{publishing ? <Loader2 className="animate-spin" size={17} /> : <Check size={17} />}{publishing ? 'Publishing…' : 'Publish listing'}<ArrowRight size={16} /></button></div>
             </div>
             <aside className="space-y-5">
               <div className="card p-5"><div className="flex items-center gap-2"><Recycle className="text-spruce" size={18} /><h2 className="font-semibold text-ink">Potential industrial uses</h2></div><p className="mt-2 text-xs leading-5 text-[#70857e]">Catalog-backed pathways—not guaranteed suitability.</p><div className="mt-4 space-y-2">{potentialUses.length ? potentialUses.map((use) => <label key={use.id} className={`block cursor-pointer rounded-xl border p-3 transition ${form.selected_use_id === use.id ? 'border-spruce bg-[#f2fbf5]' : 'border-[#deebe3] hover:border-[#b5d3c2]'}`}><input type="radio" className="sr-only" checked={form.selected_use_id === use.id} onChange={() => update('selected_use_id', use.id)} /><div className="flex items-start gap-2"><span className={`mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border ${form.selected_use_id === use.id ? 'border-spruce bg-spruce text-white' : 'border-[#abc0b4]'}`}>{form.selected_use_id === use.id && <Check size={10} />}</span><div><p className="text-sm font-semibold text-ink">{use.title}</p><p className="mt-1 text-[11px] leading-4 text-[#71867e]">{use.description}</p><p className="mt-2 text-[10px] font-bold uppercase tracking-[0.09em] text-spruce">Potential use</p></div></div></label>) : <p className="rounded-xl bg-[#f4f6f4] p-3 text-xs text-[#73877f]">Select a controlled material to reveal plausible potential uses.</p>}</div></div>
-              <div className="rounded-3xl border border-[#d8e7dc] bg-[#edf7f0] p-5"><div className="flex items-center gap-2 text-spruce"><MapPin size={17} /><p className="text-sm font-semibold">Demo location handling</p></div><p className="mt-2 text-xs leading-5 text-[#587268]">Cities use clearly labeled sample coordinates. CircularMatch does not require production GPS data for this MVP.</p></div>
+              <div className="rounded-3xl border border-[#d8e7dc] bg-[#edf7f0] p-5"><div className="flex items-center gap-2 text-spruce"><MapPin size={17} /><p className="text-sm font-semibold">Location handling</p></div><p className="mt-2 text-xs leading-5 text-[#587268]">Cities use clearly labeled sample coordinates. CircularMatch does not require production GPS data for this MVP.</p></div>
             </aside>
           </div>
         </section>

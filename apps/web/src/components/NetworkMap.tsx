@@ -3,7 +3,7 @@ import { CircleMarker, MapContainer, Polyline, Popup, TileLayer, useMap } from '
 import { MapPinned, Route as RouteIcon } from 'lucide-react'
 import type { MapPoint, MapRoute } from '../types'
 import { formatKg } from '../lib/format'
-import { DemoBadge } from './ui'
+import { StatusBadge } from './ui'
 
 const colorForType: Record<string, string> = {
   generator: '#12645b',
@@ -48,7 +48,7 @@ export function NetworkMap({
             <p className="mt-0.5 text-[11px] text-[#70857d]">Sample locations only — not live GPS or dispatch routing.</p>
           </div>
         </div>
-        {!compact && <DemoBadge>sample map</DemoBadge>}
+        {!compact && <StatusBadge>network map</StatusBadge>}
       </div>
       <div className="relative">
         <MapContainer center={[28.6139, 77.2090]} zoom={9} scrollWheelZoom={false} className="h-[360px] w-full sm:h-[430px]">
@@ -100,7 +100,7 @@ export function NetworkMap({
       {route && (
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#dbe8df] bg-[#fbfefb] px-5 py-3.5 text-xs">
           <span className="inline-flex items-center gap-2 font-semibold text-ink"><RouteIcon size={15} className="text-spruce" />Selected potential route · {route.from.city} → {route.to.city}</span>
-          <span className="rounded-full border border-[#cbe7d7] bg-[#ebf8f0] px-2.5 py-1 font-semibold text-spruce">{route.distance_km.toFixed(1)} km · demo distance</span>
+          <span className="rounded-full border border-[#cbe7d7] bg-[#ebf8f0] px-2.5 py-1 font-semibold text-spruce">{route.distance_km.toFixed(1)} km · calculated distance</span>
         </div>
       )}
     </div>

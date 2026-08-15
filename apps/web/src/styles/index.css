@@ -99,7 +99,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
     background: #f8fdf9;
     box-shadow: 0 10px 20px rgba(17, 73, 61, .09);
   }
-  .badge-demo {
+  .badge-neutral {
     @apply inline-flex items-center gap-1.5 rounded-full border border-[#e3c777] bg-[#fff8e5] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.1em] text-[#7a5c15];
     box-shadow: 0 1px 0 rgba(255,255,255,.72) inset;
   }

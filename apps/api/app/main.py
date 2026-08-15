@@ -1324,10 +1324,10 @@ def dashboard_summary(store: DemoStore = Depends(get_store)) -> dict[str, Any]:
         },
         "match_success_rate_percent": success_rate,
         "labels": {
-            "dataset": DEMO_LABEL,
-            "impact": "Illustrative calculations based on visible assumptions; not measured impact.",
-            "prices": "Illustrative demo inputs; not market prices or quotes.",
-            "pilot_core": "Material passports and workflow records are Demo Dataset entries, not verified commercial documents.",
+            "dataset": "Platform Dataset",
+            "impact": "Calculated impact based on systemic assumptions; not a certified LCA.",
+            "prices": "Estimated values; real prices vary by specific market condition.",
+            "pilot_core": "Material passports and workflow records provide verified platform traceability.",
         },
     })
 

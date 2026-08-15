@@ -19,9 +19,9 @@ export function CircularMark({ size = 36 }: { size?: number }) {
   )
 }
 
-export function DemoBadge({ children }: { children?: ReactNode }) {
+export function StatusBadge({ children }: { children?: ReactNode }) {
   if (!children) return null
-  return <span className="badge-demo">{children}</span>
+  return <span className="badge-neutral">{children}</span>
 }
 
 export function PageHeader({

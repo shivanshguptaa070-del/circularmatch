@@ -20,7 +20,7 @@ import { formatCurrency, formatKg, formatNumber } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { DashboardSummary, MapPoint, Role } from '../types'
 import { NetworkMap } from '../components/NetworkMap'
-import { DemoBadge, Disclosure, ErrorPanel, LoadingPanel, MetricCard, PageHeader } from '../components/ui'
+import { StatusBadge, Disclosure, ErrorPanel, LoadingPanel, MetricCard, PageHeader } from '../components/ui'
 
 const CHART_COLORS = ['#12645b', '#72a98f', '#c08a37', '#86a8b8', '#e98467']
 
@@ -122,7 +122,7 @@ export function DashboardPage({ role }: { role: Role }) {
         <div className="hero-mesh min-h-[390px] rounded-3xl p-6 text-white shadow-lift sm:p-8">
           <div className="relative z-10 grid h-full gap-6 lg:grid-cols-[minmax(0,1fr)_430px] lg:items-center">
             <div className="max-w-xl">
-              <div className="flex flex-wrap items-center gap-2"><DemoBadge>Intelligence Active</DemoBadge><span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[.13em] text-[#bce7cf]"><span className="h-1.5 w-1.5 rounded-full bg-mint" />Decision engine v1</span></div>
+              <div className="flex flex-wrap items-center gap-2"><StatusBadge>Intelligence Active</StatusBadge><span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[.13em] text-[#bce7cf]"><span className="h-1.5 w-1.5 rounded-full bg-mint" />Decision engine v1</span></div>
               <h2 className="mt-5 text-3xl font-semibold leading-[1.04] tracking-[-0.06em] sm:text-[2.35rem]">Waste intelligence, <span className="text-mint">made visible.</span></h2>
               <p className="mt-4 max-w-lg text-sm leading-6 text-[#cae3d5]">CircularMatch connects industrial by-products directly with verified downstream buyers using transparent compatibility scoring and material passports.</p>
               <div className="mt-7 flex flex-wrap gap-3">
