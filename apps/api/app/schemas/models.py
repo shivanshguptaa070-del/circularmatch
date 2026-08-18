@@ -132,7 +132,7 @@ class BuyerRequirement(BaseModel):
     id: str
     company_id: str
     material_id: str
-    minimum_quantity_kg_week: float = Field(gt=0)
+    minimum_quantity_kg_week: float = Field(ge=0)
     maximum_quantity_kg_week: float = Field(gt=0)
     minimum_quality_grade: QualityGrade = "standard"
     maximum_distance_km: float = Field(gt=0)
@@ -378,10 +378,10 @@ class ReviewEvidenceRequest(BaseModel):
 
 class CreateRequirementRequest(BaseModel):
     material_id: str
-    minimum_quantity_kg_week: float = Field(gt=0, le=10_000_000)
+    minimum_quantity_kg_week: float = Field(ge=0, le=10_000_000)
     maximum_quantity_kg_week: float = Field(gt=0, le=10_000_000)
     minimum_quality_grade: QualityGrade = "standard"
-    maximum_distance_km: float = Field(gt=1, le=2500)
+    maximum_distance_km: float = Field(gt=0, le=2500)
     target_price_per_kg: float | None = Field(default=None, ge=0, le=1_000_000)
     allow_partial_quantity: bool = True
     city: str = Field(min_length=2, max_length=100)

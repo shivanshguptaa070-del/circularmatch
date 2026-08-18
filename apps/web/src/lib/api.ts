@@ -27,7 +27,15 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<A
   const payload = await response.json().catch(() => null)
   if (!response.ok) {
     const detail = payload?.detail
-    throw new Error(typeof detail === 'string' ? detail : 'Something went wrong while contacting CircularMatch.')
+    let message = 'Something went wrong while contacting CircularMatch.'
+    if (typeof detail === 'string') {
+      message = detail
+    } else if (Array.isArray(detail) && detail.length > 0) {
+      message = detail.map((d: any) => d.msg || (typeof d === 'string' ? d : JSON.stringify(d))).join(', ')
+    } else if (detail && typeof detail === 'object') {
+      message = JSON.stringify(detail)
+    }
+    throw new Error(message)
   }
   return payload as ApiEnvelope<T>
 }
