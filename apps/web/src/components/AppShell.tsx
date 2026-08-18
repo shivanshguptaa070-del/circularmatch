@@ -30,19 +30,18 @@ interface NavItem {
 }
 
 const ALL_NAV: NavItem[] = [
-  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, modes: ['selling', 'sourcing', 'both'] },
-  { label: 'List my waste', path: '/list-waste', icon: PlusCircle, modes: ['selling', 'both'] },
-  { label: 'My listings', path: '/listings', icon: Recycle, modes: ['selling', 'both'] },
-  { label: 'Buyer requirements', path: '/buyer-requirements', icon: ClipboardList, modes: ['sourcing', 'both'] },
-  { label: 'Supply opportunities', path: '/supply', icon: PackageSearch, modes: ['sourcing', 'both'] },
-  { label: 'Map', path: '/map', icon: Map, modes: ['selling', 'sourcing', 'both'] },
+  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, modes: ['selling', 'sourcing'] },
+  { label: 'List my waste', path: '/list-waste', icon: PlusCircle, modes: ['selling'] },
+  { label: 'My listings', path: '/listings', icon: Recycle, modes: ['selling'] },
+  { label: 'Buyer requirements', path: '/buyer-requirements', icon: ClipboardList, modes: ['sourcing'] },
+  { label: 'Supply opportunities', path: '/supply', icon: PackageSearch, modes: ['sourcing'] },
+  { label: 'Map', path: '/map', icon: Map, modes: ['selling', 'sourcing'] },
   { label: 'Scoring rules', path: '/admin', icon: Settings2, modes: ['__admin__'] },
 ]
 
 const MODE_CONFIG: Record<ActiveMode, { label: string; icon: typeof Recycle; description: string }> = {
-  selling: { label: 'Selling Waste', icon: Recycle, description: 'You are listing industrial by-products.' },
-  sourcing: { label: 'Sourcing Materials', icon: PackageSearch, description: 'You are finding secondary materials.' },
-  both: { label: 'Sell & Buy', icon: RefreshCw, description: 'Both selling and sourcing enabled.' },
+  selling: { label: 'Sell', icon: Recycle, description: 'You are listing industrial by-products.' },
+  sourcing: { label: 'Buy', icon: PackageSearch, description: 'You are finding secondary materials.' },
 }
 
 export function AppShell({

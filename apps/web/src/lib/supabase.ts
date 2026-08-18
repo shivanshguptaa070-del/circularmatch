@@ -11,7 +11,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 })
 
-export type ActiveMode = 'selling' | 'sourcing' | 'both'
+export type ActiveMode = 'selling' | 'sourcing'
 
 export interface UserProfile {
   id: string

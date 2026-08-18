@@ -43,9 +43,8 @@ const OAUTH_PROVIDERS = [
 ]
 
 const MODE_OPTIONS: { id: ActiveMode; label: string; subtitle: string; icon: typeof Recycle }[] = [
-  { id: 'selling', label: 'Sell my waste', subtitle: 'List industrial by-products & find buyers', icon: Recycle },
-  { id: 'sourcing', label: 'Source materials', subtitle: 'Find secondary materials & reduce costs', icon: PackageSearch },
-  { id: 'both', label: 'Both', subtitle: 'Full platform access for circular businesses', icon: CheckCircle2 },
+  { id: 'selling', label: 'Sell', subtitle: 'List industrial by-products', icon: Recycle },
+  { id: 'sourcing', label: 'Buy', subtitle: 'Source secondary materials', icon: PackageSearch },
 ]
 
 const BLOCKED_DOMAINS = new Set([
@@ -120,7 +119,7 @@ export function AuthPage({ onAuth }: { onAuth: () => void }) {
   const [password, setPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [companyName, setCompanyName] = useState('')
-  const [activeMode, setActiveMode] = useState<ActiveMode>('both')
+  const [activeMode, setActiveMode] = useState<ActiveMode>('selling')
   const [showPw, setShowPw] = useState(false)
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<string | null>(null)
@@ -309,7 +308,7 @@ export function AuthPage({ onAuth }: { onAuth: () => void }) {
 
                 <div>
                   <p className="mb-2 text-xs font-semibold text-[#9ec9b5]">I want to:</p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-2 gap-2">
                     {MODE_OPTIONS.map(({ id, label, icon: Icon }) => (
                       <button
                         key={id}
