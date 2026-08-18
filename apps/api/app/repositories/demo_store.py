@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from threading import RLock
 from typing import Any
 from uuid import uuid4
+
+logger = logging.getLogger(__name__)
 
 from app.schemas.models import (
     AuditEvent,
@@ -37,6 +40,8 @@ class DemoStore:
     def __init__(self) -> None:
         self._lock = RLock()
         self.reset()
+        # Restore real user data from Supabase Storage (survives redeploys)
+        self._load_persistent_data()
 
     @staticmethod
     def timestamp() -> str:
@@ -83,6 +88,90 @@ class DemoStore:
             self.notifications: dict[str, Notification] = {}
             self.transactions: list[dict[str, Any]] = seed["transactions"]
             self.scoring_config: ScoringConfig = seed["scoring_config"]
+
+    def _load_persistent_data(self) -> None:
+        """Restore non-demo user records from Supabase Storage snapshot on startup."""
+        try:
+            from app.core.persistence import ensure_bucket, load_snapshot
+            ensure_bucket()
+            snapshot = load_snapshot()
+        except Exception as exc:
+            logger.warning("DemoStore: persistence load failed: %s", exc)
+            return
+        if not snapshot:
+            return
+        with self._lock:
+            for raw in snapshot.get("companies", []):
+                try:
+                    obj = Company(**raw)
+                    self.companies[obj.id] = obj
+                except Exception:
+                    pass
+            for raw in snapshot.get("users", []):
+                try:
+                    obj = User(**raw)
+                    self.users[obj.id] = obj
+                except Exception:
+                    pass
+            for raw in snapshot.get("listings", []):
+                try:
+                    obj = WasteListing(**raw)
+                    self.listings[obj.id] = obj
+                except Exception:
+                    pass
+            for raw in snapshot.get("requirements", []):
+                try:
+                    obj = BuyerRequirement(**raw)
+                    self.requirements[obj.id] = obj
+                except Exception:
+                    pass
+            for raw in snapshot.get("lots", []):
+                try:
+                    obj = MaterialLot(**raw)
+                    self.lots[obj.id] = obj
+                except Exception:
+                    pass
+            for raw in snapshot.get("evidence", []):
+                try:
+                    obj = QualityEvidence(**raw)
+                    self.evidence[obj.id] = obj
+                except Exception:
+                    pass
+            for raw in snapshot.get("acceptance_specs", []):
+                try:
+                    obj = BuyerAcceptanceSpec(**raw)
+                    self.acceptance_specs[obj.buyer_requirement_id] = obj
+                except Exception:
+                    pass
+            for raw in snapshot.get("matches", []):
+                try:
+                    obj = MatchRecord(**raw)
+                    self.matches[obj.id] = obj
+                except Exception:
+                    pass
+        logger.info(
+            "DemoStore: restored %d listings, %d requirements, %d lots from snapshot.",
+            len(self.listings), len(self.requirements), len(self.lots),
+        )
+
+    def _save_snapshot(self) -> None:
+        """Serialize all data and upload snapshot to Supabase Storage. Fire-and-forget."""
+        try:
+            from app.core.persistence import save_snapshot
+            with self._lock:
+                data = {
+                    "companies": [c.model_dump() for c in self.companies.values()],
+                    "users": [u.model_dump() for u in self.users.values()],
+                    "listings": [l.model_dump() for l in self.listings.values()],
+                    "requirements": [r.model_dump() for r in self.requirements.values()],
+                    "lots": [lot.model_dump() for lot in self.lots.values()],
+                    "evidence": [e.model_dump() for e in self.evidence.values()],
+                    "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values()],
+                    "matches": [m.model_dump() for m in self.matches.values()],
+                }
+            save_snapshot(data)
+        except Exception as exc:
+            logger.warning("DemoStore: snapshot save failed: %s", exc)
 
     # Query helpers ---------------------------------------------------------
     def get_user(self, user_id: str) -> User | None:
@@ -207,6 +296,7 @@ class DemoStore:
     def create_listing(self, listing: WasteListing) -> WasteListing:
         with self._lock:
             self.listings[listing.id] = listing
+        self._save_snapshot()
         return listing
 
     def update_listing(self, listing_id: str, updates: dict[str, Any]) -> WasteListing | None:
@@ -216,11 +306,13 @@ class DemoStore:
                 return None
             updated = WasteListing(**(current.model_dump() | updates))
             self.listings[listing_id] = updated
-            return updated
+        self._save_snapshot()
+        return updated
 
     def create_lot(self, lot: MaterialLot) -> MaterialLot:
         with self._lock:
             self.lots[lot.id] = lot
+        self._save_snapshot()
         return lot
 
     def create_evidence(self, evidence: QualityEvidence) -> QualityEvidence:
@@ -229,6 +321,7 @@ class DemoStore:
             lot = self.lots.get(evidence.lot_id)
             if lot and evidence.id not in lot.evidence_ids:
                 self.lots[lot.id] = MaterialLot(**(lot.model_dump() | {"evidence_ids": [*lot.evidence_ids, evidence.id]}))
+        self._save_snapshot()
         return evidence
 
     def update_evidence(self, evidence_id: str, updates: dict[str, Any]) -> QualityEvidence | None:
@@ -238,16 +331,19 @@ class DemoStore:
                 return None
             updated = QualityEvidence(**(current.model_dump() | updates))
             self.evidence[evidence_id] = updated
-            return updated
+        self._save_snapshot()
+        return updated
 
     def create_requirement(self, requirement: BuyerRequirement) -> BuyerRequirement:
         with self._lock:
             self.requirements[requirement.id] = requirement
+        self._save_snapshot()
         return requirement
 
     def save_acceptance_spec(self, spec: BuyerAcceptanceSpec) -> BuyerAcceptanceSpec:
         with self._lock:
             self.acceptance_specs[spec.buyer_requirement_id] = spec
+        self._save_snapshot()
         return spec
 
     def clear_matches_for_listing(self, listing_id: str) -> None:
@@ -265,6 +361,7 @@ class DemoStore:
     def save_match(self, match: MatchRecord) -> MatchRecord:
         with self._lock:
             self.matches[match.id] = match
+        self._save_snapshot()
         return match
 
     def update_match(self, match_id: str, updates: dict[str, Any]) -> MatchRecord | None:
