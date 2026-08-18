@@ -12,6 +12,20 @@ from app.schemas.models import (
     User,
 )
 
+_CITY_COORDINATES = {
+    "Delhi": (28.6139, 77.2090),
+    "Noida": (28.5355, 77.3910),
+    "Gurgaon": (28.4595, 77.0266),
+    "Faridabad": (28.4089, 77.3178),
+    "Ghaziabad": (28.6692, 77.4538),
+    "Bhiwadi": (28.2100, 76.8606),
+    "Manesar": (28.3553, 76.9369),
+}
+
+def city_coordinates(city_name: str) -> tuple[float, float]:
+    """Return realistic lat/long for supported cities, defaulting to Delhi if unknown."""
+    return _CITY_COORDINATES.get(city_name, (28.6139, 77.2090))
+
 def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
     pet_uses = [
         MaterialUse(
