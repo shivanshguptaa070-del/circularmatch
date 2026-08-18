@@ -149,6 +149,7 @@ export function AuthPage({ onAuth }: { onAuth: () => void }) {
           email: email.trim(),
           password,
           options: {
+            emailRedirectTo: `${window.location.origin}/`,
             data: {
               full_name: fullName.trim(),
               company_name: companyName.trim(),

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import {
   BarChart3,
@@ -10,9 +10,7 @@ import {
   PackageSearch,
   PlusCircle,
   Recycle,
-  RefreshCw,
   Settings2,
-  ShieldCheck,
   X,
   Bell,
 } from 'lucide-react'
@@ -63,6 +61,22 @@ export function AppShell({
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showNotifications, setShowNotifications] = useState(false)
   const location = useLocation()
+  const modeMenuRef = useRef<HTMLDivElement>(null)
+  const notificationRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modeMenuRef.current && !modeMenuRef.current.contains(event.target as Node)) {
+        setShowModeMenu(false)
+      }
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setShowNotifications(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   useEffect(() => {
     // Fetch notifications — silently ignore errors so a backend issue never crashes the UI
@@ -108,7 +122,7 @@ export function AppShell({
         </Link>
 
         {/* Mode switcher */}
-        <div className="relative mt-6 px-1">
+        <div className="relative mt-6 px-1" ref={modeMenuRef}>
           <button
             onClick={() => setShowModeMenu(!showModeMenu)}
             disabled={modeSwitching}
@@ -218,7 +232,7 @@ export function AppShell({
             </div>
           </div>
           <div className="flex items-center gap-2.5">
-            <div className="relative mr-2">
+            <div className="relative mr-2" ref={notificationRef}>
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
                 className="relative grid h-10 w-10 place-items-center rounded-xl border border-[#d8e4dc] bg-white text-forest shadow-sm hover:bg-gray-50 transition"

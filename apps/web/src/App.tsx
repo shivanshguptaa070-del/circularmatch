@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { Loader2, Leaf } from 'lucide-react'
 import { supabase } from './lib/supabase'
 import type { ActiveMode, UserProfile } from './lib/supabase'
@@ -32,8 +32,9 @@ function SplashScreen() {
 }
 
 function RoutedApp({ session, profile }: { session: Session; profile: UserProfile }) {
-  const initialMode = (localStorage.getItem('cm_active_mode') as ActiveMode) || profile.active_mode || 'selling'
-  const [activeMode, setActiveMode] = useState<ActiveMode>(initialMode)
+  const storedMode = localStorage.getItem('cm_active_mode') as ActiveMode | null
+  const [activeMode, setActiveMode] = useState<ActiveMode>(storedMode || profile.active_mode || 'selling')
+  const navigate = useNavigate()
   const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL as string | undefined
   const isAdmin = !!(ADMIN_EMAIL && profile.email === ADMIN_EMAIL)
 
@@ -41,22 +42,23 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
     localStorage.setItem('cm_active_mode', activeMode)
   }, [activeMode])
 
-  const switchMode = async (mode: ActiveMode) => {
+  const switchMode = useCallback(async (mode: ActiveMode) => {
     setActiveMode(mode)
     localStorage.setItem('cm_active_mode', mode)
     await supabase.from('user_profiles').update({ active_mode: mode }).eq('id', session.user.id).catch(() => null)
     await supabase.auth.updateUser({ data: { active_mode: mode } }).catch(() => null)
-  }
+    // Redirect to dashboard so the user starts fresh in the new mode
+    navigate('/dashboard', { replace: true })
+  }, [session.user.id, navigate])
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     await supabase.auth.signOut()
-  }
+  }, [])
 
   const currentProfile = { ...profile, active_mode: activeMode }
 
-  // Map activeMode to legacy role for compatibility during migration
-  // 'both' users default to generator view in role-specific pages
-  const legacyRole: 'generator' | 'buyer' | 'admin' = activeMode === 'sourcing' ? 'buyer' : 'generator'
+  // Map activeMode to legacy role for compatibility
+  const legacyRole: 'generator' | 'buyer' | 'admin' = isAdmin ? 'admin' : activeMode === 'sourcing' ? 'buyer' : 'generator'
 
   return (
     <AppShell profile={currentProfile} onSwitchMode={switchMode} onSignOut={handleSignOut} isAdmin={isAdmin}>

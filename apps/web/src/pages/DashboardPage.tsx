@@ -126,8 +126,17 @@ export function DashboardPage({ role }: { role: Role }) {
               <h2 className="mt-5 text-3xl font-semibold leading-[1.04] tracking-[-0.06em] sm:text-[2.35rem]">Waste intelligence, <span className="text-mint">made visible.</span></h2>
               <p className="mt-4 max-w-lg text-sm leading-6 text-[#cae3d5]">CircularMatch connects industrial by-products directly with verified downstream buyers using transparent compatibility scoring and material passports.</p>
               <div className="mt-7 flex flex-wrap gap-3">
-                <Link to="/list-waste" className="inline-flex items-center gap-2 rounded-xl bg-mint px-4 py-3 text-sm font-semibold text-forest shadow-[0_12px_22px_rgba(0,0,0,.13)] transition hover:-translate-y-0.5 hover:bg-white"><Recycle size={17} />List material <ArrowRight size={16} /></Link>
-                <Link to="/map" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/[.04] px-4 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"><MapPinned size={17} />Explore network</Link>
+                {role === 'buyer' ? (
+                  <>
+                    <Link to="/buyer-requirements" className="inline-flex items-center gap-2 rounded-xl bg-mint px-4 py-3 text-sm font-semibold text-forest shadow-[0_12px_22px_rgba(0,0,0,.13)] transition hover:-translate-y-0.5 hover:bg-white"><Factory size={17} />Set requirement <ArrowRight size={16} /></Link>
+                    <Link to="/supply" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/[.04] px-4 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"><MapPinned size={17} />Browse supply</Link>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/list-waste" className="inline-flex items-center gap-2 rounded-xl bg-mint px-4 py-3 text-sm font-semibold text-forest shadow-[0_12px_22px_rgba(0,0,0,.13)] transition hover:-translate-y-0.5 hover:bg-white"><Recycle size={17} />List material <ArrowRight size={16} /></Link>
+                    <Link to="/map" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/[.04] px-4 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"><MapPinned size={17} />Explore network</Link>
+                  </>
+                )}
               </div>
               <div className="mt-8 flex flex-wrap gap-2.5 text-[11px] text-[#d3e9dc]"><span className="glass-panel rounded-full px-3 py-1.5"><ShieldCheck className="mr-1.5 inline text-mint" size={13} />Explainable scores</span><span className="glass-panel rounded-full px-3 py-1.5"><Route className="mr-1.5 inline text-mint" size={13} />Optimized logistics</span></div>
             </div>
@@ -212,7 +221,7 @@ export function DashboardPage({ role }: { role: Role }) {
               ['03', 'Explain', 'Economic, logistics and impact outputs expose their assumptions.'],
             ].map(([step, title, detail]) => <div key={step} className="flex gap-4"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-forest text-[11px] font-bold text-mint shadow-sm">{step}</span><div><h3 className="text-sm font-semibold text-ink">{title}</h3><p className="mt-1 text-xs leading-5 text-[#617770]">{detail}</p></div></div>)}
           </div>
-          <Link to="/list-waste" className="btn-secondary mt-7 w-full"><Recycle size={16} />List a waste stream</Link>
+          <Link to={role === 'buyer' ? '/buyer-requirements' : '/list-waste'} className="btn-secondary mt-7 w-full">{role === 'buyer' ? <><Factory size={16} />Set a buyer requirement</> : <><Recycle size={16} />List a waste stream</>}</Link>
         </aside>
       </section>
     </div>

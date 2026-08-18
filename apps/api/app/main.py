@@ -116,7 +116,7 @@ app.add_middleware(
     allow_origins=list(set(_allowed_origins)),
     allow_credentials=True,
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Authorization", "Content-Type", "X-Demo-User-Id"],
+    allow_headers=["Authorization", "Content-Type", "X-Demo-User-Id", "X-Active-Mode"],
     max_age=600,
 )
 
