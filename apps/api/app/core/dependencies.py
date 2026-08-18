@@ -69,17 +69,20 @@ def get_store() -> DemoStore:
 def get_current_user(
     authorization: str | None = Header(default=None),
     x_demo_user_id: str | None = Header(default=None),
+    x_active_mode: str | None = Header(default=None),
     demo_store: DemoStore = Depends(get_store),
 ) -> User:
     """
     Resolve the current user from:
       1. A verified Supabase JWT in the Authorization: Bearer <token> header.
-      2. The X-Demo-User-Id header (demo / local development only).
+      2. The X-Active-Mode or X-Demo-User-Id header.
       3. A safe default demo persona (generator) if neither header is present.
 
     Real users (is_demo=False) are created on first authenticated request and
     cached in the in-memory store for the lifetime of the server process.
     """
+    header_mode = (x_active_mode or "").lower()
+
     # ── 1. Real Supabase JWT ──────────────────────────────────────────────────
     if authorization and authorization.startswith("Bearer "):
         token = authorization.split(" ", 1)[1].strip()
@@ -88,32 +91,41 @@ def get_current_user(
         if claims:
             user_id = str(claims.get("sub", ""))
             if user_id:
-                # Return existing cached user
+                meta: dict[str, Any] = claims.get("user_metadata", {}) or {}
+                email = str(claims.get("email", meta.get("email", "")))
+
+                # Check for explicit admin
+                is_admin = meta.get("role") == "admin"
+
+                # Determine role from header or metadata
+                active_mode = header_mode or meta.get("active_mode", "selling")
+                if is_admin:
+                    role_val = "admin"
+                elif active_mode in {"sourcing", "buyer"}:
+                    role_val = "buyer"
+                else:
+                    role_val = "generator"
+
+                # Return existing cached user (updating role dynamically to active mode)
                 existing_user = demo_store.get_user(user_id)
                 if existing_user:
+                    if not is_admin:
+                        existing_user.role = role_val
                     return existing_user
 
                 # Bootstrap a real user profile from JWT claims
-                meta: dict[str, Any] = claims.get("user_metadata", {}) or {}
-                email = str(claims.get("email", meta.get("email", "")))
                 full_name = str(
                     meta.get("full_name") or meta.get("name") or email.split("@")[0] or "User"
                 )
                 company_name = str(meta.get("company_name") or f"{full_name}'s Organisation")
-                active_mode = str(meta.get("active_mode", "both"))
 
                 company_id = f"company-{user_id[:8]}"
                 if not demo_store.get_company(company_id):
-                    company_type = (
-                        "generator" if active_mode == "selling"
-                        else "buyer" if active_mode == "sourcing"
-                        else "processor"
-                    )
                     demo_store.companies[company_id] = Company(
                         id=company_id,
                         owner_user_id=user_id,
                         name=company_name,
-                        company_type=company_type,
+                        company_type="processor",
                         city=str(meta.get("city", "Delhi")),
                         address_label=str(meta.get("address_label", "Industrial Area")),
                         latitude=28.6139,
@@ -121,13 +133,6 @@ def get_current_user(
                         verification_status="verified",
                         is_demo=False,
                     )
-
-                # Real authenticated users always get *both* generator and buyer roles.
-                # Admin role elevation must be done explicitly via Supabase Auth metadata
-                # by a platform admin — never inferred from a self-selected mode.
-                role_val: str = str(meta.get("role", "generator"))
-                if role_val not in {"generator", "buyer", "admin"}:
-                    role_val = "generator"
 
                 new_user = User(
                     id=user_id,
@@ -141,7 +146,15 @@ def get_current_user(
                 return new_user
 
     # ── 2. Demo / local development fallback ─────────────────────────────────
-    user_id = x_demo_user_id or "user-generator"
+    if header_mode in {"sourcing", "buyer"}:
+        user_id = "user-buyer"
+    elif header_mode in {"selling", "generator"}:
+        user_id = "user-generator"
+    elif header_mode == "admin":
+        user_id = "user-admin"
+    else:
+        user_id = x_demo_user_id or "user-generator"
+
     user = demo_store.get_user(user_id)
     if user is None:
         role = "admin" if "admin" in user_id else "buyer" if "buyer" in user_id else "generator"
@@ -173,19 +186,25 @@ def get_current_user(
 
 def require_roles(*roles: str) -> Callable[[User], User]:
     """
-    Dependency that enforces role-based access for BOTH demo and real users.
-
-    Previously, non-demo users bypassed this check entirely (blanket access).
-    Now all users must hold the required role. Real users authenticated via
-    Supabase can hold 'generator', 'buyer', or 'admin' as stored in their
-    JWT metadata — role elevation is controlled server-side only.
+    Dependency that enforces role-based access for demo and real users.
+    - Admins always bypass role checks.
+    - Users matching required roles directly pass.
+    - Real registered marketplace users have dual access to both generator & buyer operations.
     """
     def dependency(current_user: User = Depends(get_current_user)) -> User:
-        if current_user.role not in roles:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"This action requires one of the following roles: {', '.join(roles)}.",
-            )
-        return current_user
+        if current_user.role == "admin":
+            return current_user
+
+        if current_user.role in roles:
+            return current_user
+
+        # Real users can perform both generator and buyer actions on the marketplace
+        if not current_user.is_demo and ("admin" not in roles):
+            return current_user
+
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"This action requires one of the following roles: {', '.join(roles)}.",
+        )
 
     return dependency

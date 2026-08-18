@@ -32,13 +32,20 @@ function SplashScreen() {
 }
 
 function RoutedApp({ session, profile }: { session: Session; profile: UserProfile }) {
-  const [activeMode, setActiveMode] = useState<ActiveMode>(profile.active_mode || 'selling')
+  const initialMode = (localStorage.getItem('cm_active_mode') as ActiveMode) || profile.active_mode || 'selling'
+  const [activeMode, setActiveMode] = useState<ActiveMode>(initialMode)
   const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL as string | undefined
   const isAdmin = !!(ADMIN_EMAIL && profile.email === ADMIN_EMAIL)
 
+  useEffect(() => {
+    localStorage.setItem('cm_active_mode', activeMode)
+  }, [activeMode])
+
   const switchMode = async (mode: ActiveMode) => {
     setActiveMode(mode)
-    await supabase.from('user_profiles').update({ active_mode: mode }).eq('id', session.user.id)
+    localStorage.setItem('cm_active_mode', mode)
+    await supabase.from('user_profiles').update({ active_mode: mode }).eq('id', session.user.id).catch(() => null)
+    await supabase.auth.updateUser({ data: { active_mode: mode } }).catch(() => null)
   }
 
   const handleSignOut = async () => {

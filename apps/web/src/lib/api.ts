@@ -5,10 +5,16 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
 async function getAuthHeader(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession()
+  const headers: Record<string, string> = {}
   if (session?.access_token) {
-    return { Authorization: `Bearer ${session.access_token}` }
+    headers['Authorization'] = `Bearer ${session.access_token}`
   }
-  return {}
+  const mode = localStorage.getItem('cm_active_mode') || (session?.user?.user_metadata?.active_mode as string) || 'selling'
+  headers['X-Active-Mode'] = mode
+  if (!session) {
+    headers['X-Demo-User-Id'] = mode === 'sourcing' ? 'user-buyer' : 'user-generator'
+  }
+  return headers
 }
 
 export async function api<T>(path: string, options: RequestInit = {}): Promise<ApiEnvelope<T>> {
