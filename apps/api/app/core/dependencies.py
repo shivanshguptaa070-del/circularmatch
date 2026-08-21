@@ -141,7 +141,7 @@ def get_current_user(
                 
                 # Seed initial data to prevent empty dashboards for new users
                 if role_val == "generator":
-                    base_listings = [ls for ls in demo_store.listings.values() if ls.company_id == "company-user-generator"]
+                    base_listings = [ls for ls in demo_store.listings.values() if ls.company_id == "comp-gen-pet"]
                     if base_listings:
                         new_listing = base_listings[0].model_copy(update={"id": demo_store.new_id("listing"), "company_id": company_id})
                         demo_store.listings[new_listing.id] = new_listing
@@ -155,7 +155,7 @@ def get_current_user(
                                 new_ev = ev.model_copy(update={"id": demo_store.new_id("evidence"), "lot_id": new_lot.id})
                                 demo_store.evidence[new_ev.id] = new_ev
                 elif role_val == "buyer":
-                    base_reqs = [req for req in demo_store.requirements.values() if req.company_id == "company-user-buyer"]
+                    base_reqs = [req for req in demo_store.requirements.values() if req.company_id == "comp-buyer-pet-top"]
                     if base_reqs:
                         new_req = base_reqs[0].model_copy(update={"id": demo_store.new_id("requirement"), "company_id": company_id})
                         demo_store.requirements[new_req.id] = new_req
