@@ -25,10 +25,9 @@ async function getAuthHeader(): Promise<Record<string, string>> {
   const mode = localStorage.getItem('cm_active_mode') || (session?.user?.user_metadata?.active_mode as string) || 'selling'
   headers['X-Active-Mode'] = mode
   if (!session) {
-    // Send a stable per-browser session ID so the backend can isolate each
-    // demo user's data. Without this, all unauthenticated generators shared
-    // a single hardcoded "user-generator" identity and could see each other's listings.
-    headers['X-Demo-User-Id'] = getSessionId()
+    // Let the backend use the default "user-buyer" or "user-generator" 
+    // so the dashboard is populated with demo data.
+    headers['X-Demo-User-Id'] = mode === 'sourcing' || mode === 'buyer' ? 'user-buyer' : 'user-generator'
   }
   return headers
 }
