@@ -1401,7 +1401,7 @@ def dashboard_summary(
                 new_matches = recompute_requirement_matches(store, req)
                 all_matches.extend(new_matches)
         
-        total_procurement_target = round(sum(r.normalized_kg_per_week for r in requirements), 0)
+        total_procurement_target = round(sum(r.maximum_quantity_kg_week for r in requirements), 0)
         
         top_matches_by_req: dict[str, MatchRecord] = {}
         for match in sort_matches(all_matches):
@@ -1423,7 +1423,7 @@ def dashboard_summary(
         for req in requirements:
             material = store.get_material(req.material_id)
             category = material.category if material else "Uncategorized"
-            category_totals[category] = category_totals.get(category, 0) + req.normalized_kg_per_week
+            category_totals[category] = category_totals.get(category, 0) + req.maximum_quantity_kg_week
 
         return envelope({
             "role": "buyer",
