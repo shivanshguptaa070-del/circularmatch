@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { CircleDollarSign, Network, PackageCheck, Recycle, Target, UsersRound } from 'lucide-react'
+import { CircleDollarSign, Factory, Network, PackageCheck, Recycle, UsersRound } from 'lucide-react'
 import { get } from '../lib/api'
 import { formatCurrency, formatKg, formatNumber } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'

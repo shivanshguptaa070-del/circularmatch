@@ -368,15 +368,29 @@ def match_card_view(store: DemoStore, match: MatchRecord) -> dict[str, Any]:
 
 
 def can_access_listing(current_user: User, listing: WasteListing) -> bool:
-    return current_user.role == "admin" or (current_user.company_id is not None and listing.company_id == current_user.company_id)
+    if current_user.role == "admin":
+        return True
+    # Demo users can access all demo content (it's all illustrative data)
+    if current_user.is_demo and listing.is_demo:
+        return True
+    return current_user.company_id is not None and listing.company_id == current_user.company_id
 
 
 def can_access_requirement(current_user: User, requirement: BuyerRequirement) -> bool:
-    return current_user.role == "admin" or (current_user.company_id is not None and requirement.company_id == current_user.company_id)
+    if current_user.role == "admin":
+        return True
+    # Demo users can access all demo content (it's all illustrative data)
+    if current_user.is_demo and requirement.is_demo:
+        return True
+    return current_user.company_id is not None and requirement.company_id == current_user.company_id
 
 
 def can_participate_in_match(current_user: User, listing: WasteListing, requirement: BuyerRequirement) -> bool:
-    return current_user.role == "admin" or current_user.company_id in {listing.company_id, requirement.company_id}
+    if current_user.role == "admin":
+        return True
+    if current_user.is_demo and listing.is_demo and requirement.is_demo:
+        return True
+    return current_user.company_id in {listing.company_id, requirement.company_id}
 
 
 def sort_matches(matches: list[MatchRecord]) -> list[MatchRecord]:
@@ -655,7 +669,11 @@ def get_listings(
     current_user: User = Depends(get_current_user),
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
-    company_id = current_user.company_id if mine and current_user.company_id else None
+    # Demo users see all demo listings for mine=true (full demo experience)
+    if mine and current_user.is_demo:
+        company_id = None
+    else:
+        company_id = current_user.company_id if mine and current_user.company_id else None
     listings = store.list_listings(company_id=company_id, active_only=active_only)
     return envelope([listing_view(store, listing) for listing in listings])
 
@@ -895,9 +913,13 @@ def get_requirements(
     current_user: User = Depends(get_current_user),
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
-    if not mine and current_user.role != "admin":
+    if not mine and current_user.role != "admin" and not current_user.is_demo:
         raise HTTPException(status_code=403, detail="You cannot view all buyer requirements.")
-    company_id = current_user.company_id if mine and current_user.company_id else None
+    # Demo users see all demo requirements for mine=true (full demo experience)
+    if mine and current_user.is_demo:
+        company_id = None
+    else:
+        company_id = current_user.company_id if mine and current_user.company_id else None
     requirements = store.list_requirements(company_id=company_id, active_only=active_only)
     return envelope([requirement_view(store, requirement) for requirement in requirements])
 
@@ -1314,9 +1336,12 @@ def dashboard_summary(
     current_user: User = Depends(get_current_user),
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
-    print("DEBUG ROLE:", current_user.role, current_user.id)
     if current_user.role == "generator":
-        listings = [l for l in store.list_listings(active_only=True) if l.company_id == current_user.company_id]
+        # Demo users see all demo listings (for a full demo experience); real users see only their company's
+        if current_user.is_demo:
+            listings = store.list_listings(active_only=True)
+        else:
+            listings = [l for l in store.list_listings(active_only=True) if l.company_id == current_user.company_id]
         all_matches: list[MatchRecord] = []
         for listing in listings:
             all_matches.extend(ensure_listing_matches(store, listing))
@@ -1362,9 +1387,19 @@ def dashboard_summary(
         })
 
     elif current_user.role == "buyer":
-        requirements = [r for r in store.list_requirements(active_only=True) if r.company_id == current_user.company_id]
+        # Demo users see all demo requirements (for a full demo experience); real users see only their company's
+        if current_user.is_demo:
+            requirements = store.list_requirements(active_only=True)
+        else:
+            requirements = [r for r in store.list_requirements(active_only=True) if r.company_id == current_user.company_id]
         req_ids = {r.id for r in requirements}
         all_matches = [m for m in store.matches.values() if m.buyer_requirement_id in req_ids]
+        # Ensure matches exist for all requirements
+        for req in requirements:
+            req_matches = [m for m in all_matches if m.buyer_requirement_id == req.id]
+            if not req_matches:
+                new_matches = recompute_requirement_matches(store, req)
+                all_matches.extend(new_matches)
         
         total_procurement_target = round(sum(r.normalized_kg_per_week for r in requirements), 0)
         
