@@ -87,9 +87,9 @@ export function SellerDashboard() {
         <ChartCard title="Revenue Pipeline" subtitle="Secured vs potential revenue" accent="gold">
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.charts?.revenue_pipeline || []} margin={{ top: 6, right: 4, left: -18, bottom: 0 }}>
+              <BarChart data={data.charts?.revenue_pipeline || []} margin={{ top: 6, right: 4, left: 10, bottom: 0 }}>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#748982', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#748982', fontSize: 12 }} tickFormatter={(val) => `₹${val / 1000}k`} />
+                <YAxis width={40} axisLine={false} tickLine={false} tick={{ fill: '#748982', fontSize: 12 }} tickFormatter={(val) => `₹${val / 1000}k`} />
                 <Tooltip cursor={{ fill: '#f9fbfb' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} itemStyle={{ color: '#a47a25' }} formatter={(value: number) => [formatCurrency(value), 'Revenue']} />
                 <Bar dataKey="value" fill="#d4aa53" radius={[4, 4, 0, 0]} maxBarSize={50} />
               </BarChart>
