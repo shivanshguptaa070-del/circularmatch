@@ -85,3 +85,74 @@ jobs:
         run: npm audit --audit-level=high
       - name: TypeScript check & Vite build
         run: npm run build
+
+  # ── ESLint Frontend Code Quality ───────────────────────────────────────────
+  eslint-frontend:
+    name: Frontend Code Quality (ESLint)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
+      - name: Run ESLint
+        run: npm run lint
+
+  # ── OWASP Dependency Check ───────────────────────────────────────────────────
+  owasp-dependency-check:
+    name: OWASP Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          path: '.'
+          format: 'HTML'
+      - name: Upload OWASP Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: owasp-dependency-check-report
+          path: reports/dependency-check-report.html
+
+  # ── SonarCloud Code Analysis ─────────────────────────────────────────────────
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  # ── Lighthouse CI (Performance & Accessibility) ─────────────────────────────
+  lighthouse-ci:
+    name: Lighthouse CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm ci
+      - name: Build frontend
+        run: npm run build
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.12.x
+          lhci autorun

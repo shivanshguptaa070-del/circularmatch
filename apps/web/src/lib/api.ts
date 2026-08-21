@@ -3,6 +3,19 @@ import { supabase } from './supabase'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
+/** Returns a stable random ID unique to this browser, persisted across page reloads. */
+function getSessionId(): string {
+  let id = localStorage.getItem('cm_session_id')
+  if (!id) {
+    // Generate a simple UUID-v4-like random string
+    id = 'sess-' + Array.from(crypto.getRandomValues(new Uint8Array(12)))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('')
+    localStorage.setItem('cm_session_id', id)
+  }
+  return id
+}
+
 async function getAuthHeader(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession()
   const headers: Record<string, string> = {}
@@ -12,7 +25,10 @@ async function getAuthHeader(): Promise<Record<string, string>> {
   const mode = localStorage.getItem('cm_active_mode') || (session?.user?.user_metadata?.active_mode as string) || 'selling'
   headers['X-Active-Mode'] = mode
   if (!session) {
-    headers['X-Demo-User-Id'] = mode === 'sourcing' ? 'user-buyer' : 'user-generator'
+    // Send a stable per-browser session ID so the backend can isolate each
+    // demo user's data. Without this, all unauthenticated generators shared
+    // a single hardcoded "user-generator" identity and could see each other's listings.
+    headers['X-Demo-User-Id'] = getSessionId()
   }
   return headers
 }

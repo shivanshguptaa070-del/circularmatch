@@ -85,10 +85,12 @@ export function MetricCard({
 export function ScoreRing({ score, label = 'match score', size = 86 }: { score: number; label?: string; size?: number }) {
   const radius = 36
   const circumference = 2 * Math.PI * radius
-  const dashOffset = circumference - (Math.min(100, Math.max(0, score)) / 100) * circumference
-  const stroke = score >= 88 ? '#12645b' : score >= 70 ? '#c08a37' : '#e98467'
+  const clamped = Math.min(100, Math.max(0, score))
+  const dashOffset = circumference - (clamped / 100) * circumference
+  const stroke = clamped >= 88 ? '#12645b' : clamped >= 70 ? '#c08a37' : '#e98467'
+  const displayScore = Math.round(clamped)
   return (
-    <div className="relative grid shrink-0 place-items-center rounded-full bg-white/55 p-1 shadow-[0_8px_18px_rgba(14,67,55,.07)]" style={{ width: size, height: size }} aria-label={`${score}% ${label}`}>
+    <div className="relative grid shrink-0 place-items-center rounded-full bg-white/55 p-1 shadow-[0_8px_18px_rgba(14,67,55,.07)]" style={{ width: size, height: size }} aria-label={`${displayScore}% ${label}`}>
       <svg width={size - 8} height={size - 8} viewBox="0 0 88 88" className="-rotate-90 drop-shadow-[0_4px_5px_rgba(18,100,91,.14)]">
         <circle cx="44" cy="44" r={radius} fill="none" stroke="#e6eee9" strokeWidth="7" />
         <motion.circle
@@ -106,7 +108,7 @@ export function ScoreRing({ score, label = 'match score', size = 86 }: { score: 
         />
       </svg>
       <div className="absolute inset-0 grid place-items-center">
-        <span className="text-[1.15rem] font-bold tracking-[-0.04em] text-ink">{score}%</span>
+        <span className="text-[1.15rem] font-bold tracking-[-0.04em] text-ink">{displayScore}%</span>
       </div>
     </div>
   )

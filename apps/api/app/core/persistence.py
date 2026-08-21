@@ -1,4 +1,4 @@
-﻿"""
+"""
 Store snapshot persistence via Supabase Storage.
 
 Real user data (listings, requirements, lots, evidence, companies, users, matches,
@@ -34,7 +34,11 @@ def _base_headers() -> dict[str, str]:
     }
 
 
-def _snapshot_url() -> str:
+def _snapshot_download_url() -> str:
+    return f"{settings.supabase_url}/storage/v1/object/authenticated/{BUCKET_NAME}/{SNAPSHOT_KEY}"
+
+
+def _snapshot_upload_url() -> str:
     return f"{settings.supabase_url}/storage/v1/object/{BUCKET_NAME}/{SNAPSHOT_KEY}"
 
 
@@ -75,7 +79,7 @@ def load_snapshot() -> dict[str, Any] | None:
         return None
     try:
         with httpx.Client(timeout=10) as client:
-            resp = client.get(_snapshot_url(), headers=_base_headers())
+            resp = client.get(_snapshot_download_url(), headers=_base_headers())
         if resp.status_code == 200:
             snapshot: dict[str, Any] = resp.json()
             logger.info(
@@ -103,7 +107,7 @@ def save_snapshot(data: dict[str, Any]) -> None:
         payload = json.dumps(data, default=str).encode()
         with httpx.Client(timeout=12) as client:
             resp = client.put(
-                _snapshot_url(),
+                _snapshot_upload_url(),
                 content=payload,
                 headers={
                     **_base_headers(),

@@ -639,7 +639,11 @@ def get_impact_methodologies(store: DemoStore = Depends(get_store)) -> dict[str,
 
 
 @app.post("/api/ai/extract-waste")
-async def ai_extract_waste(request: ExtractWasteRequest, store: DemoStore = Depends(get_store)) -> dict[str, Any]:
+async def ai_extract_waste(
+    request: ExtractWasteRequest,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
     result = await extract_waste(request.description, store.list_materials(), settings.gemini_api_key)
     return envelope(result)
 
@@ -657,10 +661,16 @@ def get_listings(
 
 
 @app.get("/api/listings/{listing_id}/passport")
-def get_listing_passport(listing_id: str, store: DemoStore = Depends(get_store)) -> dict[str, Any]:
+def get_listing_passport(
+    listing_id: str,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
     listing = store.get_listing(listing_id)
     if listing is None:
         raise not_found("Listing")
+    if not can_access_listing(current_user, listing):
+        raise HTTPException(status_code=403, detail="You cannot access this listing's passport.")
     return envelope({
         "listing": listing_view(store, listing),
         "readiness": passport_readiness(store, listing.id),
@@ -671,10 +681,16 @@ def get_listing_passport(listing_id: str, store: DemoStore = Depends(get_store))
 
 
 @app.get("/api/listings/{listing_id}")
-def get_listing(listing_id: str, store: DemoStore = Depends(get_store)) -> dict[str, Any]:
+def get_listing(
+    listing_id: str,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
     listing = store.get_listing(listing_id)
     if listing is None:
         raise not_found("Listing")
+    if not can_access_listing(current_user, listing):
+        raise HTTPException(status_code=403, detail="You cannot access this listing.")
     return envelope(listing_view(store, listing))
 
 
@@ -685,7 +701,7 @@ def create_listing(
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
     if current_user.company_id is None:
-        raise HTTPException(status_code=400, detail="Demo generator has no company configured.")
+        raise HTTPException(status_code=400, detail="Please configure your company profile before publishing a listing.")
     material = store.get_material(request.material_id)
     if material is None or not material.supported:
         raise HTTPException(status_code=422, detail="Choose a supported controlled-catalog material.")
@@ -859,6 +875,8 @@ def update_listing(
     if not can_access_listing(current_user, listing):
         raise HTTPException(status_code=403, detail="You cannot edit this listing.")
     updates = request.model_dump(exclude_unset=True)
+    if "quality_verified" in updates and current_user.role != "admin":
+        updates.pop("quality_verified")
     if "quantity_kg" in updates or "frequency" in updates:
         quantity = updates.get("quantity_kg", listing.quantity_kg)
         frequency = updates.get("frequency", listing.frequency)
@@ -877,6 +895,8 @@ def get_requirements(
     current_user: User = Depends(get_current_user),
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
+    if not mine and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="You cannot view all buyer requirements.")
     company_id = current_user.company_id if mine and current_user.company_id else None
     requirements = store.list_requirements(company_id=company_id, active_only=active_only)
     return envelope([requirement_view(store, requirement) for requirement in requirements])
@@ -936,7 +956,7 @@ def create_requirement(
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
     if current_user.company_id is None:
-        raise HTTPException(status_code=400, detail="Demo buyer has no company configured.")
+        raise HTTPException(status_code=400, detail="Please configure your company profile before adding a requirement.")
     if store.get_material(request.material_id) is None:
         raise HTTPException(status_code=422, detail="Choose a supported controlled-catalog material.")
     coordinates = city_coordinates(request.city)
@@ -989,10 +1009,16 @@ def recompute_matches(
 
 
 @app.get("/api/listings/{listing_id}/matches")
-def get_listing_matches(listing_id: str, store: DemoStore = Depends(get_store)) -> dict[str, Any]:
+def get_listing_matches(
+    listing_id: str,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
     listing = store.get_listing(listing_id)
     if listing is None:
         raise not_found("Listing")
+    if not can_access_listing(current_user, listing):
+        raise HTTPException(status_code=403, detail="You cannot access matches for this listing.")
     matches = ensure_listing_matches(store, listing)
     return envelope({
         "listing": listing_view(store, listing),
@@ -1022,10 +1048,18 @@ def get_requirement_matches(
 
 
 @app.get("/api/matches/{match_id}/timeline")
-def get_match_timeline(match_id: str, store: DemoStore = Depends(get_store)) -> dict[str, Any]:
+def get_match_timeline(
+    match_id: str,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
     match = store.get_match(match_id)
     if match is None:
         raise not_found("Match")
+    listing = store.get_listing(match.listing_id)
+    requirement = store.get_requirement(match.buyer_requirement_id)
+    if not listing or not requirement or not can_participate_in_match(current_user, listing, requirement):
+        raise HTTPException(status_code=403, detail="You cannot access this match's timeline.")
     return envelope({
         "match_id": match_id,
         "events": timeline_for_match(store, match_id),
@@ -1034,7 +1068,11 @@ def get_match_timeline(match_id: str, store: DemoStore = Depends(get_store)) -> 
 
 
 @app.get("/api/matches/{match_id}")
-def get_match_detail(match_id: str, store: DemoStore = Depends(get_store)) -> dict[str, Any]:
+def get_match_detail(
+    match_id: str,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
     match = store.get_match(match_id)
     if match is None:
         raise not_found("Match")
@@ -1042,6 +1080,8 @@ def get_match_detail(match_id: str, store: DemoStore = Depends(get_store)) -> di
     requirement = store.get_requirement(match.buyer_requirement_id)
     if listing is None or requirement is None:
         raise HTTPException(status_code=409, detail="Match source data is unavailable.")
+    if not can_participate_in_match(current_user, listing, requirement):
+        raise HTTPException(status_code=403, detail="You cannot access this match.")
     material = store.get_material(listing.material_id)
     buyer = store.get_company(requirement.company_id)
     if material is None or buyer is None:
@@ -1270,8 +1310,12 @@ def update_shipment(
 
 
 @app.get("/api/dashboard/summary")
-def dashboard_summary(store: DemoStore = Depends(get_store)) -> dict[str, Any]:
-    listings = store.list_listings(active_only=True)
+def dashboard_summary(
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    company_id = None if current_user.role == "admin" else current_user.company_id
+    listings = store.list_listings(company_id=company_id, active_only=True)
     all_matches: list[MatchRecord] = []
     for listing in listings:
         all_matches.extend(ensure_listing_matches(store, listing))
@@ -1286,8 +1330,20 @@ def dashboard_summary(store: DemoStore = Depends(get_store)) -> dict[str, Any]:
     potential_value = round(sum((item.get("net_recovered_value") or 0) for item in top_match_economic), 0)
     potential_co2e = round(sum((item.get("estimated_net_co2e_benefit_kgco2e") or 0) for item in top_match_impact), 0)
     accepted_transactions = [item for item in store.transactions if item.get("status") == "accepted"]
+    if current_user.role != "admin":
+        # Filter accepted_transactions where listing.company_id or requirement.company_id == current_user.company_id
+        valid_transaction_ids = set()
+        for match in all_matches:
+            if match.eligibility_status != "blocked":
+                valid_transaction_ids.add(match.id)
+        accepted_transactions = [t for t in accepted_transactions if t.get("match_id") in valid_transaction_ids]
+
     matched_quantity = round(sum(item.get("agreed_quantity_kg") or 0 for item in accepted_transactions), 0)
-    active_buyers = len({item.company_id for item in store.list_requirements(active_only=True)})
+    
+    if current_user.role == "admin":
+        active_buyers = len({item.company_id for item in store.list_requirements(active_only=True)})
+    else:
+        active_buyers = len({m.buyer_requirement_id for m in all_matches if m.eligibility_status != "blocked"})
     category_totals: dict[str, float] = {}
     for listing in listings:
         material = store.get_material(listing.material_id)
@@ -1310,7 +1366,7 @@ def dashboard_summary(store: DemoStore = Depends(get_store)) -> dict[str, Any]:
         "charts": {
             "waste_by_category": [{"name": category, "value": round(value, 0)} for category, value in category_totals.items()],
             "waste_diverted_over_time": [{"period": "W1", "kg": 0}, {"period": "W2", "kg": 0}, {"period": "W3", "kg": 0}, {"period": "W4", "kg": matched_quantity}],
-            "match_success": [{"name": "Accepted", "value": len(accepted_transactions)}, {"name": "In discussion", "value": len([item for item in store.transactions if item.get("status") == "contacted"])}],
+            "match_success": [{"name": "Accepted", "value": len(accepted_transactions)}, {"name": "In discussion", "value": len([item for item in store.transactions if item.get("status") == "contacted" and item.get("match_id") in [m.id for m in all_matches]])}],
             "economic_value": [
                 {"period": "PET", "value": round(top_match_economic[0].get("net_recovered_value") or 0, 0) if top_match_economic else 0},
                 {"period": "Textile", "value": round(top_match_economic[1].get("net_recovered_value") or 0, 0) if len(top_match_economic) > 1 else 0},
@@ -1334,13 +1390,42 @@ def dashboard_summary(store: DemoStore = Depends(get_store)) -> dict[str, Any]:
 
 
 @app.get("/api/map/points")
-def map_points(match_id: str | None = Query(default=None), store: DemoStore = Depends(get_store)) -> dict[str, Any]:
+def map_points(
+    match_id: str | None = Query(default=None),
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
     points: list[dict[str, Any]] = []
+    
+    # Pre-calculate active matches for anonymization exceptions
+    active_match_company_ids = set()
+    if current_user.role != "admin" and current_user.company_id:
+        active_match_company_ids.add(current_user.company_id)
+        # Find all matches involving the user
+        for match in store.matches.values():
+            if match.eligibility_status != "blocked":
+                req = store.get_requirement(match.buyer_requirement_id)
+                listng = store.get_listing(match.listing_id)
+                if req and listng:
+                    if req.company_id == current_user.company_id:
+                        active_match_company_ids.add(listng.company_id)
+                    elif listng.company_id == current_user.company_id:
+                        active_match_company_ids.add(req.company_id)
+
     for company in store.companies.values():
         related_listings = [item for item in store.listings.values() if item.company_id == company.id]
         related_requirements = [item for item in store.requirements.values() if item.company_id == company.id]
+        
+        company_data = company.model_dump()
+        
+        # Anonymize if not admin and not explicitly interacting with them
+        if current_user.role != "admin" and company.id not in active_match_company_ids:
+            company_data["name"] = f"Anonymous {company.company_type.title()}"
+            company_data["latitude"] = float(company_data["latitude"]) + 0.015
+            company_data["longitude"] = float(company_data["longitude"]) + 0.015
+            
         points.append({
-            **company.model_dump(),
+            **company_data,
             "listings": [listing_view(store, item) for item in related_listings],
             "requirements": [requirement_view(store, item) for item in related_requirements],
         })

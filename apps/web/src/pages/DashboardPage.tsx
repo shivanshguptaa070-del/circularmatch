@@ -96,7 +96,18 @@ export function DashboardPage({ role }: { role: Role }) {
   }, [role])
   const ActionIcon = primaryAction.icon
 
-  if (dashboard.loading) return <LoadingPanel label="Loading the CircularMatch dashboard…" />
+  if (dashboard.loading) return (
+    <div className="space-y-7 animate-pulse">
+      <div className="h-32 rounded-3xl bg-[#eaf4ef]" />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[1, 2, 3, 4].map(i => <div key={i} className="h-32 rounded-2xl bg-[#f4f9f6]" />)}
+      </div>
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1.55fr)_380px]">
+        <div className="h-[390px] rounded-3xl bg-[#eaf4ef]" />
+        <div className="h-[390px] rounded-3xl bg-[#f4f9f6]" />
+      </div>
+    </div>
+  )
   if (dashboard.error || !dashboard.data) return <ErrorPanel error={dashboard.error || 'Dashboard data was unavailable.'} onRetry={() => void dashboard.reload()} />
   const data = dashboard.data
 

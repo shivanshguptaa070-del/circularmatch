@@ -74,7 +74,7 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
         <Route path="/matches/:matchId" element={<MatchDetailPage role={legacyRole} />} />
         <Route path="/map" element={<MapPage />} />
         <Route path="/supply" element={<ListingsPage role="buyer" />} />
-        <Route path="/admin" element={<AdminPage role={legacyRole} />} />
+        <Route path="/admin" element={isAdmin ? <AdminPage role={legacyRole} /> : <Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </AppShell>
@@ -86,24 +86,7 @@ export default function App() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loadingProfile, setLoadingProfile] = useState(false)
 
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s)
-      if (s) void fetchProfile(s)
-    })
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s)
-      if (s) void fetchProfile(s)
-      else setProfile(null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
-
-  const fetchProfile = async (s: Session) => {
+  const fetchProfile = useCallback(async (s: Session) => {
     setLoadingProfile(true)
     try {
       const { data, error } = await supabase
@@ -143,30 +126,41 @@ export default function App() {
     } finally {
       setLoadingProfile(false)
     }
-  }
+  }, [])
 
-  // Loading state
-  if (session === undefined || (session && loadingProfile && !profile)) {
-    return <SplashScreen />
-  }
+  useEffect(() => {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session: s } }) => {
+      setSession(s)
+      if (s) void fetchProfile(s)
+    })
 
-  // Not authenticated
-  if (!session) {
-    return (
-      <BrowserRouter>
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s)
+      if (s) void fetchProfile(s)
+      else setProfile(null)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [fetchProfile])
+
+
+
+  // Render logic inside a single BrowserRouter
+  return (
+    <BrowserRouter>
+      {session === undefined || (session && loadingProfile && !profile) ? (
+        <SplashScreen />
+      ) : !session ? (
         <Routes>
           <Route path="*" element={<AuthPage onAuth={() => void supabase.auth.getSession().then(({ data: { session: s } }) => { setSession(s); if (s) void fetchProfile(s) })} />} />
         </Routes>
-      </BrowserRouter>
-    )
-  }
-
-  // Authenticated but no profile yet (onboarding)
-  if (!profile) return <SplashScreen />
-
-  return (
-    <BrowserRouter>
-      <RoutedApp session={session} profile={profile} />
+      ) : !profile ? (
+        <SplashScreen />
+      ) : (
+        <RoutedApp session={session} profile={profile} />
+      )}
     </BrowserRouter>
   )
 }

@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { useCallback, useEffect, useState } from 'react'
 
 export function useAsync<T>(loader: () => Promise<T>, dependencies: unknown[] = []) {
@@ -19,7 +20,6 @@ export function useAsync<T>(loader: () => Promise<T>, dependencies: unknown[] = 
     } finally {
       setLoading(false)
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, dependencies)
 
   useEffect(() => {

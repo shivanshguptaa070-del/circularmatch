@@ -225,10 +225,10 @@ export function AppShell({
         <header className="topbar-surface sticky top-0 z-20 flex h-[78px] items-center justify-between px-5 backdrop-blur-xl sm:px-8 lg:px-10">
           <div className="flex items-center gap-3">
             <button className="grid h-10 w-10 place-items-center rounded-xl border border-[#d8e4dc] bg-white text-forest shadow-sm lg:hidden" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={20} /></button>
-            <div className="workspace-chip hidden text-xs sm:flex">
-              <span className="workspace-dot" />
-              <BarChart3 size={14} className="text-spruce" />
-              <span>{profile.company_name || 'My workspace'}</span>
+            <div className="workspace-chip hidden text-xs sm:flex max-w-[200px]">
+              <span className="workspace-dot shrink-0" />
+              <BarChart3 size={14} className="text-spruce shrink-0" />
+              <span className="truncate">{profile.company_name || 'My workspace'}</span>
             </div>
           </div>
           <div className="flex items-center gap-2.5">
@@ -244,7 +244,7 @@ export function AppShell({
               </button>
 
               {showNotifications && (
-                <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl border border-[#d8e4dc] bg-white shadow-2xl">
+                <div className="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] max-w-80 overflow-hidden rounded-2xl border border-[#d8e4dc] bg-white shadow-2xl">
                   <div className="bg-forest px-4 py-3 text-sm font-bold text-white">Notifications</div>
                   <div className="max-h-96 overflow-y-auto">
                     {notifications.length === 0 ? (
@@ -261,7 +261,11 @@ export function AppShell({
                               )
                             }
                             if (n.reference_url) {
-                              window.location.href = n.reference_url
+                              if (n.reference_url.startsWith('/')) {
+                                window.location.href = n.reference_url
+                              } else {
+                                console.warn('Blocked external redirect')
+                              }
                             }
                             setShowNotifications(false)
                           }}
@@ -279,9 +283,9 @@ export function AppShell({
               )}
             </div>
 
-            <div className="hidden text-right sm:block">
-              <p className="text-xs font-semibold text-ink">{profile.full_name}</p>
-              <p className="mt-0.5 text-[10px] font-medium text-[#73877f]">{profile.company_name}</p>
+            <div className="hidden text-right sm:block max-w-[150px]">
+              <p className="text-xs font-semibold text-ink truncate">{profile.full_name}</p>
+              <p className="mt-0.5 text-[10px] font-medium text-[#73877f] truncate">{profile.company_name}</p>
             </div>
             {profile.avatar_url ? (
               <img src={profile.avatar_url} alt={profile.full_name} className="h-10 w-10 rounded-xl object-cover shadow-sm" />

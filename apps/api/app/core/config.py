@@ -21,6 +21,7 @@ class Settings:
     # REQUIRED IN PRODUCTION: Supabase project JWT secret (Dashboard > API > JWT Secret).
     # Without this, token signatures are not verified — a critical security gap.
     supabase_jwt_secret: str | None = field(default_factory=lambda: os.getenv("SUPABASE_JWT_SECRET"))
+    admin_email: str | None = field(default_factory=lambda: os.getenv("VITE_ADMIN_EMAIL"))
 
     def validate_production(self) -> None:
         """
@@ -41,10 +42,11 @@ class Settings:
             errors.append("FRONTEND_ORIGIN must be set to your production domain in production mode.")
 
         if errors:
-            print("\n[CircularMatch] WARNING — missing production configuration:")
+            print("\n[CircularMatch] CRITICAL ERROR — missing production configuration:")
             for err in errors:
                 print(f"  - {err}")
             print("\nPlease set these environment variables in your Render dashboard.\n")
+            sys.exit(1)
 
 
 settings = Settings()
