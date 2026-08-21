@@ -100,12 +100,17 @@ def get_current_user(
                 else:
                     role_val = "generator"
 
-                # Return existing cached user, but dynamically apply role from active mode
+                # Return existing cached user, but dynamically apply role from active mode and FORCE is_demo=True for MVP
                 existing_user = demo_store.get_user(user_id)
                 if existing_user:
+                    updates = {}
                     if not is_admin and existing_user.role != role_val:
-                        # Return a copy with the updated role (don't mutate shared cache)
-                        return existing_user.model_copy(update={"role": role_val})
+                        updates["role"] = role_val
+                    if not is_admin and not existing_user.is_demo:
+                        updates["is_demo"] = True
+                    if updates:
+                        # Return a copy with the updated fields (don't mutate shared cache)
+                        return existing_user.model_copy(update=updates)
                     return existing_user
 
                 # Bootstrap a real user profile from JWT claims
