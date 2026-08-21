@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 from typing import Any
+import traceback
 
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
