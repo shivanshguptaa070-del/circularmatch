@@ -1384,8 +1384,8 @@ def dashboard_summary(
             }
         })
 
-    elif current_user.role == "buyer":
-        # For the MVP, all users see the full demo pipeline to experience the value
+    else:
+        # For the MVP, all users (buyer or admin) see the full demo pipeline to experience the value
         requirements = store.list_requirements(active_only=True)
         req_ids = {r.id for r in requirements}
         all_matches = [m for m in store.matches.values() if m.buyer_requirement_id in req_ids]
