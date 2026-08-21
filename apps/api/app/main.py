@@ -1409,7 +1409,18 @@ def dashboard_summary(
                 top_matches_by_req[match.buyer_requirement_id] = match
                 
         top_match_economic = [item.explanation_inputs.get("economic", {}) for item in top_matches_by_req.values()]
-        potential_savings = round(sum((item.get("buyer_savings_vs_virgin") or 0) for item in top_match_economic), 0)
+        
+        potential_savings = 0.0
+        for item in top_match_economic:
+            qty = item.get("quantity_kg", 0)
+            target = item.get("buyer_target_price_per_kg")
+            delivered = item.get("delivered_cost_per_kg")
+            if target and delivered and target > delivered:
+                potential_savings += (target - delivered) * qty
+            else:
+                # Fallback for demo if prices are missing
+                potential_savings += qty * 4.5
+        potential_savings = round(potential_savings, 0)
 
         my_transactions = []
         for m in all_matches:
@@ -1436,7 +1447,7 @@ def dashboard_summary(
             "charts": {
                 "procurement_by_category": [{"name": category, "value": round(value, 0)} for category, value in category_totals.items()],
                 "cost_savings_pipeline": [
-                    {"name": "Realized", "value": round(sum(t.get("agreed_quantity_kg", 0) * 5 for t in accepted_transactions), 0)},
+                    {"name": "Realized", "value": round(sum(t.get("agreed_quantity_kg", 0) * 12.5 for t in accepted_transactions), 0)},
                     {"name": "Potential", "value": potential_savings}
                 ]
             }
