@@ -46,7 +46,18 @@ def selected_material_use(material: Material, selected_use_id: str | None) -> Ma
         for material_use in material.uses:
             if material_use.id == selected_use_id:
                 return material_use
-    return material.uses[0]
+    if material.uses:
+        return material.uses[0]
+    return MaterialUse(
+        id=f"use-{material.id}-default",
+        material_id=material.id,
+        title="Custom Resource Recovery",
+        description="Material recovered or recycled for secondary industrial application.",
+        pathway_type="recovery",
+        recovery_factor=0.8,
+        virgin_displacement_factor=0.85,
+        assumptions={},
+    )
 
 
 def economic_value(

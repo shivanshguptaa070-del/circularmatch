@@ -201,7 +201,18 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             aliases=["other", "custom", "misc", "miscellaneous"],
             quality_scale=["unknown", "mixed", "standard", "industrial", "premium"],
             notes="Custom material stream. Please provide exact details in the description for buyer verification.",
-            uses=[],
+            uses=[
+                MaterialUse(
+                    id="use-other-repurpose",
+                    material_id="mat-other",
+                    title="Secondary Repurposing / Processing",
+                    description="Repurposed or reprocessed into industrial feedstock or alternative products.",
+                    pathway_type="reprocessing",
+                    recovery_factor=0.8,
+                    virgin_displacement_factor=0.85,
+                    assumptions={"methodology": "Standard secondary recovery assumptions"},
+                )
+            ],
         ),
     ]
 
