@@ -126,7 +126,7 @@ def get_current_user(
                         latitude=28.6139,
                         longitude=77.2090,
                         verification_status="verified",
-                        is_demo=False,
+                        is_demo=True,
                     )
 
                 new_user = User(
@@ -135,7 +135,7 @@ def get_current_user(
                     email=email,
                     role=role_val,
                     company_id=company_id,
-                    is_demo=False,
+                    is_demo=True,
                 )
                 demo_store.users[user_id] = new_user
                 
