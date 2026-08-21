@@ -138,10 +138,35 @@ def get_current_user(
                     is_demo=False,
                 )
                 demo_store.users[user_id] = new_user
+                
+                # Seed initial data to prevent empty dashboards for new users
+                if role_val == "generator":
+                    base_listings = [ls for ls in demo_store.listings.values() if ls.company_id == "company-user-generator"]
+                    if base_listings:
+                        new_listing = base_listings[0].model_copy(update={"id": demo_store.new_id("listing"), "company_id": company_id})
+                        demo_store.listings[new_listing.id] = new_listing
+                        # Clone associated lots and evidence for the new listing
+                        base_lots = [lot for lot in demo_store.lots.values() if lot.listing_id == base_listings[0].id]
+                        if base_lots:
+                            new_lot = base_lots[0].model_copy(update={"id": demo_store.new_id("lot"), "listing_id": new_listing.id, "lot_code": f"LOT-{new_listing.id[-6:].upper()}"})
+                            demo_store.lots[new_lot.id] = new_lot
+                            base_evidence = [ev for ev in demo_store.evidence.values() if ev.lot_id == base_lots[0].id]
+                            for ev in base_evidence:
+                                new_ev = ev.model_copy(update={"id": demo_store.new_id("evidence"), "lot_id": new_lot.id})
+                                demo_store.evidence[new_ev.id] = new_ev
+                elif role_val == "buyer":
+                    base_reqs = [req for req in demo_store.requirements.values() if req.company_id == "company-user-buyer"]
+                    if base_reqs:
+                        new_req = base_reqs[0].model_copy(update={"id": demo_store.new_id("requirement"), "company_id": company_id})
+                        demo_store.requirements[new_req.id] = new_req
+                        base_specs = [s for s in demo_store.acceptance_specs.values() if s.buyer_requirement_id == base_reqs[0].id]
+                        if base_specs:
+                            new_spec = base_specs[0].model_copy(update={"id": demo_store.new_id("spec"), "buyer_requirement_id": new_req.id})
+                            demo_store.acceptance_specs[new_spec.buyer_requirement_id] = new_spec
+
                 demo_store._save_snapshot()
                 return new_user
 
-    # ── 2. Local development fallback ────────────────────────────────────────
     # ── 2. Seamless fallback persona ─────────────────────────────────────────
     # If no token is attached or during initial page loads, provide a valid persona
     # so the frontend never crashes with "Missing or invalid authentication token".
