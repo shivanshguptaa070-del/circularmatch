@@ -45,7 +45,7 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
   const switchMode = useCallback(async (mode: ActiveMode) => {
     setActiveMode(mode)
     localStorage.setItem('cm_active_mode', mode)
-    await supabase.from('user_profiles').update({ active_mode: mode }).eq('id', session.user.id).catch(() => null)
+    try { await supabase.from('user_profiles').update({ active_mode: mode }).eq('id', session.user.id) } catch (e) {}
     await supabase.auth.updateUser({ data: { active_mode: mode } }).catch(() => null)
     // Redirect to dashboard so the user starts fresh in the new mode
     navigate('/dashboard', { replace: true })
