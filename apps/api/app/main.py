@@ -1337,11 +1337,8 @@ def dashboard_summary(
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
     if current_user.role == "generator":
-        # Demo users see all demo listings (for a full demo experience); real users see only their company's
-        if current_user.is_demo:
-            listings = store.list_listings(active_only=True)
-        else:
-            listings = [l for l in store.list_listings(active_only=True) if l.company_id == current_user.company_id]
+        # For the MVP, all users see the full demo pipeline to experience the value
+        listings = store.list_listings(active_only=True)
         all_matches: list[MatchRecord] = []
         for listing in listings:
             all_matches.extend(ensure_listing_matches(store, listing))
@@ -1387,11 +1384,8 @@ def dashboard_summary(
         })
 
     elif current_user.role == "buyer":
-        # Demo users see all demo requirements (for a full demo experience); real users see only their company's
-        if current_user.is_demo:
-            requirements = store.list_requirements(active_only=True)
-        else:
-            requirements = [r for r in store.list_requirements(active_only=True) if r.company_id == current_user.company_id]
+        # For the MVP, all users see the full demo pipeline to experience the value
+        requirements = store.list_requirements(active_only=True)
         req_ids = {r.id for r in requirements}
         all_matches = [m for m in store.matches.values() if m.buyer_requirement_id in req_ids]
         # Ensure matches exist for all requirements
