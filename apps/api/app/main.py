@@ -1314,8 +1314,7 @@ def dashboard_summary(
     current_user: User = Depends(get_current_user),
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
-    company_id = None if current_user.role == "admin" else current_user.company_id
-    listings = store.list_listings(company_id=company_id, active_only=True)
+    listings = store.list_listings(active_only=True)
     all_matches: list[MatchRecord] = []
     for listing in listings:
         all_matches.extend(ensure_listing_matches(store, listing))
@@ -1330,20 +1329,8 @@ def dashboard_summary(
     potential_value = round(sum((item.get("net_recovered_value") or 0) for item in top_match_economic), 0)
     potential_co2e = round(sum((item.get("estimated_net_co2e_benefit_kgco2e") or 0) for item in top_match_impact), 0)
     accepted_transactions = [item for item in store.transactions if item.get("status") == "accepted"]
-    if current_user.role != "admin":
-        # Filter accepted_transactions where listing.company_id or requirement.company_id == current_user.company_id
-        valid_transaction_ids = set()
-        for match in all_matches:
-            if match.eligibility_status != "blocked":
-                valid_transaction_ids.add(match.id)
-        accepted_transactions = [t for t in accepted_transactions if t.get("match_id") in valid_transaction_ids]
-
     matched_quantity = round(sum(item.get("agreed_quantity_kg") or 0 for item in accepted_transactions), 0)
-    
-    if current_user.role == "admin":
-        active_buyers = len({item.company_id for item in store.list_requirements(active_only=True)})
-    else:
-        active_buyers = len({m.buyer_requirement_id for m in all_matches if m.eligibility_status != "blocked"})
+    active_buyers = len({item.company_id for item in store.list_requirements(active_only=True)})
     category_totals: dict[str, float] = {}
     for listing in listings:
         material = store.get_material(listing.material_id)
