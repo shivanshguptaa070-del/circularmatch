@@ -56,41 +56,41 @@ export function BuyerDashboard() {
         }
       />
       <section className="grid gap-5 lg:grid-cols-3 xl:grid-cols-4">
-        <MetricCard title="Procurement Target" value={formatKg(data.kpis.total_procurement_target_kg_week)} suffix="/ wk" subtitle="Total requested volume" icon={Target} />
-        <MetricCard title="Active Suppliers" value={formatNumber(data.kpis.active_seller_matches)} subtitle="Matching your requirements" icon={UsersRound} />
-        <MetricCard title="Successful Procurements" value={formatNumber(data.kpis.successful_purchases)} subtitle="Completed transactions" icon={PackageCheck} />
-        <MetricCard title="Est. Cost Savings" value={formatCurrency(data.kpis.estimated_cost_savings_inr)} subtitle="Vs virgin material cost" icon={CircleDollarSign} />
+        <MetricCard label="Procurement Target" value={`${formatKg(data.kpis?.total_procurement_target_kg_week || 0)} / wk`} detail="Total requested volume" icon={Target} />
+        <MetricCard label="Active Suppliers" value={formatNumber(data.kpis?.active_seller_matches || 0)} detail="Matching your requirements" icon={UsersRound} />
+        <MetricCard label="Successful Procurements" value={formatNumber(data.kpis?.successful_purchases || 0)} detail="Completed transactions" icon={PackageCheck} />
+        <MetricCard label="Est. Cost Savings" value={formatCurrency(data.kpis?.estimated_cost_savings_inr || 0)} detail="Vs virgin material cost" icon={CircleDollarSign} />
       </section>
 
       <section className="grid gap-5 lg:grid-cols-2">
-        <ChartCard title="Procurement by category" subtitle="Weekly requirements by material category." accent="spruce">
-          <div className="h-[255px]">
-            {data.charts.procurement_by_category.length ? (
+        <ChartCard title="Procurement by Category" subtitle="Target material mix">
+          <div className="h-64 w-full">
+            {data.charts?.procurement_by_category?.length ? (
               <>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={data.charts.procurement_by_category} dataKey="value" nameKey="name" cx="50%" cy="47%" innerRadius={56} outerRadius={84} paddingAngle={4} stroke="none">
-                      {data.charts.procurement_by_category.map((entry, index) => <Cell key={`${entry.name}-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
+                    <Pie data={data.charts?.procurement_by_category || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={2}>
+                      {(data.charts?.procurement_by_category || []).map((entry, index) => <Cell key={`${entry.name}-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
                     </Pie>
-                    <Tooltip formatter={(value: number) => [`${formatNumber(value)} kg/week`, 'Requirement']} />
+                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} itemStyle={{ color: '#12645b' }} formatter={(value: number) => [`${formatKg(value)}/wk`, 'Target']} />
                   </PieChart>
                 </ResponsiveContainer>
               </>
             ) : (
-              <div className="flex h-full flex-col items-center justify-center text-center text-xs text-[#7d928a]">
-                <p>No requirements set</p>
+              <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-[#d2e5dd] bg-[#f9fbfb]">
+                <p className="text-sm text-[#748982]">No requirements set</p>
               </div>
             )}
           </div>
         </ChartCard>
-        <ChartCard title="Cost Savings Pipeline" subtitle="Realized and potential savings." accent="gold">
-          <div className="h-[255px]">
+        <ChartCard title="Cost Savings Pipeline" subtitle="Realized vs potential savings" accent="gold">
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.charts.cost_savings_pipeline} margin={{ top: 6, right: 4, left: -18, bottom: 0 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#7a8e86', fontSize: 11 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7a8e86', fontSize: 11 }} />
-                <Tooltip formatter={(value: number) => [formatCurrency(value), 'Cost Savings']} />
-                <Bar dataKey="value" radius={[7, 7, 2, 2]} fill="#c08a37" />
+              <BarChart data={data.charts?.cost_savings_pipeline || []} margin={{ top: 6, right: 4, left: -18, bottom: 0 }}>
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#748982', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#748982', fontSize: 12 }} tickFormatter={(val) => `₹${val / 1000}k`} />
+                <Tooltip cursor={{ fill: '#f9fbfb' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} itemStyle={{ color: '#a47a25' }} formatter={(value: number) => [formatCurrency(value), 'Value']} />
+                <Bar dataKey="value" fill="#d4aa53" radius={[4, 4, 0, 0]} maxBarSize={50} />
               </BarChart>
             </ResponsiveContainer>
           </div>

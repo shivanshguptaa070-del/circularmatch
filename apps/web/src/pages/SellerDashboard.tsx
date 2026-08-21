@@ -56,41 +56,42 @@ export function SellerDashboard() {
         }
       />
       <section className="grid gap-5 lg:grid-cols-3 xl:grid-cols-4">
-        <MetricCard title="Total Waste Listed" value={formatKg(data.kpis.total_waste_listed_kg_week)} suffix="/ wk" subtitle="Outgoing volume" icon={Target} />
-        <MetricCard title="Active Buyers" value={formatNumber(data.kpis.active_buyer_matches)} subtitle="Matching your listings" icon={UsersRound} />
-        <MetricCard title="Successful Sales" value={formatNumber(data.kpis.successful_sales)} subtitle="Completed transactions" icon={PackageCheck} />
-        <MetricCard title="Potential Revenue" value={formatCurrency(data.kpis.potential_revenue_inr)} subtitle="Based on active matches" icon={CircleDollarSign} />
+        <MetricCard label="Total Waste Listed" value={`${formatKg(data.kpis?.total_waste_listed_kg_week || 0)} / wk`} detail="Across all your facilities" icon={Factory} />
+        <MetricCard label="Active Buyers" value={formatNumber(data.kpis?.active_buyer_matches || 0)} detail="Matching your materials" icon={UsersRound} />
+        <MetricCard label="Successful Sales" value={formatNumber(data.kpis?.successful_sales || 0)} detail="Completed transactions" icon={PackageCheck} />
+        <MetricCard label="Potential Revenue" value={formatCurrency(data.kpis?.potential_revenue_inr || 0)} detail="From active matches" icon={CircleDollarSign} />
       </section>
 
       <section className="grid gap-5 lg:grid-cols-2">
-        <ChartCard title="My waste by category" subtitle="Weekly listings by material category." accent="spruce">
-          <div className="h-[255px]">
-            {data.charts.waste_by_category.length ? (
+        <ChartCard title="Waste by Category" subtitle="Material composition">
+          <div className="h-64 w-full">
+            {data.charts?.waste_by_category?.length ? (
               <>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie data={data.charts.waste_by_category} dataKey="value" nameKey="name" cx="50%" cy="47%" innerRadius={56} outerRadius={84} paddingAngle={4} stroke="none">
-                      {data.charts.waste_by_category.map((entry, index) => <Cell key={`${entry.name}-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
+                    <Pie data={data.charts?.waste_by_category || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={2}>
+                      {(data.charts?.waste_by_category || []).map((entry, index) => <Cell key={`${entry.name}-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
                     </Pie>
-                    <Tooltip formatter={(value: number) => [`${formatNumber(value)} kg/week`, 'Listed']} />
+                    <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} itemStyle={{ color: '#12645b' }} formatter={(value: number) => [`${formatKg(value)}/wk`, 'Volume']} />
                   </PieChart>
                 </ResponsiveContainer>
               </>
             ) : (
-              <div className="flex h-full flex-col items-center justify-center text-center text-xs text-[#7d928a]">
-                <p>No material listed</p>
+              <div className="flex h-full items-center justify-center rounded-xl border border-dashed border-[#d2e5dd] bg-[#f9fbfb]">
+                <p className="text-sm text-[#748982]">No waste listed</p>
               </div>
             )}
           </div>
         </ChartCard>
-        <ChartCard title="Revenue Pipeline" subtitle="Secured and potential revenue." accent="gold">
-          <div className="h-[255px]">
+
+        <ChartCard title="Revenue Pipeline" subtitle="Secured vs potential revenue" accent="gold">
+          <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.charts.revenue_pipeline} margin={{ top: 6, right: 4, left: -18, bottom: 0 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#7a8e86', fontSize: 11 }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#7a8e86', fontSize: 11 }} />
-                <Tooltip formatter={(value: number) => [formatCurrency(value), 'Revenue']} />
-                <Bar dataKey="value" radius={[7, 7, 2, 2]} fill="#c08a37" />
+              <BarChart data={data.charts?.revenue_pipeline || []} margin={{ top: 6, right: 4, left: -18, bottom: 0 }}>
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#748982', fontSize: 12 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#748982', fontSize: 12 }} tickFormatter={(val) => `₹${val / 1000}k`} />
+                <Tooltip cursor={{ fill: '#f9fbfb' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} itemStyle={{ color: '#a47a25' }} formatter={(value: number) => [formatCurrency(value), 'Revenue']} />
+                <Bar dataKey="value" fill="#d4aa53" radius={[4, 4, 0, 0]} maxBarSize={50} />
               </BarChart>
             </ResponsiveContainer>
           </div>
