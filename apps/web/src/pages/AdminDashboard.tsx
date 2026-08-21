@@ -3,7 +3,7 @@ import { SellerDashboard } from './SellerDashboard'
 import { BuyerDashboard } from './BuyerDashboard'
 import { AdminDashboard } from './AdminDashboard'
 
-export function DashboardPage({ role }: { role: Role }) {
+export function AdminDashboard() {
   if (role === 'generator') return <SellerDashboard />
   if (role === 'buyer') return <BuyerDashboard />
   return <AdminDashboard />

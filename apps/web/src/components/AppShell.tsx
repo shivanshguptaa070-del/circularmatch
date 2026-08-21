@@ -30,10 +30,10 @@ interface NavItem {
 const ALL_NAV: NavItem[] = [
   { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, modes: ['selling', 'sourcing'] },
   { label: 'List my waste', path: '/list-waste', icon: PlusCircle, modes: ['selling'] },
-  { label: 'My listings', path: '/listings', icon: Recycle, modes: ['selling'] },
-  { label: 'Buyer requirements', path: '/buyer-requirements', icon: ClipboardList, modes: ['sourcing'] },
-  { label: 'Supply opportunities', path: '/supply', icon: PackageSearch, modes: ['sourcing'] },
-  { label: 'Map', path: '/map', icon: Map, modes: ['selling', 'sourcing'] },
+  { label: 'My Waste Listings', path: '/listings', icon: Recycle, modes: ['selling'] },
+  { label: 'My Procurement Requirements', path: '/buyer-requirements', icon: ClipboardList, modes: ['sourcing'] },
+  { label: 'Supply Opportunities', path: '/supply', icon: PackageSearch, modes: ['sourcing'] },
+  { label: 'Material Network', path: '/map', icon: Map, modes: ['selling', 'sourcing'] },
   { label: 'Scoring rules', path: '/admin', icon: Settings2, modes: ['__admin__'] },
 ]
 

@@ -352,7 +352,36 @@ export interface ListingPassport {
   notice: string
 }
 
-export interface DashboardSummary {
+export interface SellerDashboardSummary {
+  role: 'generator'
+  kpis: {
+    total_waste_listed_kg_week: number
+    active_buyer_matches: number
+    successful_sales: number
+    potential_revenue_inr: number
+  }
+  charts: {
+    waste_by_category: Array<{ name: string; value: number }>
+    revenue_pipeline: Array<{ name: string; value: number }>
+  }
+}
+
+export interface BuyerDashboardSummary {
+  role: 'buyer'
+  kpis: {
+    total_procurement_target_kg_week: number
+    active_seller_matches: number
+    successful_purchases: number
+    estimated_cost_savings_inr: number
+  }
+  charts: {
+    procurement_by_category: Array<{ name: string; value: number }>
+    cost_savings_pipeline: Array<{ name: string; value: number }>
+  }
+}
+
+export interface AdminDashboardSummary {
+  role: 'admin'
   kpis: {
     total_waste_listed_kg_week: number
     total_waste_matched_kg: number
@@ -372,6 +401,8 @@ export interface DashboardSummary {
   match_success_rate_percent: number
   labels: Record<string, string>
 }
+
+export type DashboardSummary = SellerDashboardSummary | BuyerDashboardSummary | AdminDashboardSummary
 
 export interface ScoringConfig {
   id: string
