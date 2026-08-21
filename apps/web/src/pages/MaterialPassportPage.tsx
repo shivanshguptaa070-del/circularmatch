@@ -115,7 +115,7 @@ export function MaterialPassportPage({ role }: { role: Role }) {
         eyebrow="Trusted pilot core · Material Passport"
         title={`${data.listing.material} — buyer-readiness record`}
         description="A structured lot and evidence record that separates supplier claims, uploaded documents, review status, and deterministic calculations. It is not a laboratory certificate or legal classification."
-        actions={<Link className="btn-primary" to={`/listings/${data.listing.id}/matches`}><Sparkles size={16} />Run eligibility checks<ArrowRight size={16} /></Link>}
+        actions={canEdit ? <Link className="btn-primary" to={`/listings/${data.listing.id}/matches`}><Sparkles size={16} />Run eligibility checks<ArrowRight size={16} /></Link> : undefined}
       />
       <Disclosure>{data.notice}</Disclosure>
       {message && <div className="flex gap-3 rounded-2xl border border-[#b9ddc7] bg-[#eff9f2] p-4 text-sm text-[#28624e]"><CheckCircle2 className="mt-0.5 shrink-0" size={18} /><span>{message}</span></div>}

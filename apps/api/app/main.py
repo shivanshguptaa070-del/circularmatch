@@ -1314,6 +1314,7 @@ def dashboard_summary(
     current_user: User = Depends(get_current_user),
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
+    print("DEBUG ROLE:", current_user.role, current_user.id)
     if current_user.role == "generator":
         listings = [l for l in store.list_listings(active_only=True) if l.company_id == current_user.company_id]
         all_matches: list[MatchRecord] = []
