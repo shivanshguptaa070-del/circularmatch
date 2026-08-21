@@ -24,22 +24,30 @@ interface NavItem {
   label: string
   path: string
   icon: typeof LayoutDashboard
-  modes: Array<ActiveMode | '__admin__'>
 }
 
-const ALL_NAV: NavItem[] = [
-  { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, modes: ['selling', 'sourcing'] },
-  { label: 'List my waste', path: '/list-waste', icon: PlusCircle, modes: ['selling'] },
-  { label: 'My Waste Listings', path: '/listings', icon: Recycle, modes: ['selling'] },
-  { label: 'My Procurement Requirements', path: '/buyer-requirements', icon: ClipboardList, modes: ['sourcing'] },
-  { label: 'Supply Opportunities', path: '/supply', icon: PackageSearch, modes: ['sourcing'] },
-  { label: 'Material Network', path: '/map', icon: Map, modes: ['selling', 'sourcing'] },
-  { label: 'Scoring rules', path: '/admin', icon: Settings2, modes: ['__admin__'] },
+const SELLER_NAV: NavItem[] = [
+  { label: 'Seller Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'List Waste Stream', path: '/list-waste', icon: PlusCircle },
+  { label: 'My Waste Inventory', path: '/listings', icon: Recycle },
+  { label: 'Demand Network', path: '/map', icon: Map },
 ]
 
-const MODE_CONFIG: Record<ActiveMode, { label: string; icon: typeof Recycle; description: string }> = {
-  selling: { label: 'Sell', icon: Recycle, description: 'You are listing industrial by-products.' },
-  sourcing: { label: 'Buy', icon: PackageSearch, description: 'You are finding secondary materials.' },
+const BUYER_NAV: NavItem[] = [
+  { label: 'Procurement Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'My Procurement Targets', path: '/buyer-requirements', icon: ClipboardList },
+  { label: 'Supply Opportunities', path: '/supply', icon: PackageSearch },
+  { label: 'Supplier Network', path: '/map', icon: Map },
+]
+
+const ADMIN_NAV: NavItem[] = [
+  { label: 'Admin Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'Scoring Rules', path: '/admin', icon: Settings2 },
+]
+
+const MODE_CONFIG: Record<ActiveMode, { label: string; actionLabel: string; icon: typeof Recycle; description: string }> = {
+  selling: { label: 'Sales Workspace', actionLabel: 'Switch to Sales Tool', icon: Recycle, description: 'You are managing waste inventory.' },
+  sourcing: { label: 'Procurement Workspace', actionLabel: 'Switch to Procurement Tool', icon: PackageSearch, description: 'You are sourcing secondary materials.' },
 }
 
 export function AppShell({
@@ -85,9 +93,11 @@ export function AppShell({
       .catch(() => { /* ignore — notifications are non-critical */ })
   }, [location.pathname])
 
-  const navItems = ALL_NAV.filter((item) =>
-    item.modes.includes('__admin__') ? isAdmin : item.modes.includes(profile.active_mode)
-  )
+  const navItems = isAdmin 
+    ? ADMIN_NAV 
+    : profile.active_mode === 'sourcing' 
+      ? BUYER_NAV 
+      : SELLER_NAV
   const modeInfo = MODE_CONFIG[profile.active_mode]
   const ModeIcon = modeInfo.icon
 
@@ -152,7 +162,7 @@ export function AppShell({
                       <Icon size={13} />
                     </span>
                     <div>
-                      <p className={`text-xs font-semibold ${mode === profile.active_mode ? 'text-mint' : 'text-[#c5dfd1]'}`}>{info.label}</p>
+                      <p className={`text-xs font-semibold ${mode === profile.active_mode ? 'text-mint' : 'text-[#c5dfd1]'}`}>{info.actionLabel}</p>
                       <p className="text-[10px] text-[#5a8a78]">{info.description}</p>
                     </div>
                   </button>
