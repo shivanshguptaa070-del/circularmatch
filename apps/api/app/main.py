@@ -129,7 +129,7 @@ async def generic_exception_handler(request: Request, exc: Exception) -> JSONRes
     logger.exception("Unhandled exception on %s %s", request.method, request.url.path)
     return JSONResponse(
         status_code=500,
-        content={"detail": "An internal error occurred. Please try again later."},
+        content={"detail": f"{type(exc).__name__}: {str(exc)}", "path": request.url.path},
     )
 
 DEMO_LABEL = "Illustrative / Demo Data"
@@ -154,9 +154,9 @@ def send_notification_email(user_email: str, title: str, message: str) -> None:
     In a real MVP, this would integrate with SendGrid, SES, or Postmark.
     """
     logger.info("=" * 60)
-    logger.info(f"📧 EMAIL SENT TO: {user_email}")
-    logger.info(f"SUBJECT: {title}")
-    logger.info(f"BODY: {message}")
+    logger.info("[NOTIFICATION EMAIL] TO: %s", user_email)
+    logger.info("SUBJECT: %s", title)
+    logger.info("BODY: %s", message)
     logger.info("=" * 60)
 
 
