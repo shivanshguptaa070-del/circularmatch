@@ -670,11 +670,7 @@ def get_listings(
     current_user: User = Depends(get_current_user),
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
-    # Demo users see all demo listings for mine=true (full demo experience)
-    if mine and current_user.is_demo:
-        company_id = None
-    else:
-        company_id = current_user.company_id if mine and current_user.company_id else None
+    company_id = current_user.company_id if mine else None
     listings = store.list_listings(company_id=company_id, active_only=active_only)
     return envelope([listing_view(store, listing) for listing in listings])
 
@@ -914,13 +910,7 @@ def get_requirements(
     current_user: User = Depends(get_current_user),
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
-    if not mine and current_user.role != "admin" and not current_user.is_demo:
-        raise HTTPException(status_code=403, detail="You cannot view all buyer requirements.")
-    # Demo users see all demo requirements for mine=true (full demo experience)
-    if mine and current_user.is_demo:
-        company_id = None
-    else:
-        company_id = current_user.company_id if mine and current_user.company_id else None
+    company_id = current_user.company_id if mine else None
     requirements = store.list_requirements(company_id=company_id, active_only=active_only)
     return envelope([requirement_view(store, requirement) for requirement in requirements])
 
@@ -1338,8 +1328,9 @@ def dashboard_summary(
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
     if current_user.role == "generator":
-        # For the MVP, all users see the full demo pipeline to experience the value
-        listings = store.list_listings(active_only=True)
+        listings = store.list_listings(company_id=current_user.company_id, active_only=True)
+        if not listings and current_user.is_demo:
+            listings = store.list_listings(company_id="comp-gen-pet", active_only=True)
         all_matches: list[MatchRecord] = []
         for listing in listings:
             all_matches.extend(ensure_listing_matches(store, listing))
@@ -1371,8 +1362,8 @@ def dashboard_summary(
             "role": "generator",
             "kpis": {
                 "total_waste_listed_kg_week": total_waste,
-                "active_buyer_matches": active_buyers + 12,
-                "successful_sales": len(accepted_transactions) + 42,
+                "active_buyer_matches": active_buyers,
+                "successful_sales": len(accepted_transactions),
                 "potential_revenue_inr": potential_value,
             },
             "charts": {
@@ -1385,8 +1376,9 @@ def dashboard_summary(
         })
 
     elif current_user.role == "buyer":
-        # For the MVP, all users see the full demo pipeline to experience the value
-        requirements = store.list_requirements(active_only=True)
+        requirements = store.list_requirements(company_id=current_user.company_id, active_only=True)
+        if not requirements and current_user.is_demo:
+            requirements = store.list_requirements(company_id="comp-buyer-pet-top", active_only=True)
         req_ids = {r.id for r in requirements}
         all_matches = [m for m in store.matches.values() if m.buyer_requirement_id in req_ids]
         # Ensure matches exist for all requirements
@@ -1435,8 +1427,8 @@ def dashboard_summary(
             "role": "buyer",
             "kpis": {
                 "total_procurement_target_kg_week": total_procurement_target,
-                "active_seller_matches": active_sellers + 18,
-                "successful_purchases": len(accepted_transactions) + 38,
+                "active_seller_matches": active_sellers,
+                "successful_purchases": len(accepted_transactions),
                 "estimated_cost_savings_inr": potential_savings,
             },
             "charts": {

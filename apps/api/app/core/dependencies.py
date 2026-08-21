@@ -100,14 +100,12 @@ def get_current_user(
                 else:
                     role_val = "generator"
 
-                # Return existing cached user, but dynamically apply role from active mode and FORCE is_demo=True for MVP
+                # Return existing cached user, dynamically applying role from active mode
                 existing_user = demo_store.get_user(user_id)
                 if existing_user:
                     updates = {}
                     if not is_admin and existing_user.role != role_val:
                         updates["role"] = role_val
-                    if not is_admin and not existing_user.is_demo:
-                        updates["is_demo"] = True
                     if updates:
                         # Return a copy with the updated fields (don't mutate shared cache)
                         return existing_user.model_copy(update=updates)
@@ -140,35 +138,9 @@ def get_current_user(
                     email=email,
                     role=role_val,
                     company_id=company_id,
-                    is_demo=True,
+                    is_demo=False,
                 )
                 demo_store.users[user_id] = new_user
-                
-                # Seed initial data to prevent empty dashboards for new users
-                if role_val == "generator":
-                    base_listings = [ls for ls in demo_store.listings.values() if ls.company_id == "comp-gen-pet"]
-                    if base_listings:
-                        new_listing = base_listings[0].model_copy(update={"id": demo_store.new_id("listing"), "company_id": company_id})
-                        demo_store.listings[new_listing.id] = new_listing
-                        # Clone associated lots and evidence for the new listing
-                        base_lots = [lot for lot in demo_store.lots.values() if lot.listing_id == base_listings[0].id]
-                        if base_lots:
-                            new_lot = base_lots[0].model_copy(update={"id": demo_store.new_id("lot"), "listing_id": new_listing.id, "lot_code": f"LOT-{new_listing.id[-6:].upper()}"})
-                            demo_store.lots[new_lot.id] = new_lot
-                            base_evidence = [ev for ev in demo_store.evidence.values() if ev.lot_id == base_lots[0].id]
-                            for ev in base_evidence:
-                                new_ev = ev.model_copy(update={"id": demo_store.new_id("evidence"), "lot_id": new_lot.id})
-                                demo_store.evidence[new_ev.id] = new_ev
-                elif role_val == "buyer":
-                    base_reqs = [req for req in demo_store.requirements.values() if req.company_id == "comp-buyer-pet-top"]
-                    if base_reqs:
-                        new_req = base_reqs[0].model_copy(update={"id": demo_store.new_id("requirement"), "company_id": company_id})
-                        demo_store.requirements[new_req.id] = new_req
-                        base_specs = [s for s in demo_store.acceptance_specs.values() if s.buyer_requirement_id == base_reqs[0].id]
-                        if base_specs:
-                            new_spec = base_specs[0].model_copy(update={"id": demo_store.new_id("spec"), "buyer_requirement_id": new_req.id})
-                            demo_store.acceptance_specs[new_spec.buyer_requirement_id] = new_spec
-
                 demo_store._save_snapshot()
                 return new_user
 
