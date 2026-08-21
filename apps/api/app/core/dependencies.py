@@ -143,6 +143,7 @@ def get_current_user(
                     is_demo=False,
                 )
                 demo_store.users[user_id] = new_user
+                demo_store._save_snapshot()
                 return new_user
 
     # ── 2. Local development fallback ────────────────────────────────────────
