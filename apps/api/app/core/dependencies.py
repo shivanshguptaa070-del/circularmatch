@@ -170,12 +170,16 @@ def get_current_user(
     # ── 2. Seamless fallback persona ─────────────────────────────────────────
     # If no token is attached or during initial page loads, provide a valid persona
     # so the frontend never crashes with "Missing or invalid authentication token".
-    user_id = "user-buyer" if header_mode in {"sourcing", "buyer"} else "user-generator"
+    user_id = x_demo_user_id or ("user-buyer" if header_mode in {"sourcing", "buyer"} else "user-generator")
     user = demo_store.get_user(user_id)
     if user is not None:
+        # Dynamically apply the role requested by the frontend
+        requested_role = "buyer" if header_mode in {"sourcing", "buyer"} else "generator"
+        if user.role != requested_role:
+            return user.model_copy(update={"role": requested_role})
         return user
 
-    role = "buyer" if "buyer" in user_id else "generator"
+    role = "buyer" if header_mode in {"sourcing", "buyer"} else "generator"
     company_id = f"company-{user_id}"
     if not demo_store.get_company(company_id):
         demo_store.companies[company_id] = Company(
