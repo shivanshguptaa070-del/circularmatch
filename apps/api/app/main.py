@@ -60,6 +60,7 @@ from app.services.calculators import (
 )
 from app.services.extraction import extract_waste
 from app.services.matching import EVIDENCE_RANK, calculate_match, match_explanation
+from app.services.email_service import send_contact_notification
 
 # In production, /docs and /redoc are disabled entirely.
 # They are only available during local development (DEMO_MODE=true).
@@ -1138,10 +1139,82 @@ def contact_match(
         raise HTTPException(status_code=409, detail="Match source data is unavailable.")
     if not can_participate_in_match(current_user, listing, requirement):
         raise HTTPException(status_code=403, detail="You are not a participant in this match.")
+
     updated = store.update_match(match_id, {"status": "contacted"})
-    transaction = store.add_transaction(match_id=match_id, listing_id=listing.id, initiated_by=current_user.id, note=request.note)
-    store.add_audit_event(entity_type="match", entity_id=match_id, action="contact_recorded", actor_id=current_user.id, summary="Demo contact intent was recorded.")
-    return envelope({"match": match_card_view(store, updated or match), "transaction": transaction, "message": "Demo contact intent recorded. This is not an order, payment, or contract."})
+    note = request.note.strip()
+    transaction = store.add_transaction(
+        match_id=match_id,
+        listing_id=listing.id,
+        initiated_by=current_user.id,
+        note=note or "Contact intent recorded.",
+    )
+    store.add_audit_event(
+        entity_type="match",
+        entity_id=match_id,
+        action="contact_recorded",
+        actor_id=current_user.id,
+        summary=f"Contact intent recorded by {current_user.full_name} ({current_user.role}).",
+    )
+
+    # ── Find the other party and send them a real email ─────────────────────
+    material = store.get_material(listing.material_id)
+    material_name = material.canonical_name if material else "waste material"
+    match_url = f"{settings.frontend_base_url}/matches/{match_id}"
+
+    # Determine who is the recipient (the other party)
+    sender_role = current_user.role  # "buyer" or "generator"
+    if current_user.role == "buyer":
+        # Buyer is contacting the generator — find the generator's user account
+        gen_company = store.get_company(listing.company_id)
+        recipient_user = next(
+            (
+                u for u in store.users.values()
+                if u.company_id == listing.company_id and u.role == "generator"
+            ),
+            None,
+        )
+    else:
+        # Generator is contacting the buyer — find the buyer's user account
+        gen_company = store.get_company(requirement.company_id)
+        recipient_user = next(
+            (
+                u for u in store.users.values()
+                if u.company_id == requirement.company_id and u.role == "buyer"
+            ),
+            None,
+        )
+
+    email_sent = False
+    if recipient_user is not None:
+        email_sent = send_contact_notification(
+            api_key=settings.resend_api_key,
+            recipient_name=recipient_user.full_name,
+            recipient_email=recipient_user.email,
+            sender_name=current_user.full_name,
+            sender_email=current_user.email,
+            material=material_name,
+            match_score=match.total_score,
+            note=note,
+            match_url=match_url,
+            sender_role=sender_role,
+        )
+    else:
+        logger.warning(
+            "contact_match: could not find a recipient user for match %s (role=%s)",
+            match_id,
+            sender_role,
+        )
+
+    return envelope({
+        "match": match_card_view(store, updated or match),
+        "transaction": transaction,
+        "email_sent": email_sent,
+        "message": (
+            f"Contact request sent to {recipient_user.full_name} ({recipient_user.email})."
+            if email_sent else
+            "Contact intent recorded. Email notification could not be delivered right now."
+        ),
+    })
 
 
 @app.post("/api/matches/{match_id}/sample-requests", status_code=status.HTTP_201_CREATED)

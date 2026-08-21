@@ -22,6 +22,11 @@ class Settings:
     # Without this, token signatures are not verified — a critical security gap.
     supabase_jwt_secret: str | None = field(default_factory=lambda: os.getenv("SUPABASE_JWT_SECRET"))
     admin_email: str | None = field(default_factory=lambda: os.getenv("VITE_ADMIN_EMAIL"))
+    # Email notifications via Resend (https://resend.com)
+    # Set RESEND_API_KEY in Render environment variables to enable live emails.
+    resend_api_key: str | None = field(default_factory=lambda: os.getenv("RESEND_API_KEY"))
+    # Base URL of the frontend, used to build deep-link URLs in notification emails.
+    frontend_base_url: str = field(default_factory=lambda: os.getenv("FRONTEND_BASE_URL", "https://circularmatch.vercel.app"))
 
     def validate_production(self) -> None:
         """
