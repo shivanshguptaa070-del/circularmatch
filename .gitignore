@@ -25,3 +25,7 @@ dist/
 .vscode/
 .idea/
 *.log
+
+# Ignore media/binary files
+*.pdf
+*.zip
