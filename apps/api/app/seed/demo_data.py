@@ -194,6 +194,15 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             notes="Controlled MVP material. Grade separation and contaminant checks are required.",
             uses=steel_uses,
         ),
+        Material(
+            id="mat-other",
+            canonical_name="Other / Custom waste stream",
+            category="Other",
+            aliases=["other", "custom", "misc", "miscellaneous"],
+            quality_scale=["unknown", "mixed", "standard", "industrial", "premium"],
+            notes="Custom material stream. Please provide exact details in the description for buyer verification.",
+            uses=[],
+        ),
     ]
 
     companies = [
