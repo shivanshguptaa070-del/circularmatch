@@ -225,7 +225,7 @@ def calculate_match(
     calculated_quality_score = quality_score(listing, requirement)
     quality_blocked = calculated_quality_score == 0
     if quality_blocked:
-        checks.append(EligibilityCheck(key="quality_grade", label="Stated quality grade", status="fail", detail=f"Listing grade {listing.quality_grade} is below the buyer minimum {requirement.minimum_quality_grade}."))
+        checks.append(EligibilityCheck(key="quality_grade", label="Stated quality grade", status="warning", detail=f"Listing grade {listing.quality_grade} is below the buyer minimum {requirement.minimum_quality_grade}. A concession may be required."))
     elif listing.quality_verified:
         checks.append(EligibilityCheck(key="quality_grade", label="Stated quality grade", status="pass", detail="Stated grade meets the buyer minimum and is marked verified in the record."))
     else:
@@ -236,7 +236,7 @@ def calculate_match(
     calculated_distance_score = distance_score(distance_km, requirement.maximum_distance_km)
     distance_blocked = calculated_distance_score == 0
     if distance_blocked:
-        checks.append(EligibilityCheck(key="distance", label="Serviceable distance", status="fail", detail=f"{distance_km:.1f} km exceeds the buyer's {requirement.maximum_distance_km:.0f} km screening radius."))
+        checks.append(EligibilityCheck(key="distance", label="Serviceable distance", status="warning", detail=f"{distance_km:.1f} km exceeds the buyer's {requirement.maximum_distance_km:.0f} km screening radius. Freight negotiations needed."))
     else:
         checks.append(EligibilityCheck(key="distance", label="Serviceable distance", status="pass", detail=f"{distance_km:.1f} km is within the buyer's {requirement.maximum_distance_km:.0f} km screening radius."))
 
@@ -267,7 +267,8 @@ def calculate_match(
     if listing.frequency == "one_time":
         flags.append("This is a one-time lot; recurring supply should be confirmed.")
 
-    blocked = spec_blocked or quality_blocked or distance_blocked
+    # All checks have been softened to warnings per user request
+    blocked = False
     if blocked:
         eligibility_status = "blocked"
         next_action = "Review blocked technical or logistics criteria"
