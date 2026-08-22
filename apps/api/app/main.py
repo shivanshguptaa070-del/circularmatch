@@ -1142,18 +1142,25 @@ def contact_match(
 
     updated = store.update_match(match_id, {"status": "contacted"})
     note = request.note.strip()
+
+    # Get the quantity from the listing for the transaction record
+    matched_quantity_kg = listing.normalized_kg_per_week or 0
+
     transaction = store.add_transaction(
         match_id=match_id,
         listing_id=listing.id,
         initiated_by=current_user.id,
-        note=note or "Contact intent recorded.",
+        note=note or "Contact made — match accepted.",
+        # Mark as accepted so the dashboard Successful Matches / Sales / Purchases counter increments
+        status="accepted",
+        agreed_quantity_kg=matched_quantity_kg,
     )
     store.add_audit_event(
         entity_type="match",
         entity_id=match_id,
         action="contact_recorded",
         actor_id=current_user.id,
-        summary=f"Contact intent recorded by {current_user.full_name} ({current_user.role}).",
+        summary=f"Contact made by {current_user.full_name} ({current_user.role}) — match recorded as successful.",
     )
 
     # ── Find the other party and send them a real email ─────────────────────
