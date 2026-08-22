@@ -449,14 +449,14 @@ class DemoStore:
                 return self.notifications[notification_id]
             return None
 
-    def add_transaction(self, *, match_id: str, listing_id: str, initiated_by: str, note: str) -> dict[str, Any]:
+    def add_transaction(self, *, match_id: str, listing_id: str, initiated_by: str, note: str, status: str = "contacted", agreed_quantity_kg: float = 0) -> dict[str, Any]:
         transaction = {
             "id": f"txn-{uuid4().hex[:10]}",
             "match_id": match_id,
             "listing_id": listing_id,
             "initiated_by": initiated_by,
-            "status": "contacted",
-            "agreed_quantity_kg": 0,
+            "status": status,
+            "agreed_quantity_kg": agreed_quantity_kg,
             "note": note,
             "created_at": self.timestamp(),
             "is_demo": True,
