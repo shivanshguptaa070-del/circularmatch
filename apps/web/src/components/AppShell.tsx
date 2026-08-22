@@ -46,8 +46,8 @@ const ADMIN_NAV: NavItem[] = [
 ]
 
 const MODE_CONFIG: Record<ActiveMode, { label: string; actionLabel: string; icon: typeof Recycle; description: string }> = {
-  selling: { label: 'Sales Workspace', actionLabel: 'Switch to Sales Tool', icon: Recycle, description: 'You are managing waste inventory.' },
-  sourcing: { label: 'Procurement Workspace', actionLabel: 'Switch to Procurement Tool', icon: PackageSearch, description: 'You are sourcing secondary materials.' },
+  selling: { label: 'Sell', actionLabel: 'Switch to Sell', icon: Recycle, description: 'You are managing waste inventory.' },
+  sourcing: { label: 'Buy', actionLabel: 'Switch to Buy', icon: PackageSearch, description: 'You are sourcing secondary materials.' },
 }
 
 export function AppShell({
