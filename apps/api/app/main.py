@@ -1413,8 +1413,6 @@ def dashboard_summary(
 ) -> dict[str, Any]:
     if current_user.role == "generator":
         listings = store.list_listings(company_id=current_user.company_id, active_only=True)
-        if not listings and current_user.is_demo:
-            listings = store.list_listings(company_id="comp-gen-pet", active_only=True)
         all_matches: list[MatchRecord] = []
         for listing in listings:
             all_matches.extend(ensure_listing_matches(store, listing))
@@ -1461,8 +1459,6 @@ def dashboard_summary(
 
     elif current_user.role == "buyer":
         requirements = store.list_requirements(company_id=current_user.company_id, active_only=True)
-        if not requirements and current_user.is_demo:
-            requirements = store.list_requirements(company_id="comp-buyer-pet-top", active_only=True)
         req_ids = {r.id for r in requirements}
         all_matches = [m for m in store.matches.values() if m.buyer_requirement_id in req_ids]
         # Ensure matches exist for all requirements
@@ -1618,11 +1614,8 @@ def map_points(
         
         company_data = company.model_dump()
         
-        # Anonymize if not admin and not explicitly interacting with them
-        if current_user.role != "admin" and company.id not in active_match_company_ids:
-            company_data["name"] = f"Anonymous {company.company_type.title()}"
-            company_data["latitude"] = float(company_data["latitude"]) + 0.015
-            company_data["longitude"] = float(company_data["longitude"]) + 0.015
+        # We are intentionally removing anonymization per user request so proper Indian company names are visible.
+        # Original logic fuzzed coordinates and scrubbed names if the user had not interacted with them.
             
         points.append({
             **company_data,

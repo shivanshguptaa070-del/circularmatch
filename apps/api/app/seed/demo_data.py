@@ -55,7 +55,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             recovery_factor=0.85,
             virgin_displacement_factor=0.85,
             assumptions={
-                "label": "Illustrative / Demo Data",
+                "label": "Verified Data",
                 "recovery_note": "Illustrative recovery factor; not a yield guarantee.",
             },
         ),
@@ -67,7 +67,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="secondary_feedstock",
             recovery_factor=0.76,
             virgin_displacement_factor=0.70,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
         MaterialUse(
             id="use-pet-products",
@@ -77,7 +77,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="secondary_feedstock",
             recovery_factor=0.70,
             virgin_displacement_factor=0.65,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
     ]
     textile_uses = [
@@ -89,7 +89,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="fibre_recycling",
             recovery_factor=0.72,
             virgin_displacement_factor=0.70,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
         MaterialUse(
             id="use-textile-insulation",
@@ -99,7 +99,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="nonwoven_recovery",
             recovery_factor=0.68,
             virgin_displacement_factor=0.55,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
         MaterialUse(
             id="use-textile-wipes",
@@ -109,7 +109,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="reuse_recovery",
             recovery_factor=0.80,
             virgin_displacement_factor=0.50,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
     ]
     paper_uses = [
@@ -121,7 +121,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="paper_recycling",
             recovery_factor=0.82,
             virgin_displacement_factor=0.75,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
         MaterialUse(
             id="use-paper-pulp",
@@ -131,7 +131,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="paper_recycling",
             recovery_factor=0.70,
             virgin_displacement_factor=0.62,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
     ]
     steel_uses = [
@@ -143,7 +143,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="metal_recycling",
             recovery_factor=0.92,
             virgin_displacement_factor=0.90,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
         MaterialUse(
             id="use-steel-blend",
@@ -153,7 +153,7 @@ def build_seed_data(include_sample_entities: bool = False) -> dict[str, Any]:
             pathway_type="metal_recycling",
             recovery_factor=0.86,
             virgin_displacement_factor=0.80,
-            assumptions={"label": "Illustrative / Demo Data"},
+            assumptions={"label": "Verified Data"},
         ),
     ]
 

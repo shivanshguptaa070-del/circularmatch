@@ -25,9 +25,13 @@ async function getAuthHeader(): Promise<Record<string, string>> {
   const mode = localStorage.getItem('cm_active_mode') || (session?.user?.user_metadata?.active_mode as string) || 'selling'
   headers['X-Active-Mode'] = mode
   if (!session) {
-    // Let the backend use the default "user-buyer" or "user-generator" 
-    // so the dashboard is populated with demo data.
-    headers['X-Demo-User-Id'] = mode === 'sourcing' || mode === 'buyer' ? 'user-buyer' : 'user-generator'
+    let demoSession = localStorage.getItem('cm_demo_session')
+    if (!demoSession) {
+      demoSession = Math.random().toString(36).substring(2, 8)
+      localStorage.setItem('cm_demo_session', demoSession)
+    }
+    const rolePrefix = mode === 'sourcing' || mode === 'buyer' ? 'user-buyer' : 'user-generator'
+    headers['X-Demo-User-Id'] = `${rolePrefix}-${demoSession}`
   }
   return headers
 }
