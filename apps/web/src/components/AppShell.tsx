@@ -27,16 +27,16 @@ interface NavItem {
 }
 
 const SELLER_NAV: NavItem[] = [
-  { label: 'Seller Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { label: 'List Waste Stream', path: '/list-waste', icon: PlusCircle },
-  { label: 'My Waste Inventory', path: '/listings', icon: Recycle },
+  { label: 'Sell Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'List Waste', path: '/list-waste', icon: PlusCircle },
+  { label: 'My Inventory', path: '/listings', icon: Recycle },
   { label: 'Demand Network', path: '/map', icon: Map },
 ]
 
 const BUYER_NAV: NavItem[] = [
-  { label: 'Procurement Dashboard', path: '/dashboard', icon: LayoutDashboard },
-  { label: 'My Procurement Targets', path: '/buyer-requirements', icon: ClipboardList },
-  { label: 'Supply Opportunities', path: '/supply', icon: PackageSearch },
+  { label: 'Buy Dashboard', path: '/dashboard', icon: LayoutDashboard },
+  { label: 'My Buy Targets', path: '/buyer-requirements', icon: ClipboardList },
+  { label: 'Find Suppliers', path: '/supply', icon: PackageSearch },
   { label: 'Supplier Network', path: '/map', icon: Map },
 ]
 
