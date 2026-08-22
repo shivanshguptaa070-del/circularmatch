@@ -1186,6 +1186,9 @@ def contact_match(
 
     email_sent = False
     if recipient_user is not None:
+        # On Resend's free plan without a verified domain, you can only deliver to
+        # your own Resend account email. We send to the recipient AND BCC the admin
+        # so the owner can verify delivery immediately.
         email_sent = send_contact_notification(
             api_key=settings.resend_api_key,
             recipient_name=recipient_user.full_name,
@@ -1197,6 +1200,7 @@ def contact_match(
             note=note,
             match_url=match_url,
             sender_role=sender_role,
+            admin_email=settings.admin_email,  # BCC the platform owner for visibility
         )
     else:
         logger.warning(

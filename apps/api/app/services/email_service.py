@@ -18,7 +18,9 @@ import httpx
 logger = logging.getLogger(__name__)
 
 _RESEND_SEND_URL = "https://api.resend.com/emails"
-_FROM_ADDRESS = "CircularMatch <noreply@circularmatch.in>"
+# Use Resend's shared sender — works without domain verification on free plan.
+# Once you verify your own domain in Resend dashboard, change this to your domain.
+_FROM_ADDRESS = "CircularMatch <onboarding@resend.dev>"
 _TIMEOUT = 10.0  # seconds
 
 
@@ -53,6 +55,7 @@ def send_contact_notification(
     note: str,
     match_url: str,
     sender_role: str,  # "buyer" or "generator"
+    admin_email: str | None = None,  # BCC the platform owner for visibility
 ) -> bool:
     """Send a contact-intent email to the other party in a match.
 
@@ -178,13 +181,23 @@ def send_contact_notification(
         "-- CircularMatch team"
     )
 
+    # Build recipient list — always include the intended recipient.
+    # On Resend's free plan (no verified domain) only emails TO your Resend
+    # account owner address are actually delivered. Adding admin_email ensures
+    # the platform owner gets a copy during testing.
+    to_list = [recipient_email]
+
     payload: dict[str, Any] = {
         "from": _FROM_ADDRESS,
-        "to": [recipient_email],
+        "to": to_list,
         "reply_to": sender_email,
         "subject": subject,
         "html": html,
         "text": plain,
     }
+
+    # Add BCC to admin / platform owner so they can confirm delivery
+    if admin_email and admin_email not in to_list:
+        payload["bcc"] = [admin_email]
 
     return _send(api_key, payload)
