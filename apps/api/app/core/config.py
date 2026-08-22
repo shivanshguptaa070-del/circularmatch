@@ -21,7 +21,7 @@ class Settings:
     # REQUIRED IN PRODUCTION: Supabase project JWT secret (Dashboard > API > JWT Secret).
     # Without this, token signatures are not verified — a critical security gap.
     supabase_jwt_secret: str | None = field(default_factory=lambda: os.getenv("SUPABASE_JWT_SECRET"))
-    admin_email: str | None = field(default_factory=lambda: os.getenv("VITE_ADMIN_EMAIL"))
+    admin_email: str | None = field(default_factory=lambda: os.getenv("ADMIN_EMAIL") or os.getenv("VITE_ADMIN_EMAIL") or os.getenv("RESEND_TEST_EMAIL"))
     # Email notifications via Resend (https://resend.com)
     # Set RESEND_API_KEY in Render environment variables to enable live emails.
     resend_api_key: str | None = field(default_factory=lambda: os.getenv("RESEND_API_KEY"))

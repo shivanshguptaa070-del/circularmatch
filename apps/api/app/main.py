@@ -1185,11 +1185,9 @@ def contact_match(
         )
 
     email_sent = False
+    delivery_msg = "Contact intent recorded."
     if recipient_user is not None:
-        # On Resend's free plan without a verified domain, you can only deliver to
-        # your own Resend account email. We send to the recipient AND BCC the admin
-        # so the owner can verify delivery immediately.
-        email_sent = send_contact_notification(
+        email_sent, delivery_msg = send_contact_notification(
             api_key=settings.resend_api_key,
             recipient_name=recipient_user.full_name,
             recipient_email=recipient_user.email,
@@ -1200,9 +1198,10 @@ def contact_match(
             note=note,
             match_url=match_url,
             sender_role=sender_role,
-            admin_email=settings.admin_email,  # BCC the platform owner for visibility
+            admin_email=settings.admin_email,
         )
     else:
+        delivery_msg = "Contact recorded (no recipient account linked to listing)."
         logger.warning(
             "contact_match: could not find a recipient user for match %s (role=%s)",
             match_id,
@@ -1213,11 +1212,7 @@ def contact_match(
         "match": match_card_view(store, updated or match),
         "transaction": transaction,
         "email_sent": email_sent,
-        "message": (
-            f"Contact request sent to {recipient_user.full_name} ({recipient_user.email})."
-            if email_sent else
-            "Contact intent recorded. Email notification could not be delivered right now."
-        ),
+        "message": delivery_msg,
     })
 
 
