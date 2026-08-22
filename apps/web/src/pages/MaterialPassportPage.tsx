@@ -36,9 +36,6 @@ export function MaterialPassportPage({ role }: { role: Role }) {
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const addEvidence = async () => {
-    const primaryLot = passport.data?.lots.find((lot) => lot.status === 'available') || passport.data?.lots[0]
-
   const handleDownload = (filename: string) => {
     const blob = new Blob([`This is a securely retrieved copy of ${filename} from the CircularMatch data vault.\n\nIn the production environment, this file would be the original uploaded asset (PDF, Image, or Test Report).`], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -50,6 +47,9 @@ export function MaterialPassportPage({ role }: { role: Role }) {
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
+
+  const addEvidence = async () => {
+    const primaryLot = passport.data?.lots.find((lot) => lot.status === 'available') || passport.data?.lots[0]
     if (!primaryLot || !evidenceForm.title.trim()) {
       setError('Choose an available lot and add an evidence title first.')
       return
