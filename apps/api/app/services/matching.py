@@ -160,8 +160,8 @@ def _check_buyer_spec(
         if _normalize(lot.material_form) in allowed_forms:
             checks.append(EligibilityCheck(key="form", label="Material form", status="pass", detail=f"{lot.material_form} is accepted by this buyer template."))
         else:
-            checks.append(EligibilityCheck(key="form", label="Material form", status="fail", detail=f"{lot.material_form} is outside the buyer's accepted forms: {', '.join(acceptance_spec.accepted_forms)}."))
-            blocked = True
+            checks.append(EligibilityCheck(key="form", label="Material form", status="warning", detail=f"{lot.material_form} is not explicitly in the buyer's accepted forms: {', '.join(acceptance_spec.accepted_forms)}. A physical sample may be required."))
+            needs_sample = True
 
     if lot and acceptance_spec.accepted_colours:
         allowed_colours = {_normalize(item) for item in acceptance_spec.accepted_colours}
@@ -171,8 +171,8 @@ def _check_buyer_spec(
             checks.append(EligibilityCheck(key="colour", label="Colour", status="warning", detail="Buyer has colour constraints but the lot colour is not specified."))
             missing_evidence = True
         else:
-            checks.append(EligibilityCheck(key="colour", label="Colour", status="fail", detail=f"{lot.colour} is outside the buyer's listed accepted colours."))
-            blocked = True
+            checks.append(EligibilityCheck(key="colour", label="Colour", status="warning", detail=f"{lot.colour} is not explicitly in the buyer's listed accepted colours. A physical sample may be required."))
+            needs_sample = True
 
     best_status = _best_evidence_status(evidence)
     required_rank = EVIDENCE_RANK[acceptance_spec.required_evidence_status]
