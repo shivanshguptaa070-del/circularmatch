@@ -375,6 +375,11 @@ def can_access_listing(current_user: User, listing: WasteListing) -> bool:
     # Demo users can access all demo content (it's all illustrative data)
     if current_user.is_demo and listing.is_demo:
         return True
+        
+    # Buyers need to be able to view the passport of any active supply opportunity they are evaluating
+    if current_user.role == "buyer" and listing.status == "active":
+        return True
+        
     return current_user.company_id is not None and listing.company_id == current_user.company_id
 
 
