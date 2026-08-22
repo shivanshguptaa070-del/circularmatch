@@ -46,7 +46,7 @@ export function BuyerDashboard() {
     <div className="space-y-7">
       <PageHeader
         eyebrow="Buyer Workspace"
-        title="Procurement Dashboard"
+        title="Buy Dashboard"
         description="Track your secondary material requirements, active supplier matches, and cost savings pipeline."
         actions={
           <Link className="btn-primary" to="/buyer-requirements">
@@ -56,9 +56,9 @@ export function BuyerDashboard() {
         }
       />
       <section className="grid gap-5 lg:grid-cols-3 xl:grid-cols-4">
-        <MetricCard label="Procurement Target" value={`${formatKg(data.kpis?.total_procurement_target_kg_week || 0)} / wk`} detail="Total requested volume" icon={Target} />
+        <MetricCard label="Buy Target" value={`${formatKg(data.kpis?.total_procurement_target_kg_week || 0)} / wk`} detail="Total requested volume" icon={Target} />
         <MetricCard label="Active Suppliers" value={formatNumber(data.kpis?.active_seller_matches || 0)} detail="Matching your requirements" icon={UsersRound} />
-        <MetricCard label="Successful Procurements" value={formatNumber(data.kpis?.successful_purchases || 0)} detail="Completed transactions" icon={PackageCheck} />
+        <MetricCard label="Successful Buys" value={formatNumber(data.kpis?.successful_purchases || 0)} detail="Completed transactions" icon={PackageCheck} />
         <MetricCard label="Est. Cost Savings" value={formatCurrency(data.kpis?.estimated_cost_savings_inr || 0)} detail="Vs virgin material cost" icon={CircleDollarSign} />
       </section>
 
