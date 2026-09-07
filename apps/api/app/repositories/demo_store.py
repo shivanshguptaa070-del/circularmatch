@@ -59,6 +59,17 @@ class DemoStore:
             real_lots = {k: v for k, v in self.lots.items() if not v.is_demo} if hasattr(self, "lots") else {}
             real_evidence = {k: v for k, v in self.evidence.items() if not v.is_demo} if hasattr(self, "evidence") else {}
             real_specs = {k: v for k, v in self.acceptance_specs.items() if not v.is_demo} if hasattr(self, "acceptance_specs") else {}
+            
+            real_listing_ids = set(real_listings.keys())
+            real_req_ids = set(real_requirements.keys())
+
+            real_matches = {k: v for k, v in self.matches.items() if v.listing_id in real_listing_ids or v.buyer_requirement_id in real_req_ids} if hasattr(self, "matches") else {}
+            real_samples = {k: v for k, v in self.sample_requests.items() if not v.is_demo} if hasattr(self, "sample_requests") else {}
+            real_offers = {k: v for k, v in self.offers.items() if not v.is_demo} if hasattr(self, "offers") else {}
+            real_shipments = {k: v for k, v in self.shipments.items() if not v.is_demo} if hasattr(self, "shipments") else {}
+            real_audits = [a for a in self.audit_events if getattr(a, "is_demo", True) is False] if hasattr(self, "audit_events") else []
+            real_txns = [t for t in self.transactions if not t.get("is_demo", True)] if hasattr(self, "transactions") else []
+            all_notifications = self.notifications.copy() if hasattr(self, "notifications") else {}
 
             seed = fresh_seed_data(include_sample_entities=include_sample_entities)
             self.materials: dict[str, Material] = {item.id: item for item in seed["materials"]}
@@ -108,6 +119,13 @@ class DemoStore:
             self.lots.update(real_lots)
             self.evidence.update(real_evidence)
             self.acceptance_specs.update(real_specs)
+            self.matches.update(real_matches)
+            self.sample_requests.update(real_samples)
+            self.offers.update(real_offers)
+            self.shipments.update(real_shipments)
+            self.audit_events.extend(real_audits)
+            self.transactions.extend(real_txns)
+            self.notifications.update(all_notifications)
             if real_users:
                 logger.info(
                     "DemoStore.reset(): preserved %d real companies, %d real users, %d real listings.",
@@ -216,6 +234,38 @@ class DemoStore:
                 except Exception as exc:
                     logger.warning("DemoStore: failed to load match: %s", exc)
 
+            for raw in snapshot.get("sample_requests", []):
+                try:
+                    obj = SampleRequest(**raw)
+                    self.sample_requests[obj.id] = obj
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load sample_request: %s", exc)
+            for raw in snapshot.get("offers", []):
+                try:
+                    obj = Offer(**raw)
+                    self.offers[obj.id] = obj
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load offer: %s", exc)
+            for raw in snapshot.get("shipments", []):
+                try:
+                    obj = Shipment(**raw)
+                    self.shipments[obj.id] = obj
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load shipment: %s", exc)
+            for raw in snapshot.get("audit_events", []):
+                try:
+                    obj = AuditEvent(**raw)
+                    self.audit_events.append(obj)
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load audit_event: %s", exc)
+            self.transactions.extend(snapshot.get("transactions", []))
+            for raw in snapshot.get("notifications", []):
+                try:
+                    obj = Notification(**raw)
+                    self.notifications[obj.id] = obj
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load notification: %s", exc)
+
         real_users_loaded = sum(1 for u in self.users.values() if not u.is_demo)
         real_cos_loaded = sum(1 for c in self.companies.values() if not c.is_demo)
         logger.info(
@@ -244,6 +294,10 @@ class DemoStore:
 
                 # CRITICAL: Only persist real user records (is_demo=False).
                 # Seed/demo records are never written to storage.
+                # Identify real listings and requirements to filter matches
+                real_listing_ids = {l.id for l in self.listings.values() if not l.is_demo}
+                real_req_ids = {r.id for r in self.requirements.values() if not r.is_demo}
+
                 data = {
                     "companies": [c.model_dump() for c in self.companies.values() if not c.is_demo],
                     "users": [u.model_dump() for u in self.users.values() if not u.is_demo],
@@ -252,7 +306,13 @@ class DemoStore:
                     "lots": [lot.model_dump() for lot in self.lots.values()],
                     "evidence": [e.model_dump() for e in self.evidence.values() if not e.is_demo],
                     "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values() if not s.is_demo],
-                    "matches": [m.model_dump() for m in self.matches.values()],
+                    "matches": [m.model_dump() for m in self.matches.values() if m.listing_id in real_listing_ids or m.buyer_requirement_id in real_req_ids],
+                    "sample_requests": [s.model_dump() for s in self.sample_requests.values() if not s.is_demo],
+                    "offers": [o.model_dump() for o in self.offers.values() if not o.is_demo],
+                    "shipments": [s.model_dump() for s in self.shipments.values() if not s.is_demo],
+                    "audit_events": [a.model_dump() for a in self.audit_events if getattr(a, "is_demo", True) is False],
+                    "transactions": [t for t in self.transactions if not t.get("is_demo", True)],
+                    "notifications": [n.model_dump() for n in self.notifications.values()],
                 }
             
             import threading
@@ -529,7 +589,7 @@ class DemoStore:
         self._save_snapshot()
         return updated
 
-    def add_audit_event(self, entity_type: str, entity_id: str, action: str, summary: str, actor_id: str | None = None) -> AuditEvent:
+    def add_audit_event(self, entity_type: str, entity_id: str, action: str, summary: str, actor_id: str | None = None, is_demo: bool = True) -> AuditEvent:
         event = AuditEvent(
             id=self.new_id("audit"),
             entity_type=entity_type,
@@ -538,7 +598,7 @@ class DemoStore:
             actor_id=actor_id,
             summary=summary,
             created_at=self.timestamp(),
-            is_demo=True,
+            is_demo=is_demo,
         )
         with self._lock:
             self.audit_events.append(event)
@@ -563,7 +623,7 @@ class DemoStore:
                 return self.notifications[notification_id]
             return None
 
-    def add_transaction(self, *, match_id: str, listing_id: str, initiated_by: str, note: str, status: str = "contacted", agreed_quantity_kg: float = 0) -> dict[str, Any]:
+    def add_transaction(self, *, match_id: str, listing_id: str, initiated_by: str, note: str, status: str = "contacted", agreed_quantity_kg: float = 0, is_demo: bool = True) -> dict[str, Any]:
         transaction = {
             "id": f"txn-{uuid4().hex[:10]}",
             "match_id": match_id,
@@ -573,7 +633,7 @@ class DemoStore:
             "agreed_quantity_kg": agreed_quantity_kg,
             "note": note,
             "created_at": self.timestamp(),
-            "is_demo": True,
+            "is_demo": is_demo,
         }
         with self._lock:
             self.transactions.append(transaction)

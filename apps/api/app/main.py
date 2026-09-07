@@ -307,7 +307,7 @@ def default_acceptance_spec(store: DemoStore, requirement: BuyerRequirement) -> 
         route_note=template.get("route_note", "Buyer acceptance template has not been tailored yet."),
         review_note="Demo template — buyer must validate before real use.",
         updated_at=store.timestamp(),
-        is_demo=True,
+        is_demo=current_user.is_demo,
     )
 
 
@@ -785,7 +785,7 @@ def create_listing(
         is_demo=current_user.is_demo,  # Inherits from the listing owner
     )
     store.create_evidence(declaration)
-    store.add_audit_event(entity_type="listing", entity_id=listing.id, action="listing_created", actor_id=current_user.id, summary="Listing, initial lot, and supplier-declaration evidence were created.")
+    store.add_audit_event(entity_type="listing", entity_id=listing.id, action="listing_created", actor_id=current_user.id, summary="Listing, initial lot, and supplier-declaration evidence were created.", is_demo=current_user.is_demo)
     return envelope({"listing": listing_view(store, listing), "lot": lot_view(store, lot), "message": "Listing published with a Material Passport draft."})
 
 
@@ -818,7 +818,7 @@ def create_material_lot(
     )
     store.create_lot(lot)
     store.clear_matches_for_listing(listing.id)
-    store.add_audit_event(entity_type="listing", entity_id=listing.id, action="lot_created", actor_id=current_user.id, summary=f"Material lot {lot.lot_code} was added to the listing.")
+    store.add_audit_event(entity_type="listing", entity_id=listing.id, action="lot_created", actor_id=current_user.id, summary=f"Material lot {lot.lot_code} was added to the listing.", is_demo=current_user.is_demo)
     return envelope({"lot": lot_view(store, lot), "readiness": passport_readiness(store, listing.id), "message": "Material lot added. Recompute matches to use the newest available lot."})
 
 
@@ -855,7 +855,7 @@ def create_quality_evidence(
     )
     store.create_evidence(evidence)
     store.clear_matches_for_listing(listing.id)
-    store.add_audit_event(entity_type="lot", entity_id=lot.id, action="evidence_added", actor_id=current_user.id, summary=f"Evidence '{evidence.title}' was added with status {evidence.status}.")
+    store.add_audit_event(entity_type="lot", entity_id=lot.id, action="evidence_added", actor_id=current_user.id, summary=f"Evidence '{evidence.title}' was added with status {evidence.status}.", is_demo=current_user.is_demo)
     message = "Evidence record added. It remains supplier-uploaded until an admin review." if request.status != evidence_status else "Evidence record added to the Material Passport."
     return envelope({"evidence": evidence_view(evidence), "readiness": passport_readiness(store, listing.id), "message": message})
 
@@ -880,7 +880,7 @@ def review_quality_evidence(
     lot = store.get_lot(updated.lot_id)
     if lot:
         store.clear_matches_for_listing(lot.listing_id)
-        store.add_audit_event(entity_type="lot", entity_id=lot.id, action="evidence_reviewed", actor_id=current_user.id, summary=f"Evidence '{updated.title}' was reviewed as {updated.status}.")
+        store.add_audit_event(entity_type="lot", entity_id=lot.id, action="evidence_reviewed", actor_id=current_user.id, summary=f"Evidence '{updated.title}' was reviewed as {updated.status}.", is_demo=current_user.is_demo)
     return envelope({"evidence": evidence_view(updated), "message": "Evidence review status updated. Matches will apply it on next recompute."})
 
 
@@ -906,7 +906,7 @@ def update_listing(
     updated = store.update_listing(listing_id, updates)
     assert updated is not None
     store.clear_matches_for_listing(listing_id)
-    store.add_audit_event(entity_type="listing", entity_id=listing_id, action="listing_updated", actor_id=current_user.id, summary="Listing fields were updated and matching was invalidated.")
+    store.add_audit_event(entity_type="listing", entity_id=listing_id, action="listing_updated", actor_id=current_user.id, summary="Listing fields were updated and matching was invalidated.", is_demo=current_user.is_demo)
     return envelope({"listing": listing_view(store, updated), "message": "Listing updated; previous match suggestions were refreshed."})
 
 
@@ -965,7 +965,7 @@ def update_acceptance_spec(
     )
     store.save_acceptance_spec(spec)
     store.clear_matches_for_requirement(requirement.id)
-    store.add_audit_event(entity_type="buyer_requirement", entity_id=requirement.id, action="acceptance_spec_updated", actor_id=current_user.id, summary="Buyer acceptance template was updated; matching will recompute using the new gates.")
+    store.add_audit_event(entity_type="buyer_requirement", entity_id=requirement.id, action="acceptance_spec_updated", actor_id=current_user.id, summary="Buyer acceptance template was updated; matching will recompute using the new gates.", is_demo=current_user.is_demo)
     return envelope({"acceptance_spec": acceptance_spec_view(store, requirement), "message": "Buyer acceptance template updated. Existing match suggestions will refresh on next analysis."})
 
 
@@ -1001,7 +1001,7 @@ def create_requirement(
     store.create_requirement(requirement)
     spec = default_acceptance_spec(store, requirement)
     store.save_acceptance_spec(spec)
-    store.add_audit_event(entity_type="buyer_requirement", entity_id=requirement.id, action="buyer_requirement_created", actor_id=current_user.id, summary="Buyer requirement and starter acceptance template were created.")
+    store.add_audit_event(entity_type="buyer_requirement", entity_id=requirement.id, action="buyer_requirement_created", actor_id=current_user.id, summary="Buyer requirement and starter acceptance template were created.", is_demo=current_user.is_demo)
     return envelope({"requirement": requirement_view(store, requirement), "acceptance_spec": acceptance_spec_view(store, requirement), "message": "Buyer requirement and starter acceptance template published."})
 
 
@@ -1035,7 +1035,7 @@ def recompute_matches(
     matches = recompute_listing_matches(store, listing)
     eligible_count = len([item for item in matches if item.eligibility_status == "eligible"])
     attention_count = len(matches) - eligible_count
-    store.add_audit_event(entity_type="listing", entity_id=listing.id, action="matches_recomputed", actor_id=current_user.id, summary=f"{len(matches)} material-compatible buyer requirements analyzed; {eligible_count} eligible and {attention_count} requiring attention.")
+    store.add_audit_event(entity_type="listing", entity_id=listing.id, action="matches_recomputed", actor_id=current_user.id, summary=f"{len(matches, is_demo=current_user.is_demo)} material-compatible buyer requirements analyzed; {eligible_count} eligible and {attention_count} requiring attention.")
     return envelope({
         "listing": listing_view(store, listing),
         "matches": [match_card_view(store, item) for item in matches],
@@ -1176,13 +1176,14 @@ def contact_match(
         # Mark as accepted so the dashboard Successful Matches / Sales / Purchases counter increments
         status="accepted",
         agreed_quantity_kg=matched_quantity_kg,
+        is_demo=current_user.is_demo,
     )
     store.add_audit_event(
         entity_type="match",
         entity_id=match_id,
         action="contact_recorded",
         actor_id=current_user.id,
-        summary=f"Contact made by {current_user.full_name} ({current_user.role}) — match recorded as successful.",
+        summary=f"Contact made by {current_user.full_name} ({current_user.role}, is_demo=current_user.is_demo) — match recorded as successful.",
     )
 
     # ── Find the other party and send them a real email ─────────────────────
@@ -1267,11 +1268,11 @@ def create_sample_request(
         note=request.note,
         created_at=store.timestamp(),
         updated_at=store.timestamp(),
-        is_demo=True,
+        is_demo=current_user.is_demo,
     )
     store.create_sample_request(sample)
     store.update_match(match_id, {"status": "contacted"})
-    store.add_audit_event(entity_type="match", entity_id=match_id, action="sample_requested", actor_id=current_user.id, summary=f"A {sample.requested_quantity_kg:,.0f} kg demo sample/inspection request was created.")
+    store.add_audit_event(entity_type="match", entity_id=match_id, action="sample_requested", actor_id=current_user.id, summary=f"A {sample.requested_quantity_kg:,.0f} kg demo sample/inspection request was created.", is_demo=current_user.is_demo)
     return envelope({"sample_request": sample.model_dump(), "timeline": timeline_for_match(store, match_id), "message": "Demo sample request recorded. It is not a transport instruction or quality acceptance."})
 
 
@@ -1296,7 +1297,7 @@ def update_sample_request(
     assert updated is not None
     store.clear_matches_for_listing(listing.id)
     recompute_listing_matches(store, listing)
-    store.add_audit_event(entity_type="match", entity_id=match.id, action="sample_updated", actor_id=current_user.id, summary=f"Demo sample request updated to {updated.status}.")
+    store.add_audit_event(entity_type="match", entity_id=match.id, action="sample_updated", actor_id=current_user.id, summary=f"Demo sample request updated to {updated.status}.", is_demo=current_user.is_demo)
     return envelope({"sample_request": updated.model_dump(), "timeline": timeline_for_match(store, match.id), "message": "Sample status updated in Demo Mode. Recomputed eligibility will use the new sample status."})
 
 
@@ -1323,10 +1324,10 @@ def create_offer(
         pickup_model=request.pickup_model,
         note=request.note,
         created_at=store.timestamp(),
-        is_demo=True,
+        is_demo=current_user.is_demo,
     )
     store.create_offer(offer)
-    store.add_audit_event(entity_type="match", entity_id=match_id, action="offer_sent", actor_id=current_user.id, summary=f"Demo offer sent for {offer.quantity_kg:,.0f} kg at ₹{offer.price_per_kg:,.2f}/kg.")
+    store.add_audit_event(entity_type="match", entity_id=match_id, action="offer_sent", actor_id=current_user.id, summary=f"Demo offer sent for {offer.quantity_kg:,.0f} kg at ₹{offer.price_per_kg:,.2f}/kg.", is_demo=current_user.is_demo)
     return envelope({"offer": offer.model_dump(), "timeline": timeline_for_match(store, match_id), "message": "Illustrative offer recorded. It is not a binding commercial agreement."})
 
 
@@ -1349,7 +1350,7 @@ def update_offer(
         raise HTTPException(status_code=403, detail="You are not a participant in this offer.")
     updated = store.update_offer(offer_id, {"status": request.status, "note": request.note or offer.note})
     assert updated is not None
-    store.add_audit_event(entity_type="match", entity_id=match.id, action="offer_updated", actor_id=current_user.id, summary=f"Demo offer updated to {updated.status}.")
+    store.add_audit_event(entity_type="match", entity_id=match.id, action="offer_updated", actor_id=current_user.id, summary=f"Demo offer updated to {updated.status}.", is_demo=current_user.is_demo)
     return envelope({"offer": updated.model_dump(), "timeline": timeline_for_match(store, match.id), "message": "Offer status updated in Demo Mode. It remains non-binding."})
 
 
@@ -1376,10 +1377,10 @@ def create_shipment(
         carrier_name=request.carrier_name,
         created_at=store.timestamp(),
         updated_at=store.timestamp(),
-        is_demo=True,
+        is_demo=current_user.is_demo,
     )
     store.create_shipment(shipment)
-    store.add_audit_event(entity_type="match", entity_id=match_id, action="pickup_planned", actor_id=current_user.id, summary=f"Demo pickup planned for {shipment.planned_quantity_kg:,.0f} kg on {shipment.pickup_date}.")
+    store.add_audit_event(entity_type="match", entity_id=match_id, action="pickup_planned", actor_id=current_user.id, summary=f"Demo pickup planned for {shipment.planned_quantity_kg:,.0f} kg on {shipment.pickup_date}.", is_demo=current_user.is_demo)
     return envelope({"shipment": shipment.model_dump(), "timeline": timeline_for_match(store, match_id), "message": "Demo pickup plan recorded. It is not live fleet dispatch or a transport contract."})
 
 
@@ -1419,7 +1420,7 @@ def update_shipment(
         audit_summary = f"Demo shipment received; {received_quantity:,.0f} kg recorded as accepted for dashboard demonstration."
     else:
         audit_summary = f"Demo shipment updated to {updated.status}."
-    store.add_audit_event(entity_type="match", entity_id=match.id, action="shipment_updated", actor_id=current_user.id, summary=audit_summary)
+    store.add_audit_event(entity_type="match", entity_id=match.id, action="shipment_updated", actor_id=current_user.id, summary=audit_summary, is_demo=current_user.is_demo)
     return envelope({"shipment": updated.model_dump(), "timeline": timeline_for_match(store, match.id), "message": "Shipment record updated in Demo Mode."})
 
 
@@ -1677,7 +1678,7 @@ def update_scoring_config(
     store: DemoStore = Depends(get_store),
 ) -> dict[str, Any]:
     config = store.set_scoring_weights(request.weights)
-    store.add_audit_event(entity_type="scoring_config", entity_id=config.id, action="weights_updated", actor_id=current_user.id, summary=f"Scoring configuration v{config.version} was saved.")
+    store.add_audit_event(entity_type="scoring_config", entity_id=config.id, action="weights_updated", actor_id=current_user.id, summary=f"Scoring configuration v{config.version} was saved.", is_demo=current_user.is_demo)
     return envelope({"config": config.model_dump(), "message": "New scoring weights will be applied the next time matches are recomputed.", "notice": "MVP decision rules — configurable, not scientifically optimal."})
 
 
