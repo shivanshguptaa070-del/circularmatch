@@ -109,6 +109,7 @@ class MaterialLot(BaseModel):
     declared_spec: dict[str, Any] = Field(default_factory=dict)
     evidence_ids: list[str] = Field(default_factory=list)
     status: Literal["available", "reserved", "dispatched", "closed"] = "available"
+    is_demo: bool = True
     created_at: str
 
 
@@ -261,6 +262,7 @@ class Notification(BaseModel):
     message: str
     reference_url: str | None = None
     is_read: bool = False
+    is_demo: bool = True
     created_at: str
 
 

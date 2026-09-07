@@ -69,7 +69,7 @@ class DemoStore:
             real_shipments = {k: v for k, v in self.shipments.items() if not v.is_demo} if hasattr(self, "shipments") else {}
             real_audits = [a for a in self.audit_events if getattr(a, "is_demo", True) is False] if hasattr(self, "audit_events") else []
             real_txns = [t for t in self.transactions if not t.get("is_demo", True)] if hasattr(self, "transactions") else []
-            all_notifications = self.notifications.copy() if hasattr(self, "notifications") else {}
+            real_notifications = {k: v for k, v in self.notifications.items() if not v.is_demo} if hasattr(self, "notifications") else {}
 
             seed = fresh_seed_data(include_sample_entities=include_sample_entities)
             self.materials: dict[str, Material] = {item.id: item for item in seed["materials"]}
@@ -125,7 +125,7 @@ class DemoStore:
             self.shipments.update(real_shipments)
             self.audit_events.extend(real_audits)
             self.transactions.extend(real_txns)
-            self.notifications.update(all_notifications)
+            self.notifications.update(real_notifications)
             if real_users:
                 logger.info(
                     "DemoStore.reset(): preserved %d real companies, %d real users, %d real listings.",
@@ -303,7 +303,7 @@ class DemoStore:
                     "users": [u.model_dump() for u in self.users.values() if not u.is_demo],
                     "listings": [l.model_dump() for l in self.listings.values() if not l.is_demo],
                     "requirements": [r.model_dump() for r in self.requirements.values() if not r.is_demo],
-                    "lots": [lot.model_dump() for lot in self.lots.values()],
+                    "lots": [lot.model_dump() for lot in self.lots.values() if not lot.is_demo],
                     "evidence": [e.model_dump() for e in self.evidence.values() if not e.is_demo],
                     "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values() if not s.is_demo],
                     "matches": [m.model_dump() for m in self.matches.values() if m.listing_id in real_listing_ids or m.buyer_requirement_id in real_req_ids],
@@ -312,7 +312,7 @@ class DemoStore:
                     "shipments": [s.model_dump() for s in self.shipments.values() if not s.is_demo],
                     "audit_events": [a.model_dump() for a in self.audit_events if getattr(a, "is_demo", True) is False],
                     "transactions": [t for t in self.transactions if not t.get("is_demo", True)],
-                    "notifications": [n.model_dump() for n in self.notifications.values()],
+                    "notifications": [n.model_dump() for n in self.notifications.values() if not n.is_demo],
                 }
             
             import threading

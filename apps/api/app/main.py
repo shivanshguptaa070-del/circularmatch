@@ -447,7 +447,8 @@ def recompute_listing_matches(store: DemoStore, listing: WasteListing) -> list[M
                             title=f"New {computed.total_score:.0f}% Match Found",
                             message=f"A new listing for {material.canonical_name} matches your requirement.",
                             reference_url=f"/matches/{computed.id}",
-                            created_at=store.timestamp()
+                            created_at=store.timestamp(),
+                            is_demo=buyer_user.is_demo
                         )
                         store.create_notification(notification)
                         send_notification_email(
@@ -504,7 +505,8 @@ def recompute_requirement_matches(store: DemoStore, requirement: BuyerRequiremen
                             title=f"New {computed.total_score:.0f}% Match Found",
                             message=f"A buyer requirement matches your listing for {material.canonical_name}.",
                             reference_url=f"/matches/{computed.id}",
-                            created_at=store.timestamp()
+                            created_at=store.timestamp(),
+                            is_demo=seller_user.is_demo
                         )
                         store.create_notification(notification)
                         send_notification_email(
@@ -770,6 +772,7 @@ def create_listing(
         compliance_triage=request.compliance_triage,
         declared_spec={"supplier_statement": request.quality_notes or "Supplier description captured during listing intake."},
         created_at=store.timestamp(),
+        is_demo=current_user.is_demo
     )
     store.create_lot(lot)
     declaration = QualityEvidence(
@@ -815,6 +818,7 @@ def create_material_lot(
         compliance_triage=request.compliance_triage,
         declared_spec=request.declared_spec,
         created_at=store.timestamp(),
+        is_demo=current_user.is_demo
     )
     store.create_lot(lot)
     store.clear_matches_for_listing(listing.id)
