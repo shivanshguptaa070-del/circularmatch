@@ -119,7 +119,7 @@ def get_current_user(
 
                 company_id = f"company-{user_id[:8]}"
                 if not demo_store.get_company(company_id):
-                    demo_store.companies[company_id] = Company(
+                    demo_store.create_company(Company(
                         id=company_id,
                         owner_user_id=user_id,
                         name=company_name,
@@ -130,7 +130,7 @@ def get_current_user(
                         longitude=77.2090,
                         verification_status="verified",
                         is_demo=True,
-                    )
+                    ))
 
                 new_user = User(
                     id=user_id,
@@ -140,8 +140,7 @@ def get_current_user(
                     company_id=company_id,
                     is_demo=False,
                 )
-                demo_store.users[user_id] = new_user
-                demo_store._save_snapshot()
+                demo_store.create_user(new_user)
                 return new_user
 
     # ── 2. Seamless fallback persona ─────────────────────────────────────────
@@ -159,7 +158,7 @@ def get_current_user(
     role = "buyer" if header_mode in {"sourcing", "buyer"} else "generator"
     company_id = f"company-{user_id}"
     if not demo_store.get_company(company_id):
-        demo_store.companies[company_id] = Company(
+        demo_store.create_company(Company(
             id=company_id,
             owner_user_id=user_id,
             name=f"Company {user_id.split('-')[1].title() if '-' in user_id else user_id}",
@@ -170,7 +169,7 @@ def get_current_user(
             longitude=77.2090,
             verification_status="verified",
             is_demo=True,
-        )
+        ))
     user = User(
         id=user_id,
         full_name=user_id.replace("user-", "").title() + " User",
@@ -179,7 +178,7 @@ def get_current_user(
         company_id=company_id,
         is_demo=True,
     )
-    demo_store.users[user_id] = user
+    demo_store.create_user(user)
     return user
 
 

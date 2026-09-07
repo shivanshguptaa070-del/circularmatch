@@ -105,50 +105,50 @@ class DemoStore:
                 try:
                     obj = Company(**raw)
                     self.companies[obj.id] = obj
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load company: %s", exc)
             for raw in snapshot.get("users", []):
                 try:
                     obj = User(**raw)
                     self.users[obj.id] = obj
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load user: %s", exc)
             for raw in snapshot.get("listings", []):
                 try:
                     obj = WasteListing(**raw)
                     self.listings[obj.id] = obj
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load listing: %s", exc)
             for raw in snapshot.get("requirements", []):
                 try:
                     obj = BuyerRequirement(**raw)
                     self.requirements[obj.id] = obj
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load requirement: %s", exc)
             for raw in snapshot.get("lots", []):
                 try:
                     obj = MaterialLot(**raw)
                     self.lots[obj.id] = obj
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load lot: %s", exc)
             for raw in snapshot.get("evidence", []):
                 try:
                     obj = QualityEvidence(**raw)
                     self.evidence[obj.id] = obj
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load evidence: %s", exc)
             for raw in snapshot.get("acceptance_specs", []):
                 try:
                     obj = BuyerAcceptanceSpec(**raw)
                     self.acceptance_specs[obj.buyer_requirement_id] = obj
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load acceptance spec: %s", exc)
             for raw in snapshot.get("matches", []):
                 try:
                     obj = MatchRecord(**raw)
                     self.matches[obj.id] = obj
-                except Exception:
-                    pass
+                except Exception as exc:
+                    logger.warning("DemoStore: failed to load match: %s", exc)
         logger.info(
             "DemoStore: restored %d listings, %d requirements, %d lots from snapshot.",
             len(self.listings), len(self.requirements), len(self.lots),
@@ -159,6 +159,10 @@ class DemoStore:
         try:
             from app.core.persistence import save_snapshot
             with self._lock:
+                # Add a timestamp so we can track versions and avoid race conditions
+                version = datetime.now(timezone.utc).timestamp()
+                self._last_snapshot_version = version
+                
                 data = {
                     "companies": [c.model_dump() for c in self.companies.values()],
                     "users": [u.model_dump() for u in self.users.values()],
@@ -169,7 +173,18 @@ class DemoStore:
                     "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values()],
                     "matches": [m.model_dump() for m in self.matches.values()],
                 }
-            save_snapshot(data)
+            
+            import threading
+            def bg_save():
+                try:
+                    with self._lock:
+                        if self._last_snapshot_version != version:
+                            return # A newer snapshot is already pending or saved
+                    save_snapshot(data)
+                except Exception as exc:
+                    logger.warning("DemoStore: snapshot background save failed: %s", exc)
+                    
+            threading.Thread(target=bg_save, daemon=True).start()
         except Exception as exc:
             logger.warning("DemoStore: snapshot save failed: %s", exc)
 
@@ -293,6 +308,18 @@ class DemoStore:
         )
 
     # Mutation helpers ------------------------------------------------------
+    def create_user(self, user: User) -> User:
+        with self._lock:
+            self.users[user.id] = user
+        self._save_snapshot()
+        return user
+
+    def create_company(self, company: Company) -> Company:
+        with self._lock:
+            self.companies[company.id] = company
+        self._save_snapshot()
+        return company
+
     def create_listing(self, listing: WasteListing) -> WasteListing:
         with self._lock:
             self.listings[listing.id] = listing
@@ -376,6 +403,7 @@ class DemoStore:
     def create_sample_request(self, sample: SampleRequest) -> SampleRequest:
         with self._lock:
             self.sample_requests[sample.id] = sample
+        self._save_snapshot()
         return sample
 
     def update_sample_request(self, sample_id: str, updates: dict[str, Any]) -> SampleRequest | None:
@@ -385,11 +413,13 @@ class DemoStore:
                 return None
             updated = SampleRequest(**(current.model_dump() | updates | {"updated_at": self.timestamp()}))
             self.sample_requests[sample_id] = updated
-            return updated
+        self._save_snapshot()
+        return updated
 
     def create_offer(self, offer: Offer) -> Offer:
         with self._lock:
             self.offers[offer.id] = offer
+        self._save_snapshot()
         return offer
 
     def update_offer(self, offer_id: str, updates: dict[str, Any]) -> Offer | None:
@@ -399,11 +429,13 @@ class DemoStore:
                 return None
             updated = Offer(**(current.model_dump() | updates))
             self.offers[offer_id] = updated
-            return updated
+        self._save_snapshot()
+        return updated
 
     def create_shipment(self, shipment: Shipment) -> Shipment:
         with self._lock:
             self.shipments[shipment.id] = shipment
+        self._save_snapshot()
         return shipment
 
     def update_shipment(self, shipment_id: str, updates: dict[str, Any]) -> Shipment | None:
@@ -413,7 +445,8 @@ class DemoStore:
                 return None
             updated = Shipment(**(current.model_dump() | updates | {"updated_at": self.timestamp()}))
             self.shipments[shipment_id] = updated
-            return updated
+        self._save_snapshot()
+        return updated
 
     def add_audit_event(self, entity_type: str, entity_id: str, action: str, summary: str, actor_id: str | None = None) -> AuditEvent:
         event = AuditEvent(
@@ -463,6 +496,7 @@ class DemoStore:
         }
         with self._lock:
             self.transactions.append(transaction)
+        self._save_snapshot()
         return transaction
 
     def set_scoring_weights(self, weights: dict[str, float]) -> ScoringConfig:

@@ -627,6 +627,7 @@ def mark_notification_read(
 @app.post("/api/demo/reset")
 def demo_reset(current_user: User = Depends(require_roles("admin")), store: DemoStore = Depends(get_store)) -> dict[str, Any]:
     store.reset()
+    store._load_persistent_data()
     return envelope({"message": "Demo Dataset reset to its fictional seed state, including lots, evidence, buyer templates, and timeline records."})
 
 
