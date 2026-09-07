@@ -752,7 +752,7 @@ def create_listing(
         asking_price_per_kg=request.asking_price_per_kg,
         disposal_cost_per_kg=request.disposal_cost_per_kg,
         selected_use_id=request.selected_use_id,
-        is_demo=True,
+        is_demo=current_user.is_demo,  # Real users get is_demo=False; demo personas get True
         created_at=store.timestamp(),
     )
     store.create_listing(listing)
@@ -782,11 +782,11 @@ def create_listing(
         summary=request.quality_notes or "Supplier-provided material statement; not independently verified.",
         document_name=request.document_name,
         created_at=store.timestamp(),
-        is_demo=True,
+        is_demo=current_user.is_demo,  # Inherits from the listing owner
     )
     store.create_evidence(declaration)
     store.add_audit_event(entity_type="listing", entity_id=listing.id, action="listing_created", actor_id=current_user.id, summary="Listing, initial lot, and supplier-declaration evidence were created.")
-    return envelope({"listing": listing_view(store, listing), "lot": lot_view(store, lot), "message": "Listing published with a Material Passport draft in the Demo Dataset."})
+    return envelope({"listing": listing_view(store, listing), "lot": lot_view(store, lot), "message": "Listing published with a Material Passport draft."})
 
 
 @app.post("/api/listings/{listing_id}/lots", status_code=status.HTTP_201_CREATED)
@@ -851,7 +851,7 @@ def create_quality_evidence(
         document_name=request.document_name,
         valid_until=request.valid_until,
         created_at=store.timestamp(),
-        is_demo=True,
+        is_demo=listing.is_demo,  # Inherits from the listing it belongs to
     )
     store.create_evidence(evidence)
     store.clear_matches_for_listing(listing.id)
@@ -961,7 +961,7 @@ def update_acceptance_spec(
         route_note=request.route_note,
         review_note=request.review_note,
         updated_at=store.timestamp(),
-        is_demo=True,
+        is_demo=requirement.is_demo,  # Inherits from the requirement it belongs to
     )
     store.save_acceptance_spec(spec)
     store.clear_matches_for_requirement(requirement.id)
@@ -995,14 +995,30 @@ def create_requirement(
         city=request.city,
         latitude=coordinates[0],
         longitude=coordinates[1],
-        is_demo=True,
+        is_demo=current_user.is_demo,  # Real users get is_demo=False; demo personas get True
         created_at=store.timestamp(),
     )
     store.create_requirement(requirement)
     spec = default_acceptance_spec(store, requirement)
     store.save_acceptance_spec(spec)
     store.add_audit_event(entity_type="buyer_requirement", entity_id=requirement.id, action="buyer_requirement_created", actor_id=current_user.id, summary="Buyer requirement and starter acceptance template were created.")
-    return envelope({"requirement": requirement_view(store, requirement), "acceptance_spec": acceptance_spec_view(store, requirement), "message": "Buyer requirement and starter acceptance template published to the Demo Dataset."})
+    return envelope({"requirement": requirement_view(store, requirement), "acceptance_spec": acceptance_spec_view(store, requirement), "message": "Buyer requirement and starter acceptance template published."})
+
+
+@app.post("/api/admin/purge-demo-data")
+def purge_demo_data(
+    dry_run: bool = Query(default=True, description="If true, only returns what would be deleted without deleting."),
+    current_user: User = Depends(require_roles("admin")),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    """Admin-only: Remove all seed/demo records. Use dry_run=true first to preview."""
+    counts = store.purge_demo_data(dry_run=dry_run)
+    message = (
+        f"DRY RUN: Would delete {counts}. Call with dry_run=false to execute."
+        if dry_run
+        else f"Purged all demo/seed data: {counts}. Snapshot saved with real user data only."
+    )
+    return envelope({"dry_run": dry_run, "deleted_counts": counts, "message": message})
 
 
 @app.post("/api/listings/{listing_id}/matches/recompute")

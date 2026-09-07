@@ -49,6 +49,17 @@ class DemoStore:
 
     def reset(self, include_sample_entities: bool = True) -> None:
         with self._lock:
+            # SAFETY: Preserve real user records from memory before wiping.
+            # This means reset() is safe even if Supabase is temporarily unreachable —
+            # real user data is never lost because we never depend on the network here.
+            real_companies = {k: v for k, v in self.companies.items() if not v.is_demo} if hasattr(self, "companies") else {}
+            real_users = {k: v for k, v in self.users.items() if not v.is_demo} if hasattr(self, "users") else {}
+            real_listings = {k: v for k, v in self.listings.items() if not v.is_demo} if hasattr(self, "listings") else {}
+            real_requirements = {k: v for k, v in self.requirements.items() if not v.is_demo} if hasattr(self, "requirements") else {}
+            real_lots = {k: v for k, v in self.lots.items() if not v.is_demo} if hasattr(self, "lots") else {}
+            real_evidence = {k: v for k, v in self.evidence.items() if not v.is_demo} if hasattr(self, "evidence") else {}
+            real_specs = {k: v for k, v in self.acceptance_specs.items() if not v.is_demo} if hasattr(self, "acceptance_specs") else {}
+
             seed = fresh_seed_data(include_sample_entities=include_sample_entities)
             self.materials: dict[str, Material] = {item.id: item for item in seed["materials"]}
             self.companies: dict[str, Company] = {item.id: item for item in seed["companies"]}
@@ -89,8 +100,27 @@ class DemoStore:
             self.transactions: list[dict[str, Any]] = seed["transactions"]
             self.scoring_config: ScoringConfig = seed["scoring_config"]
 
+            # RESTORE: Merge real user records back on top of seed data
+            self.companies.update(real_companies)
+            self.users.update(real_users)
+            self.listings.update(real_listings)
+            self.requirements.update(real_requirements)
+            self.lots.update(real_lots)
+            self.evidence.update(real_evidence)
+            self.acceptance_specs.update(real_specs)
+            if real_users:
+                logger.info(
+                    "DemoStore.reset(): preserved %d real companies, %d real users, %d real listings.",
+                    len(real_companies), len(real_users), len(real_listings),
+                )
+
     def _load_persistent_data(self) -> None:
-        """Restore non-demo user records from Supabase Storage snapshot on startup."""
+        """Restore non-demo user records from Supabase Storage snapshot on startup.
+
+        Also runs a one-time migration: if a real user (is_demo=False) has a company
+        that is still tagged is_demo=True (historical bug), we correct it on load so
+        that it gets written back correctly in the next snapshot save.
+        """
         try:
             from app.core.persistence import ensure_bucket, load_snapshot
             ensure_bucket()
@@ -100,27 +130,63 @@ class DemoStore:
             return
         if not snapshot:
             return
+
         with self._lock:
+            # Build a set of company IDs owned by real users so we can fix their is_demo flag
+            real_user_company_ids: set[str] = set()
+            for raw in snapshot.get("users", []):
+                if not raw.get("is_demo", True):
+                    cid = raw.get("company_id")
+                    if cid:
+                        real_user_company_ids.add(cid)
+
+            # Load companies — fix is_demo for real-user-owned companies (one-time migration)
             for raw in snapshot.get("companies", []):
                 try:
+                    if raw.get("id") in real_user_company_ids and raw.get("is_demo", True):
+                        raw = dict(raw)  # copy so we don't mutate the snapshot dict
+                        raw["is_demo"] = False
+                        logger.info(
+                            "DemoStore: one-time fix — company %s corrected from is_demo=True to False (real user).",
+                            raw["id"],
+                        )
                     obj = Company(**raw)
                     self.companies[obj.id] = obj
                 except Exception as exc:
                     logger.warning("DemoStore: failed to load company: %s", exc)
+
+            # Load users
             for raw in snapshot.get("users", []):
                 try:
                     obj = User(**raw)
                     self.users[obj.id] = obj
                 except Exception as exc:
                     logger.warning("DemoStore: failed to load user: %s", exc)
+
+            # Build set of real listing/requirement company IDs so we can fix them too
+            real_company_ids = {c.id for c in self.companies.values() if not c.is_demo}
+
             for raw in snapshot.get("listings", []):
                 try:
+                    # Fix listings owned by real companies
+                    if raw.get("company_id") in real_company_ids and raw.get("is_demo", True):
+                        raw = dict(raw)
+                        raw["is_demo"] = False
+                        logger.info(
+                            "DemoStore: one-time fix — listing %s corrected to is_demo=False.", raw.get("id")
+                        )
                     obj = WasteListing(**raw)
                     self.listings[obj.id] = obj
                 except Exception as exc:
                     logger.warning("DemoStore: failed to load listing: %s", exc)
             for raw in snapshot.get("requirements", []):
                 try:
+                    if raw.get("company_id") in real_company_ids and raw.get("is_demo", True):
+                        raw = dict(raw)
+                        raw["is_demo"] = False
+                        logger.info(
+                            "DemoStore: one-time fix — requirement %s corrected to is_demo=False.", raw.get("id")
+                        )
                     obj = BuyerRequirement(**raw)
                     self.requirements[obj.id] = obj
                 except Exception as exc:
@@ -149,28 +215,43 @@ class DemoStore:
                     self.matches[obj.id] = obj
                 except Exception as exc:
                     logger.warning("DemoStore: failed to load match: %s", exc)
+
+        real_users_loaded = sum(1 for u in self.users.values() if not u.is_demo)
+        real_cos_loaded = sum(1 for c in self.companies.values() if not c.is_demo)
         logger.info(
-            "DemoStore: restored %d listings, %d requirements, %d lots from snapshot.",
-            len(self.listings), len(self.requirements), len(self.lots),
+            "DemoStore: restored %d real users, %d real companies, %d listings, %d requirements from snapshot.",
+            real_users_loaded, real_cos_loaded, len(self.listings), len(self.requirements),
         )
 
+        # Immediately re-save the corrected snapshot so the fixes are persisted
+        if real_users_loaded > 0:
+            self._save_snapshot()
+
+
     def _save_snapshot(self) -> None:
-        """Serialize all data and upload snapshot to Supabase Storage. Fire-and-forget."""
+        """Serialize real user data (is_demo=False only) and upload snapshot to Supabase Storage.
+
+        Demo/seed records are never included in the snapshot — they are always reconstructed
+        from demo_data.py at startup. This ensures the snapshot is a pure real-user-data backup
+        and can never be contaminated by demo records.
+        """
         try:
             from app.core.persistence import save_snapshot
             with self._lock:
                 # Add a timestamp so we can track versions and avoid race conditions
                 version = datetime.now(timezone.utc).timestamp()
                 self._last_snapshot_version = version
-                
+
+                # CRITICAL: Only persist real user records (is_demo=False).
+                # Seed/demo records are never written to storage.
                 data = {
-                    "companies": [c.model_dump() for c in self.companies.values()],
-                    "users": [u.model_dump() for u in self.users.values()],
-                    "listings": [l.model_dump() for l in self.listings.values()],
-                    "requirements": [r.model_dump() for r in self.requirements.values()],
+                    "companies": [c.model_dump() for c in self.companies.values() if not c.is_demo],
+                    "users": [u.model_dump() for u in self.users.values() if not u.is_demo],
+                    "listings": [l.model_dump() for l in self.listings.values() if not l.is_demo],
+                    "requirements": [r.model_dump() for r in self.requirements.values() if not r.is_demo],
                     "lots": [lot.model_dump() for lot in self.lots.values()],
-                    "evidence": [e.model_dump() for e in self.evidence.values()],
-                    "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values()],
+                    "evidence": [e.model_dump() for e in self.evidence.values() if not e.is_demo],
+                    "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values() if not s.is_demo],
                     "matches": [m.model_dump() for m in self.matches.values()],
                 }
             
@@ -509,6 +590,75 @@ class DemoStore:
                 is_demo=True,
             )
             return self.scoring_config
+
+    def purge_demo_data(self, *, dry_run: bool = True) -> dict[str, int]:
+        """Remove all seed/demo records (is_demo=True) from every collection.
+
+        Always call with dry_run=True first to see what would be deleted.
+        When dry_run=False, the deletion is committed and the snapshot is saved,
+        leaving only real user data in storage.
+
+        Returns a dict of entity type -> count of records deleted (or would-be-deleted).
+        """
+        with self._lock:
+            to_delete = {
+                "companies": [k for k, v in self.companies.items() if v.is_demo],
+                "users": [k for k, v in self.users.items() if v.is_demo],
+                "listings": [k for k, v in self.listings.items() if v.is_demo],
+                "requirements": [k for k, v in self.requirements.items() if v.is_demo],
+                "lots": [k for k, v in self.lots.items()],  # lots have no is_demo field yet
+                "evidence": [k for k, v in self.evidence.items() if v.is_demo],
+                "acceptance_specs": [k for k, v in self.acceptance_specs.items() if v.is_demo],
+                "matches": [k for k, v in self.matches.items()],  # matches have no is_demo field yet
+                "transactions": len([t for t in self.transactions if t.get("is_demo", True)]),
+            }
+            counts = {
+                k: (v if isinstance(v, int) else len(v))
+                for k, v in to_delete.items()
+            }
+
+            if dry_run:
+                logger.info("DemoStore.purge_demo_data(dry_run=True): would delete %s", counts)
+                return counts
+
+            # Execute deletion
+            for k in to_delete["companies"]:
+                self.companies.pop(k, None)
+            for k in to_delete["users"]:
+                self.users.pop(k, None)
+            for k in to_delete["listings"]:
+                self.listings.pop(k, None)
+            for k in to_delete["requirements"]:
+                self.requirements.pop(k, None)
+            for k in to_delete["lots"]:
+                self.lots.pop(k, None)
+            for k in to_delete["evidence"]:
+                self.evidence.pop(k, None)
+            for k in to_delete["acceptance_specs"]:
+                self.acceptance_specs.pop(k, None)
+            for k in to_delete["matches"]:
+                self.matches.pop(k, None)
+            self.transactions = [t for t in self.transactions if not t.get("is_demo", True)]
+            logger.info("DemoStore.purge_demo_data(): deleted %s", counts)
+
+        # Save snapshot immediately (synchronous, not background, so caller can confirm)
+        try:
+            from app.core.persistence import save_snapshot
+            data = {
+                "companies": [c.model_dump() for c in self.companies.values() if not c.is_demo],
+                "users": [u.model_dump() for u in self.users.values() if not u.is_demo],
+                "listings": [l.model_dump() for l in self.listings.values() if not l.is_demo],
+                "requirements": [r.model_dump() for r in self.requirements.values() if not r.is_demo],
+                "lots": [lot.model_dump() for lot in self.lots.values()],
+                "evidence": [e.model_dump() for e in self.evidence.values() if not e.is_demo],
+                "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values() if not s.is_demo],
+                "matches": [m.model_dump() for m in self.matches.values()],
+            }
+            save_snapshot(data)
+        except Exception as exc:
+            logger.warning("DemoStore.purge_demo_data(): snapshot save failed: %s", exc)
+
+        return counts
 
     @staticmethod
     def new_id(prefix: str) -> str:
