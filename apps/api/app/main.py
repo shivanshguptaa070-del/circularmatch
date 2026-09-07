@@ -307,7 +307,7 @@ def default_acceptance_spec(store: DemoStore, requirement: BuyerRequirement) -> 
         route_note=template.get("route_note", "Buyer acceptance template has not been tailored yet."),
         review_note="Demo template — buyer must validate before real use.",
         updated_at=store.timestamp(),
-        is_demo=current_user.is_demo,
+        is_demo=requirement.is_demo,
     )
 
 
