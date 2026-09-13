@@ -1039,7 +1039,7 @@ def recompute_matches(
     matches = recompute_listing_matches(store, listing)
     eligible_count = len([item for item in matches if item.eligibility_status == "eligible"])
     attention_count = len(matches) - eligible_count
-    store.add_audit_event(entity_type="listing", entity_id=listing.id, action="matches_recomputed", actor_id=current_user.id, summary=f"{len(matches, is_demo=current_user.is_demo)} material-compatible buyer requirements analyzed; {eligible_count} eligible and {attention_count} requiring attention.")
+    store.add_audit_event(entity_type="listing", entity_id=listing.id, action="matches_recomputed", actor_id=current_user.id, summary=f"{len(matches)} material-compatible buyer requirements analyzed; {eligible_count} eligible and {attention_count} requiring attention.", is_demo=current_user.is_demo)
     return envelope({
         "listing": listing_view(store, listing),
         "matches": [match_card_view(store, item) for item in matches],
