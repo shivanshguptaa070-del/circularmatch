@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertCircle, CheckCircle2, ChevronDown, ChevronRight, FileText, Info, Leaf, ShieldAlert, Sparkles, X, AlertTriangle } from 'lucide-react'
+import { AlertCircle, CheckCircle2, ChevronDown, ChevronRight, FileText, Info, Leaf, Network, ShieldAlert, Sparkles, X, AlertTriangle } from 'lucide-react'
 import { formatNumber } from '../lib/format'
 import { Link } from 'react-router-dom'
 

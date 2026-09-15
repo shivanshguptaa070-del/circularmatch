@@ -29,3 +29,6 @@ dist/
 # Ignore media/binary files
 *.pdf
 *.zip
+
+# Scratch / sample design references
+HERO SECTION SAMPLE/

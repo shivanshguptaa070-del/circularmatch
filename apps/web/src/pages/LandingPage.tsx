@@ -1,683 +1,830 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { motion, useReducedMotion } from 'framer-motion'
+import { useState, useEffect } from 'react';
+import HeroVisual from '../components/landing/HeroVisual';
 import {
-  ArrowRight, BarChart3, Bot, CheckCircle2, Factory,
-  Leaf, MapPin, Recycle, ShieldCheck, Sparkles, TrendingUp, Zap,
-} from 'lucide-react'
-import { CircularMark } from '../components/ui'
+  Leaf,
+  MapPin,
+  ArrowRight,
+  Play,
+  CheckCircle2,
+  Search,
+  Command,
+  SlidersHorizontal,
+  Bell,
+  Home,
+  Package,
+  BarChart3,
+  FileText,
+  Settings,
+  Sparkles,
+  Zap,
+  ShieldCheck,
+  Building2,
+  X,
+  Recycle,
+  Factory,
+  TrendingUp,
+  Award,
+  Users,
+  Globe,
+  ChevronDown,
+  Star,
+  Quote,
+  Truck,
+  Wallet,
+  BarChart,
+  Bot,
+  Coins,
+  Heart,
+} from 'lucide-react';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
-
-// ─── Motion tokens (motion-ui skill) ─────────────────────────────────────────
-const ease = [0.22, 1, 0.36, 1] as const
-const fadeUp = (delay = 0) => ({
-  initial:   { opacity: 0, y: 20 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport:  { once: true, margin: '-60px' },
-  transition: { duration: 0.5, ease, delay },
-})
-const staggerContainer = {
-  hidden:  {},
-  visible: { transition: { staggerChildren: 0.08 } },
-}
-const staggerItem = {
-  hidden:  { opacity: 0, y: 16, scale: 0.94 },
-  visible: { opacity: 1, y: 0,  scale: 1, transition: { duration: 0.4, ease } },
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-interface PlatformStats {
-  wasteKgWeek: number
-  activeBuyers: number
-  platformValueInr: number
-}
-
-const FALLBACK_STATS: PlatformStats = {
-  wasteKgWeek: 2600,
-  activeBuyers: 8,
-  platformValueInr: 120000,
-}
-
-// ─── Count-up hook ─────────────────────────────────────────────────────────────
-function useCountUp(target: number, duration = 1600, enabled = true, reducedMotion = false) {
-  const [value, setValue] = useState(reducedMotion ? target : 0)
-  useEffect(() => {
-    if (!enabled) return
-    // Skip animation entirely for reduced-motion users
-    if (reducedMotion) { setValue(target); return }
-    let start: number | null = null
-    const step = (ts: number) => {
-      if (!start) start = ts
-      const progress = Math.min((ts - start) / duration, 1)
-      const eased = 1 - Math.pow(1 - progress, 3)
-      setValue(Math.round(eased * target))
-      if (progress < 1) requestAnimationFrame(step)
-    }
-    requestAnimationFrame(step)
-  }, [target, duration, enabled, reducedMotion])
-  return value
-}
-
-// ─── Stat Card ────────────────────────────────────────────────────────────────
-// make-interfaces-feel-better: tabular-nums to prevent layout shift during count-up
-function StatCard({
-  label,
-  value,
-  prefix = '',
-  suffix = '',
-  animate,
-  reducedMotion,
-}: {
-  label: string
-  value: number
-  prefix?: string
-  suffix?: string
-  animate: boolean
-  reducedMotion: boolean
-}) {
-  const displayed = useCountUp(value, 1600, animate, reducedMotion)
-  const formatted = displayed >= 1000
-    ? displayed >= 100000
-      ? (displayed / 100000).toFixed(1) + 'L'
-      : displayed.toLocaleString('en-IN')
-    : displayed.toString()
-
+/* =========================================================== */
+/*  ROOT                                                      */
+/* =========================================================== */
+export default function LandingPage() {
   return (
-    <div className="flex flex-col items-center gap-2 px-8 py-8 text-center">
-      {/* tabular-nums prevents width jitter during count-up (make-interfaces-feel-better) */}
-      <p
-        className="text-4xl font-bold tracking-[-0.06em] text-white sm:text-5xl"
-        style={{ fontVariantNumeric: 'tabular-nums', fontFeatureSettings: '"tnum"' }}
-      >
-        {prefix}{formatted}{suffix}
-      </p>
-      <p className="text-sm font-medium text-[#9ecbb5]">{label}</p>
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 text-slate-900">
+      <BackgroundDecor />
+
+      <NavBar />
+      <Hero />
+      <FeaturesSection />
+      <HowItWorksSection />
+      <CategoriesSection />
+      <CTASection />
+      <FAQSection />
+      <Footer />
     </div>
-  )
+  );
 }
 
-// ─── Landing Nav ──────────────────────────────────────────────────────────────
-function LandingNav() {
-  const [scrolled, setScrolled] = useState(false)
-  useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 12)
-    window.addEventListener('scroll', handler, { passive: true })
-    return () => window.removeEventListener('scroll', handler)
-  }, [])
-
-  return (
-    <header
-      className="fixed inset-x-0 top-0 z-50"
-      // make-interfaces-feel-better: explicit transition-property, not 'all'
-      style={{
-        backgroundColor: scrolled ? 'rgba(7,52,58,0.9)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none',
-        WebkitBackdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none',
-        boxShadow: scrolled ? '0 1px 0 rgba(255,255,255,0.06)' : 'none',
-        transitionProperty: 'background-color, backdrop-filter, box-shadow',
-        transitionDuration: '300ms',
-        transitionTimingFunction: 'ease',
-      }}
-    >
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 rounded-xl p-1 transition-opacity hover:opacity-90" aria-label="CircularMatch home">
-          <CircularMark size={38} />
-          <span className="text-[16px] font-bold tracking-[-0.05em] text-white">
-            CIRCULAR<span style={{ color: 'var(--cm-mint)' }}>MATCH</span>
-          </span>
-        </Link>
-
-        {/* Nav links */}
-        <div className="flex items-center gap-3">
-          <a
-            href="#how-it-works"
-            className="hidden text-sm font-medium text-[#bce7cf] transition-colors duration-150 hover:text-white sm:block"
-          >
-            How it works
-          </a>
-          {/* motion-ui: whileTap for tactile press feedback */}
-          <motion.div whileTap={{ scale: 0.97 }} whileHover={{ scale: 1.02 }} transition={{ duration: 0.15 }}>
-            <Link
-              to="/auth"
-              className="btn-primary cursor-pointer px-5 py-2.5 text-sm"
-              id="landing-nav-signin"
-            >
-              Sign In
-            </Link>
-          </motion.div>
-        </div>
-      </nav>
-    </header>
-  )
-}
-
-// ─── Hero Section ─────────────────────────────────────────────────────────────
-function HeroSection({ reducedMotion }: { reducedMotion: boolean }) {
-  return (
-    <section className="hero-mesh relative min-h-screen pt-24 pb-20 sm:pt-32">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-10">
-
-          {/* Left: copy + CTAs */}
-          <div className="relative z-10 flex flex-col gap-7">
-            {/* Eyebrow — instant, no delay */}
-            <motion.div
-              className="inline-flex items-center gap-2 self-start rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 backdrop-blur-sm"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reducedMotion ? 0 : 0.4, ease }}
-            >
-              <MapPin size={12} className="text-mint" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#bce7cf]">
-                Delhi NCR · Industrial Circular Economy
-              </span>
-            </motion.div>
-
-            {/* Headline — text-wrap: balance (make-interfaces-feel-better) */}
-            <motion.h1
-              className="text-4xl font-bold leading-[1.04] tracking-[-0.055em] text-white sm:text-5xl lg:text-[3.4rem]"
-              style={{ textWrap: 'balance' } as React.CSSProperties}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reducedMotion ? 0 : 0.55, ease, delay: 0.08 }}
-            >
-              Turn your industrial waste into{' '}
-              <span
-                className="relative inline-block"
-                style={{
-                  background: 'linear-gradient(90deg, #bfe9d0 0%, #7dd8b0 60%, #45b590 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                }}
-              >
-                verified revenue
-              </span>
-            </motion.h1>
-
-            {/* Subtext */}
-            <motion.p
-              className="max-w-[520px] text-lg leading-relaxed text-[#a8d5be]"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reducedMotion ? 0 : 0.5, ease, delay: 0.16 }}
-            >
-              CircularMatch uses AI to match waste generators with certified recyclers
-              across Delhi NCR.{' '}
-              <span className="font-semibold text-white">Free to list, instant matching.</span>
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              className="flex flex-wrap items-center gap-3.5"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reducedMotion ? 0 : 0.45, ease, delay: 0.24 }}
-            >
-              <motion.div whileTap={{ scale: 0.97 }} whileHover={{ scale: 1.02 }} transition={{ duration: 0.15 }}>
-                <Link
-                  to="/auth"
-                  id="landing-cta-get-started"
-                  className="btn-primary inline-flex cursor-pointer items-center gap-2 px-6 py-3.5 text-base"
-                >
-                  Get Started Free
-                  <ArrowRight size={17} />
-                </Link>
-              </motion.div>
-              <motion.a
-                href="#how-it-works"
-                id="landing-cta-how-it-works"
-                className="btn-secondary inline-flex cursor-pointer items-center gap-2 border-white/20 bg-white/10 px-6 py-3.5 text-base text-white backdrop-blur-sm hover:border-white/30 hover:bg-white/15"
-                whileTap={{ scale: 0.97 }}
-                transition={{ duration: 0.15 }}
-              >
-                See How It Works
-              </motion.a>
-            </motion.div>
-
-            {/* Trust badges */}
-            <motion.div
-              className="flex flex-wrap items-center gap-5 pt-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: reducedMotion ? 0 : 0.5, delay: 0.36 }}
-            >
-              {[
-                { icon: CheckCircle2, text: 'Free to list' },
-                { icon: Zap, text: 'Instant AI matching' },
-                { icon: ShieldCheck, text: 'Verified network' },
-              ].map(({ icon: Icon, text }) => (
-                <div key={text} className="flex items-center gap-2 text-sm text-[#9ecbb5]">
-                  {/* 40px hit area on icon (make-interfaces-feel-better) */}
-                  <span className="inline-flex h-5 w-5 items-center justify-center">
-                    <Icon size={14} className="text-mint" aria-hidden="true" />
-                  </span>
-                  {text}
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Right: glassmorphism match preview card */}
-          {/* Deepened glassmorphism: blur(20px) saturate(180%) + stronger border glow */}
-          <motion.div
-            className="relative hidden lg:flex lg:justify-center"
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: reducedMotion ? 0 : 0.65, ease, delay: 0.12 }}
-          >
-            <div
-              className="hero-flow-card relative w-[340px] rounded-3xl p-6"
-              role="presentation"
-              aria-hidden="true"
-              style={{
-                backdropFilter: 'blur(20px) saturate(180%)',
-                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                border: '1px solid rgba(255,255,255,0.18)',
-                boxShadow: '0 0 0 1px rgba(255,255,255,0.06) inset, 0 32px 64px rgba(0,0,0,0.35)',
-              }}
-            >
-              {/* Card header */}
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <span className="grid h-9 w-9 place-items-center rounded-xl bg-mint/20">
-                    <Sparkles size={16} className="text-mint" />
-                  </span>
-                  <div>
-                    <p className="text-xs font-bold text-white">AI Match Found</p>
-                    <p className="text-[10px] text-[#9ecbb5]">real-time scoring</p>
-                  </div>
-                </div>
-                <div className="rounded-full border border-mint/30 bg-mint/15 px-3 py-1 text-xs font-bold text-mint">
-                  94% match
-                </div>
-              </div>
-
-              {/* Match details */}
-              <div className="mb-4 rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p className="mb-1 text-[10px] font-bold uppercase tracking-wider text-[#7ab09a]">Material</p>
-                <p className="text-sm font-semibold text-white">PET Manufacturing Trim Scrap</p>
-                <div className="mt-2 flex items-center gap-3 text-[11px] text-[#9ecbb5]">
-                  <span>3,000 kg/week</span>
-                  <span>·</span>
-                  <span>Noida, UP</span>
-                </div>
-              </div>
-
-              {/* Score breakdown */}
-              <div className="space-y-2">
-                {[
-                  { label: 'Material Match', score: 100 },
-                  { label: 'Quality Grade', score: 85 },
-                  { label: 'Distance', score: 78 },
-                ].map(({ label, score }) => (
-                  <div key={label} className="flex items-center justify-between gap-3">
-                    <span className="text-[11px] text-[#9ecbb5]">{label}</span>
-                    <div className="flex flex-1 items-center gap-2">
-                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-mint/60 to-mint"
-                          style={{ width: `${score}%` }}
-                        />
-                      </div>
-                      {/* tabular-nums on score percentages too */}
-                      <span
-                        className="w-8 text-right text-[11px] font-semibold text-white"
-                        style={{ fontVariantNumeric: 'tabular-nums' }}
-                      >
-                        {score}%
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Bottom */}
-              <div className="mt-4 flex items-center justify-between border-t border-white/10 pt-4">
-                <div>
-                  <p className="text-[10px] text-[#9ecbb5]">Est. Revenue</p>
-                  <p className="text-base font-bold text-mint">₹49,500 / mo</p>
-                </div>
-                <div className="rounded-xl bg-mint/20 px-3 py-1.5 text-xs font-bold text-mint">
-                  View Match →
-                </div>
-              </div>
-            </div>
-
-            {/* Floating badge — glass-panel */}
-            <div
-              className="glass-panel absolute -bottom-6 -left-4 flex items-center gap-2.5 rounded-2xl px-4 py-3"
-              style={{ backdropFilter: 'blur(16px) saturate(160%)', WebkitBackdropFilter: 'blur(16px) saturate(160%)' }}
-            >
-              <Bot size={16} className="text-mint" />
-              <div>
-                <p className="text-[10px] font-bold text-white">6-parameter AI engine</p>
-                <p className="text-[9px] text-[#9ecbb5]">Material · Quality · Distance · Price</p>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-// ─── Social Proof Strip (NEW — UI UX Pro: social proof before CTA) ────────────
-const SOCIAL_PROOF = [
-  { icon: Factory,  label: 'Noida Plastics Co.',    type: 'Waste Generator', quote: 'Matched our PET scrap in 48 hours.' },
-  { icon: Recycle,  label: 'GreenCycle Delhi',      type: 'Certified Recycler', quote: 'Volume doubled in 3 months.' },
-  { icon: Leaf,     label: 'UP Industrial Park',    type: 'Waste Generator', quote: 'Zero-waste compliance achieved.' },
-]
-
-function SocialProofStrip({ reducedMotion }: { reducedMotion: boolean }) {
-  return (
-    <section
-      className="relative border-y border-white/6 py-10"
-      aria-label="Customer stories"
-      style={{ background: 'linear-gradient(to right, #092d32, #0c3d3a, #092d32)' }}
-    >
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <motion.p
-          className="mb-6 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-[#6aab90]"
-          {...fadeUp(0)}
-          transition={{ duration: reducedMotion ? 0 : 0.4, ease }}
-        >
-          Trusted by Delhi NCR's industrial community
-        </motion.p>
-        <motion.div
-          className="grid gap-4 sm:grid-cols-3"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-40px' }}
-        >
-          {SOCIAL_PROOF.map((item) => {
-            const Icon = item.icon
-            return (
-              <motion.div
-                key={item.label}
-                variants={reducedMotion ? {} : staggerItem}
-                className="flex items-start gap-3.5 rounded-2xl border border-white/8 bg-white/5 px-5 py-4"
-                style={{ backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
-              >
-                <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-mint/15">
-                  <Icon size={16} className="text-mint" strokeWidth={2} />
-                </span>
-                <div>
-                  <p className="text-[13px] font-semibold text-white">{item.label}</p>
-                  <p className="mb-1 text-[10px] text-[#7ab09a]">{item.type}</p>
-                  <p className="text-[12px] italic text-[#a8d5be]">"{item.quote}"</p>
-                </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-// ─── Impact Stats Strip ───────────────────────────────────────────────────────
-function ImpactStats({ reducedMotion }: { reducedMotion: boolean }) {
-  const [stats, setStats] = useState<PlatformStats | null>(null)
-  const [visible, setVisible] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 3000)
-    fetch(`${API_BASE}/api/dashboard/summary`, {
-      headers: { 'X-Demo-User-Id': 'user-admin' },
-      signal: controller.signal,
-    })
-      .then((r) => r.json())
-      .then((json) => {
-        const kpis = json?.data?.kpis
-        setStats(kpis ? {
-          wasteKgWeek: kpis.total_waste_listed_kg_week ?? FALLBACK_STATS.wasteKgWeek,
-          activeBuyers: kpis.active_buyers ?? FALLBACK_STATS.activeBuyers,
-          platformValueInr: kpis.potential_economic_value_inr ?? FALLBACK_STATS.platformValueInr,
-        } : FALLBACK_STATS)
-      })
-      .catch(() => setStats(FALLBACK_STATS))
-      .finally(() => clearTimeout(timeout))
-    return () => { clearTimeout(timeout); controller.abort() }
-  }, [])
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true) },
-      { threshold: 0.3 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
-  const s = stats ?? FALLBACK_STATS
-
-  return (
-    <motion.section
-      ref={ref}
-      className="sidebar-surface relative border-y border-white/8"
-      aria-label="Platform impact statistics"
-      {...fadeUp()}
-      transition={{ duration: reducedMotion ? 0 : 0.5, ease }}
-    >
-      <div className="mx-auto max-w-7xl">
-        <div className="grid divide-y divide-white/8 sm:grid-cols-3 sm:divide-x sm:divide-y-0">
-          <StatCard label="Total Waste Listed (kg / week)" value={s.wasteKgWeek} suffix=" kg" animate={visible} reducedMotion={reducedMotion} />
-          <StatCard label="Active Buyers on Platform" value={s.activeBuyers} animate={visible} reducedMotion={reducedMotion} />
-          <StatCard label="Platform Economic Value" value={s.platformValueInr} prefix="₹" animate={visible} reducedMotion={reducedMotion} />
-        </div>
-      </div>
-    </motion.section>
-  )
-}
-
-// ─── Features Section ─────────────────────────────────────────────────────────
-const FEATURES = [
-  {
-    id: 'ai-matching',
-    icon: Bot,
-    iconBg: 'bg-[#eaf8f0]',
-    iconColor: 'text-spruce',
-    title: 'AI-Powered Matching',
-    description: 'Our 6-parameter scoring engine evaluates material type, quality grade, quantity fit, distance, price, and environmental impact in real time — surfacing only the most relevant buyers for your waste stream.',
-    badge: 'Instant',
-    badgeColor: 'badge-safe',
-  },
-  {
-    id: 'verified-network',
-    icon: ShieldCheck,
-    iconBg: 'bg-[#eaf4ff]',
-    iconColor: 'text-[#2a6fad]',
-    title: 'Verified Network',
-    description: 'Every recycler is pre-screened and onboarded. Every material lot gets a digital passport with chain-of-custody evidence — so you always know exactly where your material is going.',
-    badge: 'Trusted',
-    badgeColor: 'badge-safe',
-  },
-  {
-    id: 'analytics',
-    icon: BarChart3,
-    iconBg: 'bg-[#fef4ec]',
-    iconColor: 'text-[#c26c2a]',
-    title: 'Real-Time Analytics',
-    description: 'Live dashboards, CO₂ diversion tracking, and economic value calculation — all in one workspace. See your waste as an asset, not a liability.',
-    badge: 'Live data',
-    badgeColor: 'badge-neutral',
-  },
-]
-
-function FeaturesSection({ reducedMotion }: { reducedMotion: boolean }) {
-  return (
-    <section
-      id="how-it-works"
-      className="relative bg-[var(--cm-canvas)] py-24 sm:py-32"
-      aria-labelledby="features-heading"
-    >
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        {/* Header */}
-        <motion.div
-          className="mb-14 text-center"
-          {...fadeUp()}
-          transition={{ duration: reducedMotion ? 0 : 0.5, ease }}
-        >
-          <p className="eyebrow mb-4 inline-flex items-center gap-2 rounded-full border border-[#d5e6da] bg-white/70 px-3 py-1.5">
-            <TrendingUp size={11} />
-            How It Works
-          </p>
-          {/* text-wrap: balance on section title (make-interfaces-feel-better) */}
-          <h2
-            id="features-heading"
-            className="section-title text-3xl sm:text-[2.1rem]"
-            style={{ textWrap: 'balance' } as React.CSSProperties}
-          >
-            Built for industrial-scale circular economy
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-base text-[#527a6a]">
-            Three capabilities working together to turn industrial waste streams into a verified, revenue-generating resource.
-          </p>
-        </motion.div>
-
-        {/* Feature cards — staggered entrance (motion-ui stagger pattern) */}
-        <motion.div
-          className="grid gap-6 sm:grid-cols-3"
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-60px' }}
-        >
-          {FEATURES.map((f) => {
-            const Icon = f.icon
-            return (
-              <motion.div
-                key={f.id}
-                variants={reducedMotion ? {} : staggerItem}
-                className="card card-interactive flex cursor-default flex-col gap-5 p-7"
-                whileHover={reducedMotion ? {} : { y: -3, boxShadow: '0 12px 32px rgba(0,0,0,0.10)' }}
-                transition={{ duration: 0.2 }}
-              >
-                {/* Concentric radius: icon container outer (rounded-2xl = 16px) matches inner with padding */}
-                <div className={`grid h-12 w-12 place-items-center rounded-2xl ${f.iconBg}`}>
-                  <Icon size={22} className={f.iconColor} strokeWidth={2} />
-                </div>
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-2">
-                    {/* text-wrap: balance on card titles */}
-                    <h3
-                      className="text-base font-bold tracking-[-0.03em] text-[var(--cm-ink)]"
-                      style={{ textWrap: 'balance' } as React.CSSProperties}
-                    >
-                      {f.title}
-                    </h3>
-                    <span className={`${f.badgeColor} text-[10px]`}>{f.badge}</span>
-                  </div>
-                  <p className="text-sm leading-relaxed text-[#527a6a]">{f.description}</p>
-                </div>
-              </motion.div>
-            )
-          })}
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-// ─── CTA Banner ───────────────────────────────────────────────────────────────
-function CtaBanner({ reducedMotion }: { reducedMotion: boolean }) {
-  return (
-    <section className="hero-mesh py-20" aria-label="Call to action">
-      <motion.div
-        className="mx-auto max-w-7xl px-5 text-center sm:px-8"
-        {...fadeUp()}
-        transition={{ duration: reducedMotion ? 0 : 0.5, ease }}
-      >
-        <p className="eyebrow mb-4 inline-flex items-center gap-2 text-[#9ecbb5]">
-          <Leaf size={11} />
-          Join the platform
-        </p>
-        <h2
-          className="mb-5 text-3xl font-bold tracking-[-0.055em] text-white sm:text-4xl"
-          style={{ textWrap: 'balance' } as React.CSSProperties}
-        >
-          Ready to monetise your waste?
-        </h2>
-        <p className="mx-auto mb-8 max-w-md text-base text-[#a8d5be]">
-          List your first material in under 5 minutes. Our AI finds matching buyers instantly.
-        </p>
-        <motion.div
-          whileTap={reducedMotion ? {} : { scale: 0.97 }}
-          whileHover={reducedMotion ? {} : { scale: 1.02 }}
-          transition={{ duration: 0.15 }}
-          className="inline-block"
-        >
-          <Link
-            to="/auth"
-            id="landing-banner-cta"
-            className="btn-primary inline-flex cursor-pointer items-center gap-2 px-7 py-4 text-base"
-          >
-            Get Started Free
-            <ArrowRight size={17} />
-          </Link>
-        </motion.div>
-      </motion.div>
-    </section>
-  )
-}
-
-// ─── Landing Footer ───────────────────────────────────────────────────────────
-function LandingFooter() {
-  return (
-    <footer className="sidebar-surface border-t border-white/8 py-10" role="contentinfo">
-      <div className="mx-auto flex max-w-7xl flex-col items-center gap-5 px-5 sm:flex-row sm:justify-between sm:px-8">
-        <div className="flex items-center gap-3">
-          <CircularMark size={32} />
-          <div>
-            <p className="text-sm font-bold tracking-[-0.04em] text-white">
-              CIRCULAR<span style={{ color: 'var(--cm-mint)' }}>MATCH</span>
-            </p>
-            <p className="text-[10px] text-[#7ab09a]">Material Intelligence · Delhi NCR</p>
-          </div>
-        </div>
-        <nav aria-label="Footer navigation" className="flex items-center gap-6 text-sm text-[#9ecbb5]">
-          <Link to="/terms" className="transition-colors duration-150 hover:text-white">Terms</Link>
-          <Link to="/privacy" className="transition-colors duration-150 hover:text-white">Privacy</Link>
-          <Link to="/auth" className="transition-colors duration-150 hover:text-white">Sign In</Link>
-        </nav>
-        <p className="text-xs text-[#5a8a78]">
-          © {new Date().getFullYear()} CircularMatch. Illustrative demo data.
-        </p>
-      </div>
-    </footer>
-  )
-}
-
-// ─── Page export ──────────────────────────────────────────────────────────────
-export function LandingPage() {
-  // motion-ui: respect prefers-reduced-motion across all animations
-  const reducedMotion = useReducedMotion() ?? false
-
+/* =========================================================== */
+/*  SHARED DECOR                                              */
+/* =========================================================== */
+function BackgroundDecor() {
   return (
     <>
-      <title>CircularMatch — Turn Industrial Waste into Verified Revenue</title>
-      <meta
-        name="description"
-        content="CircularMatch uses AI to match waste generators with certified recyclers across Delhi NCR. Free to list, instant matching."
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle, rgba(16,185,129,0.25) 1px, transparent 1px)',
+          backgroundSize: '22px 22px',
+        }}
       />
-      <div className="flex min-h-screen flex-col">
-        <LandingNav />
-        <main id="main-content">
-          <HeroSection reducedMotion={reducedMotion} />
-          <SocialProofStrip reducedMotion={reducedMotion} />
-          <ImpactStats reducedMotion={reducedMotion} />
-          <FeaturesSection reducedMotion={reducedMotion} />
-          <CtaBanner reducedMotion={reducedMotion} />
-        </main>
-        <LandingFooter />
-      </div>
+      <div
+        aria-hidden
+        className="pointer-events-none fixed -top-32 -left-24 z-0 h-[480px] w-[480px] rounded-full bg-emerald-200/40 blur-3xl animate-blob"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed top-40 -right-20 z-0 h-[420px] w-[420px] rounded-full bg-teal-200/40 blur-3xl animate-blob"
+        style={{ animationDelay: '3s' }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none fixed bottom-0 left-1/3 z-0 h-[380px] w-[380px] rounded-full bg-green-200/40 blur-3xl animate-blob"
+        style={{ animationDelay: '6s' }}
+      />
     </>
-  )
+  );
 }
+
+function SectionWrapper({
+  id,
+  children,
+  className = '',
+}: {
+  id?: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <section
+      id={id}
+      className={`relative z-10 mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-12 lg:py-28 ${className}`}
+    >
+      {children}
+    </section>
+  );
+}
+
+function SectionEyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-4 inline-flex items-center gap-2.5 rounded-full border border-emerald-200/60 bg-white/80 px-4 py-1.5 text-sm font-bold uppercase tracking-[0.15em] text-emerald-800 shadow-sm backdrop-blur">
+      <Sparkles className="h-4 w-4 text-emerald-500" />
+      {children}
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+      {children}
+    </h2>
+  );
+}
+
+function SectionLead({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
+      {children}
+    </p>
+  );
+}
+
+/* =========================================================== */
+/*  NAV BAR                                                   */
+/* =========================================================== */
+function NavBar() {
+  const scrollTo = (id: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  return (
+    <header className="sticky top-0 z-40 mx-auto flex max-w-7xl animate-fade-in-up items-center justify-between bg-emerald-50/70 px-6 py-4 backdrop-blur-md lg:px-10">
+      <a href="#" className="flex items-center gap-2 transition hover:opacity-90">
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-emerald-100">
+          <Leaf className="h-5 w-5 text-emerald-600" strokeWidth={2.2} />
+        </div>
+        <div className="text-xl font-extrabold tracking-tight">
+          CIRCULAR<span className="text-emerald-500">MATCH</span>
+        </div>
+      </a>
+
+      <nav className="hidden items-center gap-9 text-sm font-medium text-slate-700 md:flex">
+        <a href="#features" onClick={scrollTo('features')} className="hover:text-emerald-700 transition">Features</a>
+        <a href="#how" onClick={scrollTo('how')} className="hover:text-emerald-700 transition">How it works</a>
+        <a href="#marketplace" onClick={scrollTo('marketplace')} className="hover:text-emerald-700 transition">Marketplace</a>
+        <a href="#faq" onClick={scrollTo('faq')} className="hover:text-emerald-700 transition">FAQ</a>
+      </nav>
+
+      <div className="flex items-center gap-2">
+        <a href="/auth" className="hidden text-sm font-semibold text-slate-700 transition hover:text-emerald-700 sm:block px-3 py-2">
+          Log in
+        </a>
+        <a href="/list-waste" className="group shine-wrap relative inline-flex animate-glow items-center gap-2 overflow-hidden rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-700/25 ring-1 ring-emerald-800/20 transition hover:bg-emerald-800">
+          Get Started
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:animate-magnetic" />
+        </a>
+      </div>
+    </header>
+  );
+}
+
+/* =========================================================== */
+/*  HERO                                                      */
+/* =========================================================== */
+function Hero() {
+  return (
+    <SectionWrapper className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-8">
+      <div className="flex flex-col justify-center animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+        {/* Location pill */}
+        <div
+          className="mb-7 inline-flex w-fit animate-fade-in-right items-center gap-2 rounded-full border border-emerald-200/60 bg-white/80 px-3 py-1.5 text-[11px] font-bold tracking-[0.18em] text-emerald-800 shadow-sm backdrop-blur transition hover:scale-[1.03] hover:border-emerald-300 hover:shadow-md"
+          style={{ animationDelay: '0.35s' }}
+        >
+          <MapPin className="h-3.5 w-3.5 text-emerald-600 animate-pop" />
+          <span>DELHI NCR</span>
+          <span className="h-1 w-1 rounded-full bg-emerald-400 animate-heartbeat" />
+          <span>INDUSTRIAL CIRCULAR ECONOMY</span>
+        </div>
+
+        <h1
+          className="text-5xl font-extrabold leading-[1.05] tracking-tight text-slate-900 sm:text-6xl lg:text-[64px] animate-fade-in-up"
+          style={{ animationDelay: '0.25s' }}
+        >
+          Turn your <br />
+          industrial waste into{' '}
+          <span className="relative inline-block text-emerald-500">
+            verified revenue.
+            <svg
+              className="absolute -bottom-2 left-0 w-full animate-draw-line"
+              viewBox="0 0 300 12"
+              fill="none"
+              preserveAspectRatio="none"
+              aria-hidden
+            >
+              <path
+                d="M2 8 Q 75 2, 150 6 T 298 4"
+                stroke="url(#underlineGradient)"
+                strokeWidth="3"
+                strokeLinecap="round"
+                fill="none"
+                style={{ animationDuration: '3s' }}
+              />
+              <defs>
+                <linearGradient id="underlineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor="#34d399" />
+                  <stop offset="50%" stopColor="#10b981" />
+                  <stop offset="100%" stopColor="#34d399" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </span>
+        </h1>
+
+        <p
+          className="mt-7 max-w-lg text-[17px] leading-relaxed text-slate-600 animate-fade-in-up"
+          style={{ animationDelay: '0.4s' }}
+        >
+          CircularMatch uses AI to match waste generators with certified recyclers
+          across Delhi NCR.{' '}
+          <span className="font-bold text-slate-900">Free to list, instant matching.</span>
+        </p>
+
+        <div
+          className="mt-8 flex flex-wrap items-center gap-4 animate-fade-in-up"
+          style={{ animationDelay: '0.55s' }}
+        >
+          <a
+            href="/list-waste"
+            className="group shine-wrap relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-emerald-700 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-700/30 ring-1 ring-emerald-800/30 transition-all duration-300 ease-out hover:bg-emerald-800 hover:shadow-emerald-800/40 hover:scale-[1.03]"
+          >
+            <span className="relative z-10">Get Started Free</span>
+            <ArrowRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            <span className="absolute inset-0 -z-0 animate-gradient-pan rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+          </a>
+          <a
+            href="#how"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="group inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-md ring-1 ring-slate-200 transition-all duration-300 ease-out hover:bg-slate-50 hover:scale-[1.03] hover:shadow-lg hover:ring-emerald-200"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-white transition-transform group-hover:rotate-12">
+              <Play className="h-3 w-3 fill-white" />
+            </span>
+            See How It Works
+          </a>
+        </div>
+
+        <div
+          className="mt-10 flex flex-wrap items-start gap-x-10 gap-y-5 animate-fade-in-up"
+          style={{ animationDelay: '0.7s' }}
+        >
+          {[
+            { icon: <CheckCircle2 className="h-3.5 w-3.5" />, title: 'Free to list', sub: 'No hidden fees' },
+            { icon: <Zap className="h-3.5 w-3.5" />, title: 'Instant AI matching', sub: 'Find verified partners' },
+            { icon: <ShieldCheck className="h-3.5 w-3.5" />, title: 'Verified network', sub: 'Trusted & compliant' },
+          ].map((f, i) => (
+            <div
+              key={i}
+              className="group lift-hover flex animate-fade-in-up cursor-pointer items-start gap-2.5 rounded-lg p-1.5 transition-all duration-300 hover:bg-emerald-50/60"
+              style={{ animationDelay: `${0.6 + i * 0.08}s` }}
+            >
+              <div className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200 transition-all duration-300 group-hover:rotate-[360deg] group-hover:bg-emerald-700 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-700/30">
+                {f.icon}
+              </div>
+              <div className="leading-tight">
+                <div className="text-sm font-bold text-slate-900 transition-colors duration-200 group-hover:text-emerald-700">{f.title}</div>
+                <div className="text-xs text-slate-500">{f.sub}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 flex animate-fade-in-up items-center gap-3" style={{ animationDelay: '1.1s' }}>
+          <Leaf className="h-4 w-4 text-emerald-600 animate-pop" />
+          <span className="animate-tagline-pop text-sm font-semibold text-slate-700">
+            Cleaner Industries. <span className="text-emerald-700">A Greener Tomorrow.</span>
+          </span>
+          <span className="animated-underline hidden h-0.5 flex-1 sm:block" />
+        </div>
+      </div>
+
+      <HeroVisual />
+    </SectionWrapper>
+  );
+}
+
+
+/* =========================================================== */
+/*  FEATURES                                                  */
+/* =========================================================== */
+function FeaturesSection() {
+  const features = [
+    {
+      icon: <Bot className="h-6 w-6" />,
+      title: 'AI-Powered Matching',
+      desc: 'Our algorithm reads material specs, geography, certifications and price ranges to find your perfect partner in seconds.',
+      tint: 'from-emerald-500 to-teal-500',
+    },
+    {
+      icon: <ShieldCheck className="h-6 w-6" />,
+      title: '100% Verified Network',
+      desc: 'Every recycler passes KYC, facility audits and pollution-board checks. We do the verification so you don\'t have to.',
+      tint: 'from-sky-500 to-blue-500',
+    },
+    
+    {
+      icon: <Wallet className="h-6 w-6" />,
+      title: 'Transparent Pricing',
+      desc: 'See live market rates per kg before you list. We take zero commission — every rupee goes to you.',
+      tint: 'from-violet-500 to-purple-500',
+    },
+    {
+      icon: <BarChart className="h-6 w-6" />,
+      title: 'Material Passports',
+      desc: 'Supplier declarations, quality evidence, and compliance triage collected directly into traceable material passports.',
+      tint: 'from-rose-500 to-pink-500',
+    },
+    
+  ];
+
+  return (
+    <SectionWrapper id="features">
+      <div className="text-center">
+        <SectionEyebrow>Why CircularMatch</SectionEyebrow>
+        <SectionTitle>Everything you need to monetise waste.</SectionTitle>
+        <SectionLead>
+          From the first listing to the final payout, we make industrial
+          circularity simple, compliant and genuinely profitable.
+        </SectionLead>
+      </div>
+
+      <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {features.map((f, i) => (
+          <div
+            key={i}
+            className="group lift-hover shine-wrap relative flex flex-col items-center text-center rounded-2xl border border-emerald-100/60 bg-white p-6 shadow-sm transition-all duration-500 animate-fade-in-up"
+            style={{ animationDelay: `${i * 0.08}s` }}
+          >
+            <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${f.tint} text-white shadow-lg transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110`}>
+              {f.icon}
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 transition-colors group-hover:text-emerald-700">{f.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">{f.desc}</p>
+            <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              Learn more <ArrowRight className="h-3 w-3" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </SectionWrapper>
+  );
+}
+
+/* =========================================================== */
+/*  HOW IT WORKS                                              */
+/* =========================================================== */
+function HowItWorksSection() {
+  const steps = [
+    {
+      icon: <Package className="h-6 w-6" />,
+      title: 'List your material',
+      desc: 'Snap a photo, add specs (grade, weight, location). Takes 90 seconds.',
+    },
+    {
+      icon: <Bot className="h-6 w-6" />,
+      title: 'Get AI-matched',
+      desc: 'Our engine ranks verified recyclers by distance, capacity and material fit.',
+    },
+    {
+      icon: <Truck className="h-6 w-6" />,
+      title: 'Review Matches',
+      desc: 'Evaluate matched buyers or sellers, review target prices, and negotiate directly.',
+    },
+    {
+      icon: <Wallet className="h-6 w-6" />,
+      title: 'Build Material Passport',
+      desc: 'Upload quality evidence and lot specifications to create a verified, traceable record.',
+    },
+  ];
+
+  return (
+    <SectionWrapper id="how">
+      <div className="text-center">
+        <SectionEyebrow>How it works</SectionEyebrow>
+        <SectionTitle>Four steps to circularity.</SectionTitle>
+        <SectionLead>
+          We've compressed what used to be a 3-month tender cycle into a single
+          afternoon. Here's how.
+        </SectionLead>
+      </div>
+
+      <div className="relative mt-14">
+        {/* Connecting line */}
+        <div className="absolute left-0 right-0 top-12 hidden h-0.5 bg-gradient-to-r from-emerald-200 via-emerald-400 to-emerald-200 lg:block" />
+
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          {steps.map((s, i) => (
+            <div
+              key={i}
+              className="group relative animate-fade-in-up text-center"
+              style={{ animationDelay: `${i * 0.12}s` }}
+            >
+              <div className="relative mx-auto mb-5 flex h-24 w-24 items-center justify-center">
+                <div className="absolute inset-0 rounded-full bg-emerald-100 opacity-50 transition-all duration-500 group-hover:scale-125 group-hover:opacity-100" />
+                <div className="absolute inset-2 rounded-full bg-emerald-50 transition-all duration-500 group-hover:bg-emerald-700 group-hover:text-white" />
+                <span className="absolute -top-1 -right-1 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white shadow-md ring-2 ring-white transition-transform duration-500 group-hover:rotate-[360deg]">
+                  {i + 1}
+                </span>
+                <div className="relative z-10 flex h-12 w-12 items-center justify-center text-emerald-700 transition-colors duration-500 group-hover:text-white">
+                  {s.icon}
+                </div>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 transition-colors group-hover:text-emerald-700">{s.title}</h3>
+              <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-slate-600">{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </SectionWrapper>
+  );
+}
+
+
+/* =========================================================== */
+/*  CATEGORIES                                                */
+/* =========================================================== */
+function CategoriesSection() {
+  const [categories, setCategories] = useState<{name: string, count: number, emoji: string, tint: string}[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [materialsRes, listingsRes] = await Promise.all([
+          fetch('/api/reference/materials').then(res => res.json()),
+          fetch('/api/listings?active_only=true').then(res => res.json())
+        ]);
+        
+        const materials = materialsRes.data || [];
+        const listings = listingsRes.data || [];
+
+        const catCounts: Record<string, number> = {};
+        listings.forEach((l: any) => {
+          const catName = l.material || l.material_category;
+          if (catName) {
+            catCounts[catName] = (catCounts[catName] || 0) + 1;
+          }
+        });
+
+        // Tints and emojis map
+        const styleMap: Record<string, {emoji: string, tint: string}> = {
+          'Plastic': { emoji: '♳', tint: 'from-sky-400 to-blue-500' },
+          'Metal': { emoji: '⚙️', tint: 'from-slate-400 to-slate-600' },
+          'Paper / Cardboard': { emoji: '📦', tint: 'from-amber-400 to-orange-500' },
+          'Textile': { emoji: '🧵', tint: 'from-rose-400 to-pink-500' },
+          'Other': { emoji: '♻️', tint: 'from-lime-400 to-emerald-500' },
+        };
+
+        const liveCats = materials.map((m: any) => ({
+          name: m.canonical_name,
+          count: catCounts[m.canonical_name] || 0,
+          emoji: styleMap[m.canonical_name]?.emoji || '📦',
+          tint: styleMap[m.canonical_name]?.tint || 'from-emerald-400 to-teal-500'
+        }));
+
+        setCategories(liveCats);
+      } catch (err) {
+        console.error("Failed to load categories", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  return (
+    <SectionWrapper id="marketplace">
+      <div className="text-center">
+        <SectionEyebrow>Marketplace</SectionEyebrow>
+        <SectionTitle>Real materials. Real buyers.</SectionTitle>
+        <SectionLead>
+          Browse live listings or post yours — every category has certified
+          downstream recyclers ready to absorb volume.
+        </SectionLead>
+      </div>
+
+      <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        {loading ? (
+           <div className="col-span-full text-center text-slate-500 py-10 animate-pulse">Loading live marketplace data...</div>
+        ) : categories.map((c, i) => (
+          <a
+            key={i}
+            href="/listings"
+            className="group lift-hover shine-wrap relative flex flex-col items-center gap-3 rounded-2xl border border-emerald-100/60 bg-white p-6 text-center transition-all duration-500 animate-fade-in-up"
+            style={{ animationDelay: `${i * 0.06}s` }}
+          >
+            <div className={`mb-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${c.tint} text-2xl text-white shadow-md transition-transform duration-500 group-hover:rotate-[10deg] group-hover:scale-110`}>
+              {c.emoji}
+            </div>
+            <div className="text-sm font-bold text-slate-900 transition-colors group-hover:text-emerald-700">{c.name}</div>
+            <div className="text-xs text-slate-500">{c.count} active listing{c.count !== 1 ? 's' : ''}</div>
+            <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              Browse <ArrowRight className="h-3 w-3" />
+            </div>
+          </a>
+        ))}
+      </div>
+    </SectionWrapper>
+  );
+}
+
+
+
+/* =========================================================== */
+/*  CTA                                                       */
+/* =========================================================== */
+function CTASection() {
+  return (
+    <SectionWrapper>
+      <div className="relative overflow-hidden rounded-3xl bg-white p-8 text-center shadow-xl ring-1 ring-emerald-100 sm:p-14 animate-fade-in-up">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-20 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-emerald-200/50 blur-3xl animate-blob"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -bottom-20 right-0 h-72 w-72 rounded-full bg-teal-200/50 blur-3xl animate-blob"
+          style={{ animationDelay: '3s' }}
+        />
+
+        <div className="relative">
+          <SectionEyebrow>Ready when you are</SectionEyebrow>
+          <h2 className="mx-auto mt-3 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl">
+            Turn industrial by-products into <br className="hidden sm:block" />
+            <span className="text-emerald-500">verified circular resources</span>.
+          </h2>
+          <p className="mx-auto mt-5 max-w-xl text-base text-slate-600">
+            List your first material in under 3 minutes. Free to list. No
+            contract. Just a smarter way to deal with the by-products of doing
+            business.
+          </p>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+            <a
+              href="/list-waste"
+              className="group shine-wrap relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-emerald-700 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-700/30 transition-all duration-300 hover:scale-[1.03] hover:bg-emerald-800"
+            >
+              <span className="relative z-10">Get Started Free</span>
+              <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <span className="absolute inset-0 -z-0 animate-gradient-pan rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            </a>
+            <a
+              href="mailto:hi@circularmatch.in?subject=Demo%20Request%20-%20CircularMatch"
+              className="group inline-flex items-center gap-3 rounded-full bg-white px-5 py-3.5 text-sm font-semibold text-slate-800 shadow-md ring-1 ring-slate-200 transition-all duration-300 hover:scale-[1.03] hover:bg-slate-50 hover:shadow-lg hover:ring-emerald-200"
+            >
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-white transition-transform group-hover:rotate-12">
+                <Play className="h-3 w-3 fill-white" />
+              </span>
+              Book a demo
+            </a>
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Free to list</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Zero commission</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> 100% verified recyclers</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Traceable Material Passports</span>
+          </div>
+        </div>
+      </div>
+    </SectionWrapper>
+  );
+}
+
+/* =========================================================== */
+/*  FAQ                                                       */
+/* =========================================================== */
+function FAQSection() {
+  const [open, setOpen] = useState<number | null>(0);
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    fetch('/api/reference/stats')
+      .then(res => res.json())
+      .then(data => {
+        if (data.data) {
+          setStats(data.data);
+        }
+      })
+      .catch(console.error);
+  }, []);
+
+  const qs = [
+    {
+      q: 'How does the AI matching work?',
+      a: 'Our matching engine compares your material specifications (category, quality, quantity) against the active requirements of verified buyers in our network to find the most profitable and compliant matches.',
+    },
+    {
+      q: 'What is a Material Passport?',
+      a: 'A Material Passport is a digital record that collects your supplier declarations, quality evidence, and compliance documents into a single, traceable profile for your listed materials.',
+    },
+    {
+      q: 'Is CircularMatch really free for waste generators?',
+      a: 'Yes. We charge zero commission on your listings. The platform is completely free for waste generators to find matches, explore market rates, and build Material Passports.',
+    },
+    {
+      q: 'How are the buyers verified?',
+      a: 'Every buyer in our network passes verification checks including KYC and pollution-control board certifications to ensure compliant, legal, and responsible recycling.',
+    },
+    {
+      q: 'What happens after I find a match?',
+      a: 'Once you accept a match, you connect directly with the buyer to finalize logistics and payment terms. CircularMatch provides the intelligence and matchmaking, while you retain full control over your actual transactions.',
+    },
+  ];
+
+  return (
+    <SectionWrapper id="faq">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <SectionEyebrow>FAQ</SectionEyebrow>
+          <SectionTitle>Everything you wanted to ask.</SectionTitle>
+          <SectionLead>
+            Have a different question? Reach our team at{' '}
+            <a href="mailto:hi@circularmatch.in" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+              hi@circularmatch.in
+            </a>{' '}
+            — usually a 2-hour reply window.
+          </SectionLead>
+
+          <div className="mt-8 grid grid-cols-2 gap-4">
+            <div className="group lift-hover rounded-xl border border-emerald-100/60 bg-white p-4 transition-all duration-300 hover:border-emerald-300">
+              <Users className="h-5 w-5 text-emerald-600 transition-transform group-hover:rotate-[360deg]" />
+              <div className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.businesses || '500+'}</div>
+              <div className="text-xs text-slate-500">Businesses active</div>
+            </div>
+            <div className="group lift-hover rounded-xl border border-emerald-100/60 bg-white p-4 transition-all duration-300 hover:border-emerald-300">
+              <Package className="h-5 w-5 text-emerald-600 transition-transform group-hover:rotate-[360deg]" />
+              <div className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.listings || '50+'}</div>
+              <div className="text-xs text-slate-500">Active listings</div>
+            </div>
+            <div className="group lift-hover rounded-xl border border-emerald-100/60 bg-white p-4 transition-all duration-300 hover:border-emerald-300">
+              <Award className="h-5 w-5 text-emerald-600 transition-transform group-hover:rotate-[360deg]" />
+              <div className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.materials || '15+'}</div>
+              <div className="text-xs text-slate-500">Materials supported</div>
+            </div>
+            <div className="group lift-hover rounded-xl border border-emerald-100/60 bg-white p-4 transition-all duration-300 hover:border-emerald-300">
+              <Building2 className="h-5 w-5 text-emerald-600 transition-transform group-hover:rotate-[360deg]" />
+              <div className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.requirements || '20+'}</div>
+              <div className="text-xs text-slate-500">Active buyers</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="lg:col-span-7">
+          <div className="space-y-3">
+            {qs.map((item, i) => (
+              <div
+                key={i}
+                className="group overflow-hidden rounded-2xl border border-emerald-100/60 bg-white shadow-sm transition-all duration-500 hover:border-emerald-300 hover:shadow-md"
+              >
+                <button
+                  onClick={() => setOpen(open === i ? null : i)}
+                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+                >
+                  <span className="text-sm font-bold text-slate-900 transition-colors group-hover:text-emerald-700 sm:text-base">
+                    {item.q}
+                  </span>
+                  <ChevronDown
+                    className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-500 ${open === i ? 'rotate-180 text-emerald-600' : ''}`}
+                  />
+                </button>
+                <div
+                  className="grid transition-all duration-500 ease-in-out"
+                  style={{ gridTemplateRows: open === i ? '1fr' : '0fr' }}
+                >
+                  <div className="overflow-hidden">
+                    <p className="px-5 pb-5 text-sm leading-relaxed text-slate-600">{item.a}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </SectionWrapper>
+  );
+}
+
+/* =========================================================== */
+/*  FOOTER                                                    */
+/* =========================================================== */
+function Footer() {
+  const scrollTo = (id: string) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const linkCols = [
+    {
+      title: 'Product',
+      links: [
+        { label: 'Marketplace', href: '#marketplace' },
+        { label: 'How it works', href: '#how' },
+        { label: 'List Waste', href: '/list-waste' },
+        { label: 'Material Passports', href: '/dashboard' },
+      ],
+    },
+    {
+      title: 'Platform',
+      links: [
+        { label: 'AI Matching', href: '#features' },
+        { label: 'Verified Network', href: '#features' },
+        { label: 'Zero Commission', href: '#features' },
+      ],
+    },
+    {
+      title: 'Resources',
+      links: [
+        { label: 'FAQ', href: '#faq' },
+        { label: 'Support & Help', href: 'mailto:hi@circularmatch.in' },
+      ],
+    },
+    {
+      title: 'Legal',
+      links: [
+        { label: 'Privacy Policy', href: '/privacy' },
+        { label: 'Terms of Service', href: '/terms' },
+      ],
+    },
+  ];
+  return (
+    <footer className="relative z-10 mt-12 border-t border-emerald-100/60 bg-white/50 backdrop-blur-sm">
+      <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-12">
+        <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="col-span-2">
+            <a href="#" className="flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-700 text-white shadow-md">
+                <Leaf className="h-5 w-5" />
+              </div>
+              <div className="text-xl font-extrabold tracking-tight">
+                CIRCULAR<span className="text-emerald-500">MATCH</span>
+              </div>
+            </a>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-600">
+              The AI-powered marketplace turning industrial waste into verified
+              revenue across India's biggest manufacturing hubs.
+            </p>
+            <div className="mt-6 flex items-center gap-2">
+              {[
+                { label: 'Twitter', path: 'M22 5.92a8.38 8.38 0 0 1-2.36.64 4.13 4.13 0 0 0 1.8-2.27 8.19 8.19 0 0 1-2.6 1 4.1 4.1 0 0 0-7 3.74A11.65 11.65 0 0 1 3 4.79a4.1 4.1 0 0 0 1.27 5.47 4.07 4.07 0 0 1-1.86-.51v.05a4.1 4.1 0 0 0 3.29 4.02 4.13 4.13 0 0 1-1.85.07 4.1 4.1 0 0 0 3.83 2.85A8.23 8.23 0 0 1 2 18.41a11.61 11.61 0 0 0 6.29 1.84c7.55 0 11.68-6.25 11.68-11.68l-.01-.53A8.36 8.36 0 0 0 22 5.92z' },
+                { label: 'LinkedIn', path: 'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zM8.34 18.34H5.67V9.99h2.67v8.35zM7 8.82a1.55 1.55 0 1 1 0-3.1 1.55 1.55 0 0 1 0 3.1zm11.34 9.52h-2.67v-4.06c0-.97-.02-2.22-1.35-2.22-1.36 0-1.57 1.06-1.57 2.15v4.13H10.1V9.99h2.56v1.14h.04a2.81 2.81 0 0 1 2.53-1.39c2.7 0 3.2 1.78 3.2 4.1v4.5z' },
+                { label: 'GitHub', path: 'M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56v-2.18c-3.2.7-3.87-1.36-3.87-1.36-.52-1.33-1.27-1.68-1.27-1.68-1.04-.71.08-.7.08-.7 1.15.08 1.76 1.18 1.76 1.18 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.47.11-3.06 0 0 .97-.31 3.18 1.18a11.04 11.04 0 0 1 5.79 0c2.2-1.49 3.17-1.18 3.17-1.18.62 1.59.23 2.77.11 3.06.73.81 1.18 1.84 1.18 3.1 0 4.43-2.69 5.4-5.25 5.69.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56C20.21 21.38 23.5 17.08 23.5 12c0-6.35-5.15-11.5-11.5-11.5z' },
+              ].map((s, i) => (
+                <a
+                  key={i}
+                  aria-label={s.label}
+                  href="#"
+                  className="group flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm ring-1 ring-emerald-100 transition-all duration-300 hover:scale-110 hover:bg-emerald-700 hover:text-white hover:shadow-md"
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 transition-transform group-hover:rotate-[360deg]">
+                    <path d={s.path} />
+                  </svg>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {linkCols.map((col, i) => (
+            <div key={i}>
+              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">{col.title}</h4>
+              <ul className="space-y-2">
+                {col.links.map((l) => (
+                  <li key={l.label}>
+                    <a
+                      href={l.href}
+                      onClick={l.href.startsWith('#') ? scrollTo(l.href.slice(1)) : undefined}
+                      className="text-sm text-slate-600 transition hover:text-emerald-700"
+                    >
+                      {l.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-emerald-100/60 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
+          <div className="flex items-center gap-2">
+            <Leaf className="h-3.5 w-3.5 text-emerald-600" />
+            <span>© 2026 CircularMatch Technologies Pvt. Ltd. · Made with intent in Delhi NCR.</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inset-0 animate-soft-ping rounded-full bg-emerald-500/70" />
+                <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              All systems operational
+            </span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+

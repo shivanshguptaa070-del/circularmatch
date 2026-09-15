@@ -34,3 +34,15 @@ def get_impact_methodologies(store: DemoStore = Depends(get_store)) -> dict[str,
         "notice": "These are demo methodology records. They are not a verified LCA, GHG inventory, or external reporting claim.",
     })
 
+@router.get("/api/reference/stats")
+def get_global_stats(store: DemoStore = Depends(get_store)) -> dict[str, Any]:
+    active_companies = len(store.companies)
+    active_listings = len(store.list_listings(active_only=True))
+    active_requirements = len(store.list_requirements(active_only=True))
+    supported_materials = len([m for m in store.materials.values() if m.supported])
+    return envelope({
+        "businesses": active_companies,
+        "listings": active_listings,
+        "requirements": active_requirements,
+        "materials": supported_materials
+    })
