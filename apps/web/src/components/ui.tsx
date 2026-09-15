@@ -1,8 +1,26 @@
 import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
-import { AlertCircle, CheckCircle2, Info, Leaf, Sparkles } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { AlertCircle, CheckCircle2, ChevronDown, ChevronRight, FileText, Info, Leaf, ShieldAlert, Sparkles, X, AlertTriangle } from 'lucide-react'
 import { formatNumber } from '../lib/format'
-import { motion } from 'framer-motion'
+import { Link } from 'react-router-dom'
+
+export function Breadcrumb({ items }: { items: { label: string; href?: string }[] }) {
+  return (
+    <nav className="flex items-center gap-2 text-sm font-medium mb-4">
+      {items.map((item, index) => (
+        <div key={item.label} className="flex items-center gap-2">
+          {index > 0 && <ChevronRight size={14} className="text-[#a0b1a9]" />}
+          {item.href ? (
+            <Link to={item.href} className="text-[#526b62] hover:text-ink transition-colors">{item.label}</Link>
+          ) : (
+            <span className="text-ink">{item.label}</span>
+          )}
+        </div>
+      ))}
+    </nav>
+  )
+}
 
 export function CircularMark({ size = 36 }: { size?: number }) {
   return (
@@ -151,12 +169,57 @@ export function Disclosure({ title = 'Notice', children }: { title?: string; chi
   )
 }
 
-export function LoadingPanel({ label = 'Loading CircularMatch data…' }: { label?: string }) {
+export function PageSkeleton({ label = 'Loading CircularMatch data…' }: { label?: string }) {
   return (
     <div className="card flex min-h-[220px] items-center justify-center p-8">
       <div className="text-center">
         <div className="relative mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#e8f5ed] text-spruce"><div className="h-7 w-7 animate-spin rounded-full border-[3px] border-mint border-t-spruce" /><Leaf className="absolute" size={13} /></div>
         <p className="mt-4 text-sm font-medium text-[#607770]">{label}</p>
+      </div>
+    </div>
+  )
+}
+
+
+
+export function ConfirmDialog({ 
+  isOpen, 
+  title, 
+  description, 
+  confirmLabel = 'Confirm', 
+  cancelLabel = 'Cancel', 
+  onConfirm, 
+  onCancel,
+  children
+}: { 
+  isOpen: boolean; 
+  title: string; 
+  description: string; 
+  confirmLabel?: string; 
+  cancelLabel?: string; 
+  onConfirm: () => void; 
+  onCancel: () => void;
+  children?: React.ReactNode;
+}) {
+  if (!isOpen) return null
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-spruce/40 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-3xl bg-white shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="p-6">
+          <div className="flex items-center gap-3">
+            <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#f8eadd] text-[#c97424]">
+              <AlertTriangle size={20} />
+            </div>
+            <h3 className="text-xl font-semibold text-ink">{title}</h3>
+          </div>
+          <p className="mt-4 text-sm leading-6 text-[#617a70]">{description}</p>
+          {children && <div className="mt-5">{children}</div>}
+        </div>
+        <div className="flex items-center justify-end gap-3 border-t border-[#f1f5f2] bg-[#fbfdfb] p-5">
+          <button className="btn-secondary" onClick={onCancel}>{cancelLabel}</button>
+          <button className="btn-primary" onClick={onConfirm}>{confirmLabel}</button>
+        </div>
       </div>
     </div>
   )
@@ -185,5 +248,21 @@ export function EmptyPanel({ title, detail, action }: { title: string; detail: s
       <p className="mt-1 max-w-md text-sm leading-6 text-[#6d837b]">{detail}</p>
       {action && <div className="mt-5">{action}</div>}
     </div>
+  )
+}
+
+export function ChartCard({ title, subtitle, children, accent = 'spruce' }: { title: string; subtitle: string; children: React.ReactNode; accent?: 'spruce' | 'gold' | 'coral' }) {
+  const accentClass = accent === 'gold' ? 'text-[#a47a25] bg-[#fff6df]' : accent === 'coral' ? 'text-coral bg-[#fff0eb]' : 'text-spruce bg-[#e7f5ed]'
+  return (
+    <section className="card chart-card p-5 sm:p-6">
+      <div className="mb-5 flex items-start justify-between gap-3">
+        <div>
+          <h2 className="font-semibold tracking-[-0.03em] text-ink">{title}</h2>
+          <p className="mt-1 text-xs leading-5 text-[#748982]">{subtitle}</p>
+        </div>
+        <span className={`grid h-9 w-9 place-items-center rounded-2xl ${accentClass}`}><Network size={17} /></span>
+      </div>
+      {children}
+    </section>
   )
 }

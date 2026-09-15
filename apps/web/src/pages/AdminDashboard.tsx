@@ -2,6 +2,7 @@ import {
   Bar,
   BarChart,
   Cell,
+  Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -14,7 +15,7 @@ import { get } from '../lib/api'
 import { formatCurrency, formatKg, formatNumber } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { AdminDashboardSummary } from '../types'
-import { ErrorPanel, LoadingPanel, MetricCard, PageHeader } from '../components/ui'
+import { ErrorPanel, PageSkeleton, MetricCard, PageHeader } from '../components/ui'
 
 const CHART_COLORS = ['#12645b', '#72a98f', '#c08a37', '#86a8b8', '#e98467']
 
@@ -37,7 +38,7 @@ function ChartCard({ title, subtitle, children, accent = 'spruce' }: { title: st
 export function AdminDashboard() {
   const summary = useAsync(() => get<AdminDashboardSummary>('/api/dashboard/summary').then((r) => r.data), [])
 
-  if (summary.loading) return <LoadingPanel label="Loading admin workspace..." />
+  if (summary.loading) return <PageSkeleton />
   if (summary.error || !summary.data) return <ErrorPanel error={summary.error || 'Unavailable'} onRetry={() => void summary.reload()} />
   const data = summary.data
 
@@ -65,6 +66,7 @@ export function AdminDashboard() {
                   <Pie data={data.charts?.waste_by_category || []} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={85} paddingAngle={2}>
                     {(data.charts?.waste_by_category || []).map((entry, index) => <Cell key={`${entry.name}-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />)}
                   </Pie>
+                  <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', color: '#445' }} />
                   <Tooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }} itemStyle={{ color: '#12645b' }} formatter={(value: number) => [`${formatKg(value)}/wk`, 'Volume']} />
                 </PieChart>
               </ResponsiveContainer>

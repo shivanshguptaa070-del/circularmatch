@@ -5,7 +5,7 @@ import { get, patch, post } from '../lib/api'
 import { formatKg, titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { ListingPassport, Role } from '../types'
-import { StatusBadge, Disclosure, EmptyPanel, ErrorPanel, LoadingPanel, PageHeader, QualityPill } from '../components/ui'
+import { StatusBadge, Disclosure, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, Breadcrumb } from '../components/ui'
 
 const readinessTone: Record<string, string> = {
   draft: 'border-[#d7e1db] bg-[#f5f8f6] text-[#5f756c]',
@@ -27,21 +27,34 @@ const evidenceTone: Record<string, string> = {
 export function MaterialPassportPage({ role }: { role: Role }) {
   const { listingId } = useParams<{ listingId: string }>()
   const passport = useAsync(() => get<ListingPassport>(`/api/listings/${listingId}/passport`).then((response) => response.data), [listingId])
-  const [evidenceForm, setEvidenceForm] = useState({ evidence_type: 'certificate', title: '', issuer: '', summary: '', document_name: '' })
+  const [evidenceForm, setEvidenceForm] = useState({ evidence_type: 'certificate', title: '', issuer: '', summary: '', document_name: '', document_url: '' })
   const [lotForm, setLotForm] = useState({ lot_code: '', available_quantity_kg: '', material_form: 'Manufacturing trim', source_status: 'pre_consumer', colour: 'Clear', packaging: 'Baled sacks', storage_condition: 'Covered indoor storage', sample_available: true, compliance_triage: 'not_assessed' })
   const [savingEvidence, setSavingEvidence] = useState(false)
+  const [uploadingDoc, setUploadingDoc] = useState(false)
   const [reviewingEvidenceId, setReviewingEvidenceId] = useState<string | null>(null)
   const [savingLot, setSavingLot] = useState(false)
   const [showLotForm, setShowLotForm] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const handleDownload = (filename: string) => {
-    const blob = new Blob([`This is a securely retrieved copy of ${filename} from the CircularMatch data vault.\n\nIn the production environment, this file would be the original uploaded asset (PDF, Image, or Test Report).`], { type: 'text/plain' })
+  const handleDownload = async (evidence: any) => {
+    if (evidence.document_url) {
+      try {
+        const { data } = await get<{ signed_url: string }>(`/api/documents/${evidence.document_url}`);
+        if (data.signed_url) {
+          window.open(data.signed_url, '_blank');
+          return;
+        }
+      } catch (e) {
+        setError('Failed to retrieve document.');
+      }
+    }
+    // Fallback if no document_url (legacy data)
+    const blob = new Blob([`This is a securely retrieved copy of ${evidence.document_name} from the CircularMatch data vault.\n\nIn the production environment, this file would be the original uploaded asset (PDF, Image, or Test Report).`], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = filename
+    a.download = evidence.document_name || 'document.txt'
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -64,9 +77,10 @@ export function MaterialPassportPage({ role }: { role: Role }) {
         status: 'uploaded',
         summary: evidenceForm.summary,
         document_name: evidenceForm.document_name || null,
+        document_url: evidenceForm.document_url || null,
       })
       setMessage(response.data.message)
-      setEvidenceForm({ evidence_type: 'certificate', title: '', issuer: '', summary: '', document_name: '' })
+      setEvidenceForm({ evidence_type: 'certificate', title: '', issuer: '', summary: '', document_name: '', document_url: '' })
       await passport.reload()
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not add the evidence record.')
@@ -115,7 +129,7 @@ export function MaterialPassportPage({ role }: { role: Role }) {
     }
   }
 
-  if (passport.loading) return <LoadingPanel label="Loading the Material Passport…" />
+  if (passport.loading) return <PageSkeleton />
   if (passport.error || !passport.data) return <ErrorPanel error={passport.error || 'Material Passport unavailable.'} onRetry={() => void passport.reload()} />
   const data = passport.data
   const primaryLot = data.lots.find((lot) => lot.status === 'available') || data.lots[0]
@@ -123,6 +137,11 @@ export function MaterialPassportPage({ role }: { role: Role }) {
 
   return (
     <div className="space-y-7">
+      <Breadcrumb items={[
+        { label: 'Dashboard', href: '/' },
+        { label: 'Lots', href: '/listings' },
+        { label: 'Material Passport' }
+      ]} />
       <PageHeader
         eyebrow="Trusted pilot core · Material Passport"
         title={`${data.listing.material} — buyer-readiness record`}
@@ -133,7 +152,7 @@ export function MaterialPassportPage({ role }: { role: Role }) {
       {message && <div className="flex gap-3 rounded-2xl border border-[#b9ddc7] bg-[#eff9f2] p-4 text-sm text-[#28624e]"><CheckCircle2 className="mt-0.5 shrink-0" size={18} /><span>{message}</span></div>}
       {error && <div className="rounded-2xl border border-[#f1c6b9] bg-[#fff7f4] p-4 text-sm text-[#994f3a]">{error}</div>}
 
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_350px]">
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_350px]">
         <article className="card overflow-hidden">
           <div className="flex flex-wrap items-start justify-between gap-4 bg-gradient-to-r from-[#eaf7ef] to-[#fbfdfb] p-5 sm:p-6">
             <div><p className="eyebrow">Material stream</p><h2 className="mt-2 text-2xl font-semibold tracking-[-.045em] text-ink">{data.listing.company}</h2><p className="mt-1 text-sm text-[#667c73]">{formatKg(data.listing.normalized_kg_per_week)}/week · {data.listing.city} · {data.listing.availability}</p></div>
@@ -153,17 +172,17 @@ export function MaterialPassportPage({ role }: { role: Role }) {
         </aside>
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_390px]">
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_312px] xl:grid-cols-[minmax(0,1fr)_390px]">
         <article className="card p-5 sm:p-7">
           <div className="flex flex-wrap items-start justify-between gap-4"><div><div className="flex items-center gap-2"><ClipboardCheck className="text-spruce" size={19} /><h2 className="text-xl font-semibold tracking-[-.04em] text-ink">Lots and declared specification</h2></div><p className="mt-2 text-sm leading-6 text-[#687e75]">A recurring listing can contain several dispatchable lots. Matching uses the currently available lot.</p></div>{canEdit && <button className="btn-secondary !py-2.5" onClick={() => setShowLotForm((value) => !value)}><PackagePlus size={16} />{showLotForm ? 'Close lot form' : 'Add material lot'}</button>}</div>
           {showLotForm && <div className="mt-6 rounded-2xl border border-[#d9e8df] bg-[#f7fbf8] p-4"><div className="grid gap-4 sm:grid-cols-2"><label><span className="field-label">Lot code</span><input className="field-input" value={lotForm.lot_code} onChange={(event) => setLotForm({ ...lotForm, lot_code: event.target.value })} placeholder="e.g. PET-NOI-W34" /></label><label><span className="field-label">Available quantity (kg)</span><input type="number" className="field-input" value={lotForm.available_quantity_kg} onChange={(event) => setLotForm({ ...lotForm, available_quantity_kg: event.target.value })} /></label><label><span className="field-label">Material form</span><input className="field-input" value={lotForm.material_form} onChange={(event) => setLotForm({ ...lotForm, material_form: event.target.value })} /></label><label><span className="field-label">Colour</span><input className="field-input" value={lotForm.colour} onChange={(event) => setLotForm({ ...lotForm, colour: event.target.value })} /></label><label><span className="field-label">Packaging</span><input className="field-input" value={lotForm.packaging} onChange={(event) => setLotForm({ ...lotForm, packaging: event.target.value })} /></label><label><span className="field-label">Source status</span><select className="field-input" value={lotForm.source_status} onChange={(event) => setLotForm({ ...lotForm, source_status: event.target.value as typeof lotForm.source_status })}><option value="pre_consumer">Pre-consumer</option><option value="post_consumer">Post-consumer</option><option value="unknown">Unknown</option></select></label><label className="sm:col-span-2"><span className="field-label">Storage condition</span><input className="field-input" value={lotForm.storage_condition} onChange={(event) => setLotForm({ ...lotForm, storage_condition: event.target.value })} /></label></div><div className="mt-4 flex justify-end"><button className="btn-primary" disabled={savingLot} onClick={() => void addLot()}>{savingLot ? <Loader2 className="animate-spin" size={16} /> : <PackagePlus size={16} />}{savingLot ? 'Creating…' : 'Create lot'}</button></div></div>}
           <div className="mt-6 space-y-4">{data.lots.length ? data.lots.map((lot) => <article key={lot.id} className="rounded-2xl border border-[#dfeae2] bg-[#fbfdfb] p-4"><div className="flex flex-wrap items-start justify-between gap-3"><div><p className="font-semibold text-ink">{lot.lot_code}</p><p className="mt-1 text-xs text-[#6c8178]">{formatKg(lot.available_quantity_kg)} · {lot.material_form} · {titleCase(lot.source_status)}</p></div><span className="badge-safe">{titleCase(lot.status)}</span></div><div className="mt-4 grid gap-3 text-xs sm:grid-cols-3"><div><span className="block text-[#81958d]">Colour</span><strong className="mt-1 block text-ink">{lot.colour}</strong></div><div><span className="block text-[#81958d]">Packaging</span><strong className="mt-1 block text-ink">{lot.packaging}</strong></div><div><span className="block text-[#81958d]">Compliance triage</span><strong className="mt-1 block leading-5 text-ink">{lot.triage_label}</strong></div></div><p className="mt-4 rounded-xl bg-white p-3 text-xs leading-5 text-[#637970]">{String(lot.declared_spec.supplier_statement || 'No supplier statement added.')}</p></article>) : <EmptyPanel title="No dispatchable lots" detail="Create a lot to make this recurring material stream buyer-ready." />}</div>
         </article>
-        <aside className="card p-5 sm:p-6"><div className="flex items-center gap-2"><UploadCloud className="text-spruce" size={19} /><div><p className="eyebrow">Evidence record</p><h2 className="mt-1 text-lg font-semibold tracking-[-.03em] text-ink">Add supporting context</h2></div></div><p className="mt-3 text-xs leading-5 text-[#6e837a]">The system stores a structured evidence record, not a private uploaded file. A production version will store documents in role-controlled private storage.</p>{canEdit && <div className="mt-5 space-y-3"><select className="field-input" value={evidenceForm.evidence_type} onChange={(event) => setEvidenceForm({ ...evidenceForm, evidence_type: event.target.value })}><option value="certificate">Certificate / declaration</option><option value="test_report">Test report</option><option value="photo">Photo record</option><option value="invoice">Invoice / source record</option><option value="other">Other evidence</option></select><input className="field-input" placeholder="Evidence title" value={evidenceForm.title} onChange={(event) => setEvidenceForm({ ...evidenceForm, title: event.target.value })} /><input className="field-input" placeholder="Issuer / source" value={evidenceForm.issuer} onChange={(event) => setEvidenceForm({ ...evidenceForm, issuer: event.target.value })} /><textarea className="field-input resize-y" rows={3} placeholder="What does this evidence support?" value={evidenceForm.summary} onChange={(event) => setEvidenceForm({ ...evidenceForm, summary: event.target.value })} /><div className="flex items-center gap-3"><input type="file" className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#eaf1ec] file:text-spruce hover:file:bg-[#d8e5dd]" onChange={(event) => { const file = event.target.files?.[0]; if (file) setEvidenceForm({ ...evidenceForm, document_name: file.name }) }} /><span className="text-xs text-[#71867e] truncate max-w-[150px]">{evidenceForm.document_name ? `Selected: ${evidenceForm.document_name}` : 'Optional file upload'}</span></div><button className="btn-primary w-full" disabled={savingEvidence} onClick={() => void addEvidence()}>{savingEvidence ? <Loader2 className="animate-spin" size={16} /> : <FilePlus2 size={16} />}{savingEvidence ? 'Saving…' : 'Add evidence record'}</button></div>}</aside>
+        <aside className="card p-5 sm:p-6"><div className="flex items-center gap-2"><UploadCloud className="text-spruce" size={19} /><div><p className="eyebrow">Evidence record</p><h2 className="mt-1 text-lg font-semibold tracking-[-.03em] text-ink">Add supporting context</h2></div></div><p className="mt-3 text-xs leading-5 text-[#6e837a]">The system stores a structured evidence record, not a private uploaded file. A production version will store documents in role-controlled private storage.</p>{canEdit && <div className="mt-5 space-y-3"><select className="field-input" value={evidenceForm.evidence_type} onChange={(event) => setEvidenceForm({ ...evidenceForm, evidence_type: event.target.value })}><option value="certificate">Certificate / declaration</option><option value="test_report">Test report</option><option value="photo">Photo record</option><option value="invoice">Invoice / source record</option><option value="other">Other evidence</option></select><input className="field-input" placeholder="Evidence title" value={evidenceForm.title} onChange={(event) => setEvidenceForm({ ...evidenceForm, title: event.target.value })} /><input className="field-input" placeholder="Issuer / source" value={evidenceForm.issuer} onChange={(event) => setEvidenceForm({ ...evidenceForm, issuer: event.target.value })} /><textarea className="field-input resize-y" rows={3} placeholder="What does this evidence support?" value={evidenceForm.summary} onChange={(event) => setEvidenceForm({ ...evidenceForm, summary: event.target.value })} /><div className="flex items-center gap-3"><input type="file" disabled={uploadingDoc} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#eaf1ec] file:text-spruce hover:file:bg-[#d8e5dd]" onChange={async (event) => { const file = event.target.files?.[0]; if (file) { setEvidenceForm({ ...evidenceForm, document_name: file.name }); setUploadingDoc(true); setError(null); try { const formData = new FormData(); formData.append('file', file); const res = await post<{ document_url: string }>('/api/documents/upload', formData); setEvidenceForm(prev => ({ ...prev, document_name: file.name, document_url: res.data.document_url })); } catch (e) { setError('Failed to upload document'); } finally { setUploadingDoc(false); } } }} /><span className="text-xs text-[#71867e] truncate max-w-[150px]">{uploadingDoc ? 'Uploading...' : evidenceForm.document_name ? `Selected: ${evidenceForm.document_name}` : 'Optional file upload'}</span></div><button className="btn-primary w-full" disabled={savingEvidence || uploadingDoc} onClick={() => void addEvidence()}>{savingEvidence ? <Loader2 className="animate-spin" size={16} /> : <FilePlus2 size={16} />}{savingEvidence ? 'Saving…' : 'Add evidence record'}</button></div>}</aside>
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[1.15fr_.85fr]">
-        <article className="card p-5 sm:p-7"><div className="flex items-center gap-2"><FileCheck2 className="text-spruce" size={19} /><div><p className="eyebrow">Evidence chain</p><h2 className="mt-1 text-xl font-semibold tracking-[-.04em] text-ink">What supports this lot?</h2></div></div><div className="mt-6 space-y-3">{primaryLot?.evidence.length ? primaryLot.evidence.map((evidence) => <div key={evidence.id} className="flex gap-3 rounded-2xl border border-[#dfe9e2] bg-[#fbfdfb] p-4"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#e9f6ee] text-spruce"><FlaskConical size={16} /></span><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-semibold text-ink">{evidence.title}</p><span className={evidenceTone[evidence.status]}>{evidence.status_label}</span></div><p className="mt-1 text-xs text-[#6c8178]">{evidence.issuer} · {titleCase(evidence.evidence_type)}</p><p className="mt-2 text-xs leading-5 text-[#5f766d]">{evidence.summary}</p>{evidence.document_name && <div className="mt-3 flex flex-col items-start gap-1"><p className="text-[11px] font-medium text-[#668177]">Attached document: {evidence.document_name}</p><button className="btn-secondary !px-3 !py-1.5 text-xs mt-1" onClick={() => handleDownload(evidence.document_name!)}><Download size={13} />Download</button></div>}{role === 'admin' && !['reviewed', 'test_reviewed', 'rejected', 'expired'].includes(evidence.status) && <div className="mt-3 flex flex-wrap gap-2"><button className="btn-secondary !px-3 !py-2 text-xs" disabled={reviewingEvidenceId === evidence.id} onClick={() => void reviewEvidence(evidence.id, 'reviewed')}>{reviewingEvidenceId === evidence.id ? <Loader2 className="animate-spin" size={13} /> : <CheckCircle2 size={13} />}Mark reviewed</button><button className="btn-secondary !px-3 !py-2 text-xs" disabled={reviewingEvidenceId === evidence.id} onClick={() => void reviewEvidence(evidence.id, 'test_reviewed')}>Mark test-reviewed</button></div>}</div></div>) : <EmptyPanel title="No evidence record" detail="Add a supplier declaration, photo record, test report, or other supporting evidence." />}</div></article>
+      <section className="grid gap-5 lg:grid-cols-2 xl:grid-cols-[1.15fr_.85fr]">
+        <article className="card p-5 sm:p-7"><div className="flex items-center gap-2"><FileCheck2 className="text-spruce" size={19} /><div><p className="eyebrow">Evidence chain</p><h2 className="mt-1 text-xl font-semibold tracking-[-.04em] text-ink">What supports this lot?</h2></div></div><div className="mt-6 space-y-3">{primaryLot?.evidence.length ? primaryLot.evidence.map((evidence) => <div key={evidence.id} className="flex gap-3 rounded-2xl border border-[#dfe9e2] bg-[#fbfdfb] p-4"><span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#e9f6ee] text-spruce"><FlaskConical size={16} /></span><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="font-semibold text-ink">{evidence.title}</p><span className={evidenceTone[evidence.status]}>{evidence.status_label}</span></div><p className="mt-1 text-xs text-[#6c8178]">{evidence.issuer} · {titleCase(evidence.evidence_type)}</p><p className="mt-2 text-xs leading-5 text-[#5f766d]">{evidence.summary}</p>{evidence.document_name && <div className="mt-3 flex flex-col items-start gap-1"><p className="text-[11px] font-medium text-[#668177]">Attached document: {evidence.document_name}</p><button className="btn-secondary !px-3 !py-1.5 text-xs mt-1" onClick={() => void handleDownload(evidence)}><Download size={13} />Download</button></div>}{role === 'admin' && !['reviewed', 'test_reviewed', 'rejected', 'expired'].includes(evidence.status) && <div className="mt-3 flex flex-wrap gap-2"><button className="btn-secondary !px-3 !py-2 text-xs" disabled={reviewingEvidenceId === evidence.id} onClick={() => void reviewEvidence(evidence.id, 'reviewed')}>{reviewingEvidenceId === evidence.id ? <Loader2 className="animate-spin" size={13} /> : <CheckCircle2 size={13} />}Mark reviewed</button><button className="btn-secondary !px-3 !py-2 text-xs" disabled={reviewingEvidenceId === evidence.id} onClick={() => void reviewEvidence(evidence.id, 'test_reviewed')}>Mark test-reviewed</button></div>}</div></div>) : <EmptyPanel title="No evidence record" detail="Add a supplier declaration, photo record, test report, or other supporting evidence." />}</div></article>
         <aside className="card p-5 sm:p-7"><p className="eyebrow">Audit activity</p><h2 className="mt-2 text-xl font-semibold tracking-[-.04em] text-ink">Traceable changes</h2><div className="mt-6 space-y-4">{data.audit_events.length ? data.audit_events.map((event) => <div key={event.id} className="border-l-2 border-[#b8ddc7] pl-4"><p className="text-sm font-semibold text-ink">{titleCase(event.action)}</p><p className="mt-1 text-xs leading-5 text-[#647b72]">{event.summary}</p><p className="mt-1 text-[10px] font-bold uppercase tracking-[.1em] text-[#8aa097]">System record</p></div>) : <p className="text-sm leading-6 text-[#6b8179]">New listing, evidence, review, and match events will appear here.</p>}</div></aside>
       </section>
     </div>

@@ -1,21 +1,29 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Loader2, Leaf } from 'lucide-react'
 import { supabase } from './lib/supabase'
 import type { ActiveMode, UserProfile } from './lib/supabase'
 import type { Session } from '@supabase/supabase-js'
 import { AppShell } from './components/AppShell'
-import { AuthPage } from './pages/AuthPage'
-import { DashboardPage } from './pages/DashboardPage'
-import { ListWastePage } from './pages/ListWastePage'
-import { BuyerRequirementsPage } from './pages/BuyerRequirementsPage'
-import { ListingsPage } from './pages/ListingsPage'
-import { ListingMatchesPage } from './pages/ListingMatchesPage'
-import { MaterialPassportPage } from './pages/MaterialPassportPage'
-import { BuyerAcceptanceSpecPage } from './pages/BuyerAcceptanceSpecPage'
-import { MatchDetailPage } from './pages/MatchDetailPage'
-import { MapPage } from './pages/MapPage'
-import { AdminPage } from './pages/AdminPage'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { ToastProvider } from './components/ToastProvider'
+const AuthPage = lazy(() => import('./pages/AuthPage').then(m => ({ default: m.AuthPage })))
+const LandingPage = lazy(() => import('./pages/LandingPage').then(m => ({ default: m.LandingPage })))
+const TermsPage = lazy(() => import('./pages/TermsPage').then(m => ({ default: m.TermsPage })))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage').then(m => ({ default: m.PrivacyPage })))
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
+const ListWastePage = lazy(() => import('./pages/ListWastePage').then(m => ({ default: m.ListWastePage })))
+const BuyerRequirementsPage = lazy(() => import('./pages/BuyerRequirementsPage').then(m => ({ default: m.BuyerRequirementsPage })))
+const ListingsPage = lazy(() => import('./pages/ListingsPage').then(m => ({ default: m.ListingsPage })))
+const ListingMatchesPage = lazy(() => import('./pages/ListingMatchesPage').then(m => ({ default: m.ListingMatchesPage })))
+const MaterialPassportPage = lazy(() => import('./pages/MaterialPassportPage').then(m => ({ default: m.MaterialPassportPage })))
+const BuyerAcceptanceSpecPage = lazy(() => import('./pages/BuyerAcceptanceSpecPage').then(m => ({ default: m.BuyerAcceptanceSpecPage })))
+const MatchDetailPage = lazy(() => import('./pages/MatchDetailPage').then(m => ({ default: m.MatchDetailPage })))
+const MapPage = lazy(() => import('./pages/MapPage').then(m => ({ default: m.MapPage })))
+const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })))
+
+const queryClient = new QueryClient()
 
 function SplashScreen() {
   return (
@@ -29,6 +37,20 @@ function SplashScreen() {
       </div>
     </main>
   )
+}
+
+function AuthCallback() {
+  const navigate = useNavigate()
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate('/dashboard', { replace: true })
+      } else {
+        navigate('/', { replace: true })
+      }
+    })
+  }, [navigate])
+  return <SplashScreen />
 }
 
 function RoutedApp({ session, profile }: { session: Session; profile: UserProfile }) {
@@ -45,7 +67,7 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
   const switchMode = useCallback(async (mode: ActiveMode) => {
     setActiveMode(mode)
     localStorage.setItem('cm_active_mode', mode)
-    try { await supabase.from('user_profiles').update({ active_mode: mode }).eq('id', session.user.id) } catch (e) {}
+    try { await supabase.from('user_profiles').update({ active_mode: mode }).eq('id', session.user.id) } catch (e) { /* ignore */ }
     await supabase.auth.updateUser({ data: { active_mode: mode } }).catch(() => null)
     // Redirect to dashboard so the user starts fresh in the new mode
     navigate('/dashboard', { replace: true })
@@ -62,21 +84,25 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
 
   return (
     <AppShell profile={currentProfile} onSwitchMode={switchMode} onSignOut={handleSignOut} isAdmin={isAdmin}>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<DashboardPage role={legacyRole} />} />
-        <Route path="/list-waste" element={<ListWastePage role={legacyRole} />} />
-        <Route path="/buyer-requirements" element={<BuyerRequirementsPage role={legacyRole} />} />
-        <Route path="/listings" element={<ListingsPage role={legacyRole} />} />
-        <Route path="/listings/:listingId/passport" element={<MaterialPassportPage role={legacyRole} />} />
-        <Route path="/listings/:listingId/matches" element={<ListingMatchesPage role={legacyRole} />} />
-        <Route path="/buyer-requirements/:requirementId/acceptance-spec" element={<BuyerAcceptanceSpecPage role={legacyRole} />} />
-        <Route path="/matches/:matchId" element={<MatchDetailPage role={legacyRole} />} />
-        <Route path="/map" element={<MapPage />} />
-        <Route path="/supply" element={<ListingsPage role="buyer" />} />
-        <Route path="/admin" element={isAdmin ? <AdminPage role={legacyRole} /> : <Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
-      </Routes>
+      <Suspense fallback={<div className="p-20 grid place-items-center"><Loader2 className="animate-spin text-spruce" size={24} /></div>}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<DashboardPage role={legacyRole} />} />
+          <Route path="/list-waste" element={<ListWastePage role={legacyRole} />} />
+          <Route path="/buyer-requirements" element={<BuyerRequirementsPage role={legacyRole} />} />
+          <Route path="/listings" element={<ListingsPage role={legacyRole} />} />
+          <Route path="/listings/:listingId/passport" element={<MaterialPassportPage role={legacyRole} />} />
+          <Route path="/listings/:listingId/matches" element={<ListingMatchesPage role={legacyRole} />} />
+          <Route path="/buyer-requirements/:requirementId/acceptance-spec" element={<BuyerAcceptanceSpecPage role={legacyRole} />} />
+          <Route path="/matches/:matchId" element={<MatchDetailPage role={legacyRole} />} />
+          <Route path="/map" element={<MapPage />} />
+          <Route path="/supply" element={<ListingsPage role="buyer" />} />
+          <Route path="/admin" element={isAdmin ? <AdminPage role={legacyRole} /> : <Navigate to="/dashboard" replace />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+      </Suspense>
     </AppShell>
   )
 }
@@ -149,18 +175,31 @@ export default function App() {
 
   // Render logic inside a single BrowserRouter
   return (
-    <BrowserRouter>
-      {session === undefined || (session && loadingProfile && !profile) ? (
-        <SplashScreen />
-      ) : !session ? (
-        <Routes>
-          <Route path="*" element={<AuthPage onAuth={() => void supabase.auth.getSession().then(({ data: { session: s } }) => { setSession(s); if (s) void fetchProfile(s) })} />} />
-        </Routes>
-      ) : !profile ? (
-        <SplashScreen />
-      ) : (
-        <RoutedApp session={session} profile={profile} />
-      )}
-    </BrowserRouter>
+    <ErrorBoundary>
+      <ToastProvider>
+        <QueryClientProvider client={queryClient}>
+          <BrowserRouter>
+        {session === undefined || (session && loadingProfile && !profile) ? (
+          <SplashScreen />
+        ) : !session ? (
+          <Suspense fallback={<SplashScreen />}>
+            <Routes>
+              <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/reset-password" element={<AuthPage onAuth={() => void supabase.auth.getSession().then(({ data: { session: s } }) => { setSession(s); if (s) void fetchProfile(s) })} defaultStep="reset" />} />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="*" element={<AuthPage onAuth={() => void supabase.auth.getSession().then(({ data: { session: s } }) => { setSession(s); if (s) void fetchProfile(s) })} />} />
+            </Routes>
+          </Suspense>
+        ) : !profile ? (
+          <SplashScreen />
+        ) : (
+          <RoutedApp session={session} profile={profile} />
+        )}
+      </BrowserRouter>
+      </QueryClientProvider>
+      </ToastProvider>
+    </ErrorBoundary>
   )
 }

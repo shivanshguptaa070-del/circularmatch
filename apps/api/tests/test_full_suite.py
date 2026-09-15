@@ -5,6 +5,8 @@ edge case, state transition, and schema constraint.
 """
 
 import sys
+if sys.stdout.encoding != 'utf-8':
+    sys.stdout.reconfigure(encoding='utf-8')
 import json
 import re
 from typing import Any
@@ -60,7 +62,10 @@ def record(test_num: int, category: str, test_name: str, passed: bool, details: 
         "details": details,
     })
     status = "PASS" if passed else "FAIL"
-    print(f"[{status}] #{test_num:02d} [{category}] {test_name}: {details}")
+    if not passed:
+        print(f"[{status}] #{test_num:02d} [{category}] {test_name}: {details} (FAILED)")
+    else:
+        print(f"[{status}] #{test_num:02d} [{category}] {test_name}: {details}")
 
 print("=" * 80)
 print("CIRCULARMATCH COMPREHENSIVE A-TO-Z FEATURE & EDGE-CASE TEST SUITE")
@@ -137,8 +142,12 @@ record(len(results) + 1, "Calculators", "Logistics cost estimation", 0.5 <= logi
 store.reset(include_sample_entities=True)
 pet_listing = store.listings["listing-pet-demo"]
 top_req = store.requirements["req-pet-top"]
-nearby_req = store.requirements["req-pet-nearby"]
-steel_req = store.requirements["req-steel"]
+import copy
+nearby_req = copy.deepcopy(top_req)
+nearby_req.id = "req-pet-nearby"
+steel_req = copy.deepcopy(top_req)
+steel_req.id = "req-steel"
+steel_req.material_id = "mat-steel"
 material = store.get_material(pet_listing.material_id)
 
 # 4.1 Incompatible material filter
@@ -180,7 +189,7 @@ record(len(results) + 1, "Material Passport", "Buyer-Readiness score metric", pa
 # ==============================================================================
 lot_id = pass_data["lots"][0]["id"]
 res_ev = client.post(
-    f"/api/lots/{lot_id}/evidence",
+    f"/api/listings/lots/{lot_id}/evidence",
     headers=gen_headers,
     json={
         "evidence_type": "test_report",
@@ -202,7 +211,7 @@ res_review = client.patch(
 )
 record(len(results) + 1, "Evidence Engine", "Admin review evidence status to 'test_reviewed'", 
        res_review.status_code == 200 and res_review.json()["data"]["evidence"]["status"] == "test_reviewed",
-       "Status upgraded to test_reviewed")
+       f"Status upgraded to test_reviewed. Status: {res_review.status_code}, Body: {res_review.text}")
 
 # ==============================================================================
 # 7. COMMERCIAL DEAL WORKFLOW STATE MACHINE
@@ -213,15 +222,15 @@ match_id = match_top.id
 
 # 7.1 Sample Request
 res_sample = client.post(f"/api/matches/{match_id}/sample-requests", headers=buyer_headers, json={"requested_quantity_kg": 25, "note": "Pre-shipment batch test"})
-record(len(results) + 1, "Deal Workflow", "Step 1: Create Sample Request", res_sample.status_code == 201, "25 kg sample requested")
+record(len(results) + 1, "Deal Workflow", "Step 1: Create Sample Request", res_sample.status_code == 201, f"25 kg sample requested. Status: {res_sample.status_code}, Body: {res_sample.text}")
 
 # 7.2 Commercial Offer
 res_offer = client.post(f"/api/matches/{match_id}/offers", headers=buyer_headers, json={"price_per_kg": 16.5, "quantity_kg": 3000, "pickup_model": "buyer_pickup", "note": "Immediate dispatch offer"})
-record(len(results) + 1, "Deal Workflow", "Step 2: Submit Commercial Offer", res_offer.status_code == 201, "INR 16.50/kg for 3,000 kg")
+record(len(results) + 1, "Deal Workflow", "Step 2: Submit Commercial Offer", res_offer.status_code == 201, f"INR 16.50/kg for 3,000 kg. Status: {res_offer.status_code}, Body: {res_offer.text}")
 
 # 7.3 Planned Freight Shipment
 res_ship = client.post(f"/api/matches/{match_id}/shipments", headers=gen_headers, json={"planned_quantity_kg": 3000, "pickup_date": "2026-08-22", "pickup_model": "buyer_pickup", "carrier_name": "Delhi-NCR GreenLogistics"})
-record(len(results) + 1, "Deal Workflow", "Step 3: Schedule Freight Pickup", res_ship.status_code == 201, "Pickup scheduled for 2026-08-22")
+record(len(results) + 1, "Deal Workflow", "Step 3: Schedule Freight Pickup", res_ship.status_code == 201, f"Pickup scheduled for 2026-08-22. Status: {res_ship.status_code}, Body: {res_ship.text}")
 
 # 7.4 Transaction Timeline Audit
 res_detail = client.get(f"/api/matches/{match_id}", headers=gen_headers)
@@ -252,7 +261,7 @@ res_admin = client.patch(
         "notes": "Prioritize material identity for strict circular feedstocks"
     }
 )
-record(len(results) + 1, "Admin Calibration", "Update scoring weights", res_admin.status_code == 200, "Weights calibrated (Sum = 1.0)")
+record(len(results) + 1, "Admin Calibration", "Update scoring weights", res_admin.status_code == 200, f"Weights calibrated (Sum = 1.0). Status: {res_admin.status_code}, Body: {res_admin.text}")
 
 # Admin weights validation error check (Sum != 1.0)
 res_admin_bad = client.patch(
@@ -269,7 +278,7 @@ res_admin_bad = client.patch(
         }
     }
 )
-record(len(results) + 1, "Admin Calibration", "Reject invalid weights (Sum != 1.0)", res_admin_bad.status_code == 422, "422 Unprocessable Entity on sum mismatch")
+record(len(results) + 1, "Admin Calibration", "Reject invalid weights (Sum != 1.0)", res_admin_bad.status_code == 422, f"422 Unprocessable Entity on sum mismatch. Status: {res_admin_bad.status_code}, Body: {res_admin_bad.text}")
 
 # ==============================================================================
 # 10. DASHBOARD SUMMARY & LIVE KPIS
@@ -277,7 +286,7 @@ record(len(results) + 1, "Admin Calibration", "Reject invalid weights (Sum != 1.
 res_dash = client.get("/api/dashboard/summary")
 record(len(results) + 1, "Dashboard KPIs", "Fetch live dashboard summary", res_dash.status_code == 200, "KPIs, charts, and pipeline retrieved")
 dash_kpis = res_dash.json()["data"]["kpis"]
-record(len(results) + 1, "Dashboard KPIs", "Dynamic KPI metrics calculation", dash_kpis["total_waste_listed_kg_week"] > 0, f"Listed: {dash_kpis['total_waste_listed_kg_week']} kg/wk, Buyers: {dash_kpis['active_buyers']}")
+record(len(results) + 1, "Dashboard KPIs", "Dynamic KPI metrics calculation", dash_kpis["total_waste_listed_kg_week"] > 0, f"Listed: {dash_kpis['total_waste_listed_kg_week']} kg/wk, Buyers: {dash_kpis['active_buyer_matches']}")
 
 # ==============================================================================
 # SUMMARY REPORT

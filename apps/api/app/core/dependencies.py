@@ -9,7 +9,7 @@ from jose import ExpiredSignatureError, JWTError, jwt
 
 from app.core.config import settings
 from app.repositories.demo_store import DemoStore
-from app.schemas.models import Company, User
+from app.schemas.models import Company, User, WasteListing, BuyerRequirement
 
 logger = logging.getLogger(__name__)
 
@@ -129,7 +129,7 @@ def get_current_user(
                         latitude=28.6139,
                         longitude=77.2090,
                         verification_status="verified",
-                        is_demo=True,
+                        is_demo=False,
                     ))
 
                 new_user = User(
@@ -149,10 +149,11 @@ def get_current_user(
     user_id = x_demo_user_id or ("user-buyer" if header_mode in {"sourcing", "buyer"} else "user-generator")
     user = demo_store.get_user(user_id)
     if user is not None:
-        # Dynamically apply the role requested by the frontend
-        requested_role = "buyer" if header_mode in {"sourcing", "buyer"} else "generator"
-        if user.role != requested_role:
-            return user.model_copy(update={"role": requested_role})
+        # Dynamically apply the role requested by the frontend, except for admins
+        if user.role != "admin":
+            requested_role = "buyer" if header_mode in {"sourcing", "buyer"} else "generator"
+            if user.role != requested_role:
+                return user.model_copy(update={"role": requested_role})
         return user
 
     role = "buyer" if header_mode in {"sourcing", "buyer"} else "generator"
@@ -206,3 +207,31 @@ def require_roles(*roles: str) -> Callable[[User], User]:
         )
 
     return dependency
+
+def can_access_listing(current_user: User, listing: WasteListing) -> bool:
+    if current_user.role == "admin":
+        return True
+    # Demo users can access all demo content (it's all illustrative data)
+    if current_user.is_demo and listing.is_demo:
+        return True
+        
+    # Buyers need to be able to view the passport of any active supply opportunity they are evaluating
+    if current_user.role == "buyer" and listing.status == "active":
+        return True
+        
+    return current_user.company_id is not None and listing.company_id == current_user.company_id
+
+def can_access_requirement(current_user: User, requirement: BuyerRequirement) -> bool:
+    if current_user.role == "admin":
+        return True
+    # Demo users can access all demo content (it's all illustrative data)
+    if current_user.is_demo and requirement.is_demo:
+        return True
+    return current_user.company_id is not None and requirement.company_id == current_user.company_id
+
+def can_participate_in_match(current_user: User, listing: WasteListing, requirement: BuyerRequirement) -> bool:
+    if current_user.role == "admin":
+        return True
+    if current_user.is_demo and listing.is_demo and requirement.is_demo:
+        return True
+    return current_user.company_id in {listing.company_id, requirement.company_id}

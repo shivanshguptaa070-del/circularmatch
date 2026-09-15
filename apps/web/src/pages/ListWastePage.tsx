@@ -5,8 +5,9 @@ import { get, post } from '../lib/api'
 import { DELHI_NCR_CITIES, SAMPLE_GENERATOR_TEXT, QUALITY_OPTIONS } from '../lib/constants'
 import { titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
+import { useToast } from '../components/ToastProvider'
 import type { ExtractionResult, Listing, Material, Role } from '../types'
-import { StatusBadge, Disclosure, ErrorPanel, LoadingPanel, PageHeader, QualityPill } from '../components/ui'
+import { StatusBadge, Disclosure, ErrorPanel, PageSkeleton, PageHeader, QualityPill } from '../components/ui'
 
 interface ListingFormState {
   material_id: string
@@ -26,7 +27,9 @@ interface ListingFormState {
   storage_condition: string
   sample_available: boolean
   compliance_triage: 'not_assessed' | 'ordinary_secondary_material' | 'needs_compliance_review' | 'regulated_or_hazardous_route'
+  compliance_triage: 'not_assessed' | 'ordinary_secondary_material' | 'needs_compliance_review' | 'regulated_or_hazardous_route'
   document_name: string
+  document_url: string
 }
 
 const initialForm: ListingFormState = {
@@ -47,7 +50,9 @@ const initialForm: ListingFormState = {
   storage_condition: 'Covered indoor storage',
   sample_available: true,
   compliance_triage: 'not_assessed',
+  compliance_triage: 'not_assessed',
   document_name: '',
+  document_url: '',
 }
 
 export function ListWastePage({ role }: { role: Role }) {
@@ -59,7 +64,8 @@ export function ListWastePage({ role }: { role: Role }) {
   const [form, setForm] = useState<ListingFormState>(initialForm)
   const [analyzing, setAnalyzing] = useState(false)
   const [publishing, setPublishing] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [uploadingDoc, setUploadingDoc] = useState(false)
+  const { error: toastError } = useToast()
 
   const selectedMaterial = materials.data?.find((item) => item.id === form.material_id)
   const potentialUses = extraction?.potential_uses.length ? extraction.potential_uses : (selectedMaterial?.uses || []).map((item) => ({ ...item, label: 'Potential use — verify suitability with buyer' }))
@@ -67,7 +73,6 @@ export function ListWastePage({ role }: { role: Role }) {
   const update = (key: keyof ListingFormState, value: string | boolean) => setForm((current) => ({ ...current, [key]: value } as ListingFormState))
 
   const analyze = async () => {
-    setError(null)
     setAnalyzing(true)
     try {
       const response = await post<ExtractionResult>('/api/ai/extract-waste', { description })
@@ -92,19 +97,19 @@ export function ListWastePage({ role }: { role: Role }) {
         sample_available: true,
         compliance_triage: 'not_assessed',
         document_name: '',
+        document_url: '',
       })
       setStep(2)
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not analyze the description.')
+      toastError(cause instanceof Error ? cause.message : 'Could not analyze the description.')
     } finally {
       setAnalyzing(false)
     }
   }
 
   const publish = async () => {
-    setError(null)
     if (!form.material_id || !Number(form.quantity_kg) || !form.city) {
-      setError('Please choose a material, enter quantity, and select a city before publishing.')
+      toastError('Please choose a material, enter quantity, and select a city before publishing.')
       return
     }
     setPublishing(true)
@@ -130,16 +135,17 @@ export function ListWastePage({ role }: { role: Role }) {
         sample_available: form.sample_available,
         compliance_triage: form.compliance_triage,
         document_name: form.document_name || undefined,
+        document_url: form.document_url || undefined,
       })
       navigate(`/listings/${response.data.listing.id}/matches`, { state: { created: true } })
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not publish this listing.')
+      toastError(cause instanceof Error ? cause.message : 'Could not publish this listing.')
     } finally {
       setPublishing(false)
     }
   }
 
-  if (materials.loading) return <LoadingPanel label="Loading the supported material catalog…" />
+  if (materials.loading) return <PageSkeleton />
   if (materials.error || !materials.data) return <ErrorPanel error={materials.error || 'Material catalog unavailable.'} onRetry={() => void materials.reload()} />
   const catalog = materials.data
 
@@ -156,14 +162,10 @@ export function ListWastePage({ role }: { role: Role }) {
         <span className={`flex items-center gap-2 rounded-full px-3 py-2 ${step === 1 ? 'bg-forest text-white' : 'bg-[#e2f1e8] text-spruce'}`}><span className="grid h-5 w-5 place-items-center rounded-full bg-white/20 text-[10px]">1</span>Describe waste</span>
         <ChevronRight size={15} className="text-[#a0b1a9]" />
         <span className={`flex items-center gap-2 rounded-full px-3 py-2 ${step === 2 ? 'bg-forest text-white' : 'bg-[#edf2ee] text-[#789087]'}`}><span className="grid h-5 w-5 place-items-center rounded-full bg-white/20 text-[10px]">2</span>Review & publish</span>
-        <ChevronRight size={15} className="text-[#a0b1a9]" />
-        <span className="flex items-center gap-2 rounded-full bg-[#edf2ee] px-3 py-2 text-[#789087]"><span className="grid h-5 w-5 place-items-center rounded-full bg-white text-[10px]">3</span>Find best buyers</span>
       </div>
 
-      {error && <div className="rounded-2xl border border-[#f1c6b9] bg-[#fff7f4] p-4 text-sm text-[#994f3a]">{error}</div>}
-
       {step === 1 ? (
-        <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_288px] xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="card p-5 sm:p-7">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
@@ -201,12 +203,12 @@ export function ListWastePage({ role }: { role: Role }) {
       ) : (
         <section className="space-y-5">
           {extraction && <Disclosure title={extraction.provider === 'gemini' ? 'AI-assisted draft' : 'Standard extraction — rule-based fallback'}>{extraction.provider_disclosure}</Disclosure>}
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_288px] xl:grid-cols-[minmax(0,1fr)_360px]">
             <div className="card p-5 sm:p-7">
               <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#e4ece6] pb-5"><div><div className="flex items-center gap-2"><ClipboardCheck size={19} className="text-spruce" /><h2 className="text-lg font-semibold tracking-[-0.03em] text-ink">Review structured listing</h2></div><p className="mt-1 text-sm text-[#6a8078]">Edit the draft before it becomes available for matching.</p></div><button className="btn-secondary !py-2" onClick={() => setStep(1)}><ArrowLeft size={15} />Edit description</button></div>
               {extraction?.structured.missing_fields?.length ? <div className="mt-5 rounded-xl border border-[#efd8a4] bg-[#fff8e8] p-3 text-xs text-[#806427]"><strong>Complete before publishing:</strong><ul className="mt-1 list-disc space-y-0.5 pl-4">{extraction.structured.missing_fields.map((item) => <li key={item}>{item}</li>)}</ul></div> : null}
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                <label><span className="field-label">Controlled material</span><select value={form.material_id} className="field-input" onChange={(event) => { update('material_id', event.target.value); const use = catalog.find((item) => item.id === event.target.value)?.uses[0]?.id || ''; update('selected_use_id', use) }}><option value="">Select material</option>{catalog.map((material) => <option key={material.id} value={material.id}>{material.canonical_name} · {material.category}</option>)}</select></label>
+                <label><span className="field-label">Controlled material</span><select value={form.material_id} className="field-input" onChange={(event) => { const material_id = event.target.value; const use = catalog.find((item) => item.id === material_id)?.uses[0]?.id || ''; setForm(prev => ({ ...prev, material_id, selected_use_id: use, colour: '', material_form: '', packaging: '' })) }}><option value="">Select material</option>{catalog.map((material) => <option key={material.id} value={material.id}>{material.canonical_name} · {material.category}</option>)}</select></label>
                 <label><span className="field-label">Quantity available</span><div className="relative"><input type="number" min="1" value={form.quantity_kg} className="field-input pr-12" onChange={(event) => update('quantity_kg', event.target.value)} /><span className="absolute right-3 top-3.5 text-xs font-semibold text-[#758b82]">kg</span></div></label>
                 <label><span className="field-label">Frequency</span><select value={form.frequency} className="field-input" onChange={(event) => update('frequency', event.target.value)}><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="one_time">One-time lot</option></select></label>
                 <label><span className="field-label">City</span><select value={form.city} className="field-input" onChange={(event) => update('city', event.target.value)}>{DELHI_NCR_CITIES.map((city) => <option key={city}>{city}</option>)}</select></label>
@@ -215,7 +217,7 @@ export function ListWastePage({ role }: { role: Role }) {
                 <label><span className="field-label">Target asking price <span className="font-normal text-[#82968e]">₹/kg</span></span><input type="number" min="0" value={form.asking_price_per_kg} className="field-input" onChange={(event) => update('asking_price_per_kg', event.target.value)} /></label>
                 <label><span className="field-label">Current disposal cost <span className="font-normal text-[#82968e]">₹/kg</span></span><input type="number" min="0" value={form.disposal_cost_per_kg} className="field-input" onChange={(event) => update('disposal_cost_per_kg', event.target.value)} /></label>
                 <label className="sm:col-span-2"><span className="field-label">Quality note</span><input value={form.quality_notes} className="field-input" onChange={(event) => update('quality_notes', event.target.value)} /></label>
-                <label className="sm:col-span-2"><span className="field-label">Supporting document (Upload)</span><div className="flex items-center gap-3"><input type="file" className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#eaf1ec] file:text-spruce hover:file:bg-[#d8e5dd]" onChange={(event) => { const file = event.target.files?.[0]; if (file) update('document_name', file.name) }} /><span className="text-xs text-[#71867e] truncate max-w-[200px]">{form.document_name ? `Selected: ${form.document_name}` : 'No file selected'}</span></div></label>
+                <label className="sm:col-span-2"><span className="field-label">Supporting document (Upload)</span><div className="flex items-center gap-3"><input type="file" disabled={uploadingDoc} className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#eaf1ec] file:text-spruce hover:file:bg-[#d8e5dd]" onChange={async (event) => { const file = event.target.files?.[0]; if (file) { update('document_name', file.name); setUploadingDoc(true); try { const formData = new FormData(); formData.append('file', file); const res = await post<{ document_url: string }>('/api/documents/upload', formData); update('document_url', res.data.document_url); } catch (e) { toastError('Failed to upload document'); } finally { setUploadingDoc(false); } } }} /><span className="text-xs text-[#71867e] truncate max-w-[200px]">{uploadingDoc ? 'Uploading...' : form.document_name ? `Selected: ${form.document_name}` : 'No file selected'}</span></div></label>
                 <div className="sm:col-span-2 mt-2 rounded-2xl border border-[#d8e7dc] bg-[#f7fbf8] p-4">
                   <div className="flex items-start justify-between gap-3"><div><p className="text-sm font-semibold text-ink">Material Passport starter</p><p className="mt-1 text-xs leading-5 text-[#6e837a]">These are supplier-declared lot details. They improve matching but do not verify composition or legal status.</p></div><span className="badge-neutral">lot data</span></div>
                   <div className="mt-4 grid gap-4 sm:grid-cols-2">
@@ -243,7 +245,7 @@ export function ListWastePage({ role }: { role: Role }) {
                     </span>
                   )}
                 </div>
-                <button className="btn-primary" disabled={publishing || !form.material_id || !Number(form.quantity_kg) || !form.city} onClick={() => void publish()}>
+                <button className="btn-primary" disabled={publishing || uploadingDoc || !form.material_id || !Number(form.quantity_kg) || !form.city} onClick={() => void publish()}>
                   {publishing ? <Loader2 className="animate-spin" size={17} /> : <Check size={17} />}
                   {publishing ? 'Publishing…' : 'Publish listing'}
                   <ArrowRight size={16} />

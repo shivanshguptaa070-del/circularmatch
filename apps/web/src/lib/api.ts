@@ -3,19 +3,6 @@ import { supabase } from './supabase'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
-/** Returns a stable random ID unique to this browser, persisted across page reloads. */
-function getSessionId(): string {
-  let id = localStorage.getItem('cm_session_id')
-  if (!id) {
-    // Generate a simple UUID-v4-like random string
-    id = 'sess-' + Array.from(crypto.getRandomValues(new Uint8Array(12)))
-      .map(b => b.toString(16).padStart(2, '0'))
-      .join('')
-    localStorage.setItem('cm_session_id', id)
-  }
-  return id
-}
-
 async function getAuthHeader(): Promise<Record<string, string>> {
   const { data: { session } } = await supabase.auth.getSession()
   const headers: Record<string, string> = {}
@@ -39,7 +26,9 @@ async function getAuthHeader(): Promise<Record<string, string>> {
 export async function api<T>(path: string, options: RequestInit = {}): Promise<ApiEnvelope<T>> {
   const authHeaders = await getAuthHeader()
   const headers = new Headers(options.headers)
-  headers.set('Content-Type', 'application/json')
+  if (!(options.body instanceof FormData)) {
+    headers.set('Content-Type', 'application/json')
+  }
   Object.entries(authHeaders).forEach(([k, v]) => headers.set(k, v))
 
   const response = await fetch(`${API_BASE}${path}`, { ...options, headers })
@@ -61,9 +50,12 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<A
 
 export const get = <T>(path: string) => api<T>(path)
 export const post = <T>(path: string, body?: unknown) =>
-  api<T>(path, { method: 'POST', body: body ? JSON.stringify(body) : undefined })
+  api<T>(path, { method: 'POST', body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined })
 export const patch = <T>(path: string, body: unknown) =>
   api<T>(path, { method: 'PATCH', body: JSON.stringify(body) })
+export const put = <T>(path: string, body: unknown) =>
+  api<T>(path, { method: 'PUT', body: JSON.stringify(body) })
+export const del = <T>(path: string) => api<T>(path, { method: 'DELETE' })
 
 export async function getNotifications() {
   return get<{ notifications: import('../types').Notification[] }>('/api/notifications')
@@ -73,7 +65,3 @@ export async function markNotificationRead(notificationId: string) {
   return patch<{ notification: import('../types').Notification }>(`/api/notifications/${notificationId}/read`, {})
 }
 
-// Legacy compatibility — no-op, auth is handled by Supabase
-export function getStoredUser() { return null }
-export function setStoredUser(_user: unknown) { void _user }
-export function clearStoredUser() { supabase.auth.signOut().catch(() => null) }

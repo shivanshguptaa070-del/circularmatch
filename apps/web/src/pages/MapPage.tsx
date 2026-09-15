@@ -5,7 +5,7 @@ import { formatKg } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { MapPoint, MapRoute } from '../types'
 import { NetworkMap } from '../components/NetworkMap'
-import { StatusBadge, Disclosure, ErrorPanel, LoadingPanel, PageHeader } from '../components/ui'
+import { StatusBadge, Disclosure, ErrorPanel, PageSkeleton, PageHeader } from '../components/ui'
 
 export function MapPage() {
   const [params] = useSearchParams()
@@ -15,7 +15,7 @@ export function MapPage() {
     [matchId],
   )
 
-  if (map.loading) return <LoadingPanel label="Loading material network map…" />
+  if (map.loading) return <PageSkeleton />
   if (map.error || !map.data) return <ErrorPanel error={map.error || 'Map data unavailable.'} onRetry={() => void map.reload()} />
   const data = map.data
   const generators = data.points.filter((point) => point.company_type === 'generator')
@@ -24,7 +24,7 @@ export function MapPage() {
   return (
     <div className="space-y-7">
       <PageHeader eyebrow="Network map" title="Regional material network" description="Explore verified generator and buyer locations. Track distance and logistics pathways across active circular routes." actions={<StatusBadge>Active Network</StatusBadge>} />
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_330px]">
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_264px] xl:grid-cols-[minmax(0,1fr)_330px]">
         <NetworkMap points={data.points} route={data.selected_route} />
         <aside className="card p-5 sm:p-6"><p className="eyebrow">Network legend</p><h2 className="mt-2 text-xl font-semibold tracking-[-0.035em] text-ink">Material discovery points</h2><div className="mt-6 space-y-4"><div className="flex items-center gap-3"><span className="h-3 w-3 rounded-full border-2 border-white bg-spruce shadow" /><div><p className="text-sm font-semibold text-ink">Waste generators</p><p className="text-xs text-[#6f857d]">{generators.length} company location{generators.length === 1 ? '' : 's'}</p></div></div><div className="flex items-center gap-3"><span className="h-3 w-3 rounded-full border-2 border-white bg-[#c08a37] shadow" /><div><p className="text-sm font-semibold text-ink">Buyers & processors</p><p className="text-xs text-[#6f857d]">{buyers.length} sample demand point{buyers.length === 1 ? '' : 's'}</p></div></div><div className="flex items-center gap-3"><span className="h-0 w-8 border-t-2 border-dashed border-spruce" /><div><p className="text-sm font-semibold text-ink">Potential route</p><p className="text-xs text-[#6f857d]">Shown only after a match is selected</p></div></div></div>{data.selected_route ? <div className="mt-7 rounded-2xl bg-[#edf7f0] p-4"><div className="flex items-center gap-2 text-spruce"><Route size={16} /><span className="text-xs font-bold uppercase tracking-[0.1em]">Selected match route</span></div><p className="mt-3 text-sm font-semibold text-ink">{data.selected_route.from.city} → {data.selected_route.to.city}</p><p className="mt-1 text-xs leading-5 text-[#607770]">{data.selected_route.distance_km.toFixed(1)} km calculated distance{data.selected_route.match_score ? ` · ${Math.round(data.selected_route.match_score)}% match score` : ''}</p></div> : <div className="mt-7 rounded-2xl bg-[#f5f8f5] p-4 text-xs leading-5 text-[#657b72]">Open a buyer match and select <strong>View route</strong> to place a potential circular pathway on this map.</div>}</aside>
       </section>

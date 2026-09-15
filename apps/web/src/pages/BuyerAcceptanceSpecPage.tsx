@@ -5,7 +5,7 @@ import { get, patch } from '../lib/api'
 import { formatKg, titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { BuyerAcceptanceSpec, BuyerRequirement, Role } from '../types'
-import { StatusBadge, Disclosure, ErrorPanel, LoadingPanel, PageHeader } from '../components/ui'
+import { StatusBadge, Disclosure, ErrorPanel, PageSkeleton, PageHeader } from '../components/ui'
 
 interface SpecResponse {
   requirement: BuyerRequirement
@@ -62,7 +62,7 @@ export function BuyerAcceptanceSpecPage({ role }: { role: Role }) {
     }
   }
 
-  if (data.loading) return <LoadingPanel label="Loading buyer acceptance template…" />
+  if (data.loading) return <PageSkeleton />
   if (data.error || !data.data) return <ErrorPanel error={data.error || 'Buyer acceptance template unavailable.'} onRetry={() => void data.reload()} />
   const { requirement, acceptance_spec: spec } = data.data
 
@@ -78,7 +78,7 @@ export function BuyerAcceptanceSpecPage({ role }: { role: Role }) {
       {message && <div className="flex gap-3 rounded-2xl border border-[#b9ddc7] bg-[#eff9f2] p-4 text-sm text-[#28624e]"><CheckCircle2 className="mt-0.5 shrink-0" size={18} /><span>{message}</span></div>}
       {error && <div className="rounded-2xl border border-[#f1c6b9] bg-[#fff7f4] p-4 text-sm text-[#994f3a]">{error}</div>}
 
-      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
+      <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_288px] xl:grid-cols-[minmax(0,1fr)_360px]">
         <article className="card p-5 sm:p-7"><div className="flex items-start justify-between gap-4 border-b border-[#e4ece6] pb-5"><div><div className="flex items-center gap-2"><SlidersHorizontal className="text-spruce" size={19} /><h2 className="text-xl font-semibold tracking-[-.04em] text-ink">Acceptance profile</h2></div><p className="mt-2 text-sm leading-6 text-[#687e75]">Matching evaluates these explicit rules before it recommends a commercial action.</p></div><StatusBadge>buyer controlled</StatusBadge></div>
           <div className="mt-6 grid gap-5 sm:grid-cols-2">
             <label><span className="field-label">Accepted forms <span className="font-normal text-[#82968e]">comma separated</span></span><input className="field-input" disabled={role !== 'buyer'} value={form.accepted_forms} onChange={(event) => setForm({ ...form, accepted_forms: event.target.value })} placeholder="Manufacturing trim, Regrind" /></label>

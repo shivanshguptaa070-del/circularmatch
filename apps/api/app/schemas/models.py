@@ -122,9 +122,11 @@ class QualityEvidence(BaseModel):
     status: EvidenceStatus = "self_declared"
     summary: str = ""
     document_name: str | None = None
+    document_url: str | None = None
     valid_until: str | None = None
     reviewed_by: str | None = None
     reviewed_at: str | None = None
+    review_note: str = ""
     is_demo: bool = True
     created_at: str
 
@@ -291,6 +293,7 @@ class ScoringConfig(BaseModel):
         }
     )
     version: int = 1
+    notes: str | None = None
     is_demo: bool = True
 
     @field_validator("weights")
@@ -336,6 +339,7 @@ class CreateListingRequest(BaseModel):
     sample_available: bool = False
     compliance_triage: ComplianceTriage = "not_assessed"
     document_name: str | None = Field(default=None, max_length=200)
+    document_url: str | None = None
 
 
 class UpdateListingRequest(BaseModel):
@@ -370,6 +374,7 @@ class CreateEvidenceRequest(BaseModel):
     status: EvidenceStatus = "uploaded"
     summary: str = Field(default="", max_length=1000)
     document_name: str | None = Field(default=None, max_length=240)
+    document_url: str | None = None
     valid_until: str | None = Field(default=None, max_length=32)
 
 
@@ -393,6 +398,17 @@ class CreateRequirementRequest(BaseModel):
         if self.minimum_quantity_kg_week > self.maximum_quantity_kg_week:
             raise ValueError("Minimum quantity cannot exceed maximum quantity.")
         return self
+
+
+class UpdateRequirementRequest(BaseModel):
+    minimum_quantity_kg_week: float | None = Field(default=None, ge=0, le=10_000_000)
+    maximum_quantity_kg_week: float | None = Field(default=None, gt=0, le=10_000_000)
+    minimum_quality_grade: QualityGrade | None = None
+    maximum_distance_km: float | None = Field(default=None, gt=0, le=2500)
+    target_price_per_kg: float | None = Field(default=None, ge=0, le=1_000_000)
+    allow_partial_quantity: bool | None = None
+    status: Literal["active", "archived"] | None = None
+
 
 
 class UpdateBuyerAcceptanceSpecRequest(BaseModel):
@@ -444,6 +460,7 @@ class UpdateShipmentRequest(BaseModel):
 
 class UpdateScoringConfigRequest(BaseModel):
     weights: dict[str, float]
+    notes: str | None = None
 
     @field_validator("weights")
     @classmethod

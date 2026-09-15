@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   BarChart3,
   ClipboardList,
@@ -69,6 +69,7 @@ export function AppShell({
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showNotifications, setShowNotifications] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
   const modeMenuRef = useRef<HTMLDivElement>(null)
   const notificationRef = useRef<HTMLDivElement>(null)
 
@@ -272,7 +273,7 @@ export function AppShell({
                             }
                             if (n.reference_url) {
                               if (n.reference_url.startsWith('/')) {
-                                window.location.href = n.reference_url
+                                navigate(n.reference_url)
                               } else {
                                 console.warn('Blocked external redirect')
                               }

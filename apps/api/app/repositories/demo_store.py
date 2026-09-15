@@ -141,7 +141,9 @@ class DemoStore:
         """
         try:
             from app.core.persistence import ensure_bucket, load_snapshot
+            from app.core.storage import ensure_documents_bucket
             ensure_bucket()
+            ensure_documents_bucket()
             snapshot = load_snapshot()
         except Exception as exc:
             logger.warning("DemoStore: persistence load failed: %s", exc)
