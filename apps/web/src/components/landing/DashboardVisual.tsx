@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Leaf, Home, Package, BarChart3, FileText, Bell, Settings, 
-  Search, Command, SlidersHorizontal, CheckCircle2, MapPin, ArrowRight,
-  Recycle, Factory
+  Search, Command, SlidersHorizontal, CheckCircle2, MapPin, ArrowRight
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
-const MATERIAL_ICONS: Record<string, { icon: any, color: string, bg: string }> = {
-  "PET": { icon: Recycle, color: "text-sky-600", bg: "bg-sky-100" },
-  "AL": { icon: Factory, color: "text-slate-600", bg: "bg-slate-100" },
-  "WD": { icon: Leaf, color: "text-emerald-600", bg: "bg-emerald-100" }
+const MATERIAL_IMAGES: Record<string, string> = {
+  "PET": "/pet-flakes.jpg",
+  "AL": "/al-scrap.jpg",
+  "WD": "/wood-waste.jpg"
 };
 
 interface MaterialListing {
@@ -207,13 +206,11 @@ export default function DashboardVisual() {
               style={{ animationDelay: `${0.4 + i * 0.06}s` }}
             >
               <div className="col-span-5 flex items-center gap-3 min-w-0">
-                <div className={cn(
-                  "flex h-11 w-11 shrink-0 items-center justify-center rounded-lg ring-1 ring-slate-100 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3",
-                  (MATERIAL_ICONS[r.code] || MATERIAL_ICONS.WD).bg,
-                  (MATERIAL_ICONS[r.code] || MATERIAL_ICONS.WD).color
-                )}>
-                  {React.createElement((MATERIAL_ICONS[r.code] || MATERIAL_ICONS.WD).icon, { className: "h-5 w-5" })}
-                </div>
+                <img
+                  src={MATERIAL_IMAGES[r.code] || MATERIAL_IMAGES.WD}
+                  alt=""
+                  className="h-11 w-11 shrink-0 rounded-lg object-cover ring-1 ring-slate-100 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                />
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
                     <span className="truncate text-sm font-semibold text-slate-900">{r.name}</span>
