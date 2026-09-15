@@ -124,7 +124,7 @@ export function AppShell({
     <div className="sidebar-surface flex h-full flex-col px-4 py-5 text-white">
       <div className="relative z-10 flex flex-col h-full">
         {/* Logo */}
-        <Link to="/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-1 transition hover:bg-white/5">
+        <Link to="/listings" className="flex items-center gap-3 rounded-2xl px-2 py-1 transition hover:bg-white/5">
           <CircularMark size={42} />
           <div>
             <p className="text-[17px] font-bold leading-none tracking-[-0.055em]">CIRCULAR<span className="text-mint">MATCH</span></p>
