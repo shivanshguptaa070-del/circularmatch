@@ -570,7 +570,7 @@ function CTASection() {
               <span className="absolute inset-0 -z-0 animate-gradient-pan rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </a>
             <a
-              href="mailto:hi@circularmatch.in?subject=Demo%20Request%20-%20CircularMatch"
+              href="mailto:shivanshguptaa070@gmail.com?subject=Demo%20Request%20-%20CircularMatch"
               className="group inline-flex items-center gap-3 rounded-full bg-white px-5 py-3.5 text-sm font-semibold text-slate-800 shadow-md ring-1 ring-slate-200 transition-all duration-300 hover:scale-[1.03] hover:bg-slate-50 hover:shadow-lg hover:ring-emerald-200"
             >
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-white transition-transform group-hover:rotate-12">
@@ -641,8 +641,8 @@ function FAQSection() {
           <SectionTitle>Everything you wanted to ask.</SectionTitle>
           <SectionLead>
             Have a different question? Reach our team at{' '}
-            <a href="mailto:hi@circularmatch.in" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
-              hi@circularmatch.in
+            <a href="mailto:shivanshguptaa070@gmail.com" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+              shivanshguptaa070@gmail.com
             </a>{' '}
             — usually a 2-hour reply window.
           </SectionLead>
@@ -740,7 +740,7 @@ function Footer() {
       title: 'Resources',
       links: [
         { label: 'FAQ', href: '#faq' },
-        { label: 'Support & Help', href: 'mailto:hi@circularmatch.in' },
+        { label: 'Support & Help', href: 'mailto:shivanshguptaa070@gmail.com' },
       ],
     },
     {
