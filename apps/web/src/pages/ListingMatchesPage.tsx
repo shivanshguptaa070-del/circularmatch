@@ -21,7 +21,7 @@ export function ListingMatchesPage({ role }: { role: Role }) {
 
   const { data: materialsData, isPending: materialsLoading, error: materialsError, refetch: refetchMaterials } = useQuery({
     queryKey: ['materials'],
-    queryFn: () => get<Material[]>('/api/materials').then((response) => response.data)
+    queryFn: () => get<Material[]>('/api/reference/materials').then((response) => response.data)
   })
 
   const { toast, success, error: toastError } = useToast()

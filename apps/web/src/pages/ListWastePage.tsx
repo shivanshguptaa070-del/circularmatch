@@ -57,7 +57,7 @@ const initialForm: ListingFormState = {
 
 export function ListWastePage({ role }: { role: Role }) {
   const navigate = useNavigate()
-  const materials = useAsync(() => get<Material[]>('/api/materials').then((response) => response.data), [])
+  const materials = useAsync(() => get<Material[]>('/api/reference/materials').then((response) => response.data), [])
   const [step, setStep] = useState<1 | 2>(1)
   const [description, setDescription] = useState(SAMPLE_GENERATOR_TEXT)
   const [extraction, setExtraction] = useState<ExtractionResult | null>(null)

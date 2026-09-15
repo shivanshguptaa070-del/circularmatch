@@ -10,7 +10,7 @@ import { StatusBadge, Disclosure, EmptyPanel, ErrorPanel, PageSkeleton, PageHead
 import { toast } from 'sonner'
 
 export function BuyerRequirementsPage({ role }: { role: Role }) {
-  const materials = useAsync(() => get<Material[]>('/api/materials').then((response) => response.data), [])
+  const materials = useAsync(() => get<Material[]>('/api/reference/materials').then((response) => response.data), [])
   const requirements = useAsync(() => get<BuyerRequirement[]>('/api/buyer-requirements?mine=true').then((response) => response.data), [])
   const [selectedRequirementId, setSelectedRequirementId] = useState<string | null>(null)
   const matches = useAsync(
