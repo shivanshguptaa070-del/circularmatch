@@ -179,24 +179,29 @@ export default function App() {
       <ToastProvider>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
-        {session === undefined || (session && loadingProfile && !profile) ? (
-          <SplashScreen />
-        ) : !session ? (
-          <Suspense fallback={<SplashScreen />}>
-            <Routes>
-              <Route path="/auth/callback" element={<AuthCallback />} />
-              <Route path="/reset-password" element={<AuthPage onAuth={() => void supabase.auth.getSession().then(({ data: { session: s } }) => { setSession(s); if (s) void fetchProfile(s) })} defaultStep="reset" />} />
-              <Route path="/terms" element={<TermsPage />} />
-              <Route path="/privacy" element={<PrivacyPage />} />
-              <Route path="/" element={<LandingPage />} />
-              <Route path="*" element={<AuthPage onAuth={() => void supabase.auth.getSession().then(({ data: { session: s } }) => { setSession(s); if (s) void fetchProfile(s) })} />} />
-            </Routes>
-          </Suspense>
-        ) : !profile ? (
-          <SplashScreen />
-        ) : (
-          <RoutedApp session={session} profile={profile} />
-        )}
+            {session === undefined || (session && loadingProfile && !profile) ? (
+              <SplashScreen />
+            ) : (
+              <Suspense fallback={<SplashScreen />}>
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/privacy" element={<PrivacyPage />} />
+                  
+                  {!session ? (
+                    <>
+                      <Route path="/auth/callback" element={<AuthCallback />} />
+                      <Route path="/reset-password" element={<AuthPage onAuth={() => void supabase.auth.getSession().then(({ data: { session: s } }) => { setSession(s); if (s) void fetchProfile(s) })} defaultStep="reset" />} />
+                      <Route path="*" element={<AuthPage onAuth={() => void supabase.auth.getSession().then(({ data: { session: s } }) => { setSession(s); if (s) void fetchProfile(s) })} />} />
+                    </>
+                  ) : !profile ? (
+                    <Route path="*" element={<SplashScreen />} />
+                  ) : (
+                    <Route path="/*" element={<RoutedApp session={session} profile={profile} />} />
+                  )}
+                </Routes>
+              </Suspense>
+            )}
       </BrowserRouter>
       </QueryClientProvider>
       </ToastProvider>
