@@ -37,6 +37,49 @@ export default {
       letterSpacing: {
         tag: '0.18em',
       },
+      keyframes: {
+        blob: {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        },
+        twinkle: {
+          '0%, 100%': { opacity: '0.2', transform: 'scale(0.8)' },
+          '50%': { opacity: '1', transform: 'scale(1.2)' },
+        },
+        'fade-in-up': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'pulse-ring': {
+          '0%': { transform: 'scale(0.8)', opacity: '0.5' },
+          '100%': { transform: 'scale(1.5)', opacity: '0' },
+        },
+        pop: {
+          '0%': { transform: 'scale(0.95)' },
+          '40%': { transform: 'scale(1.02)' },
+          '100%': { transform: 'scale(1)' },
+        },
+        magnetic: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '50%': { transform: 'translateX(4px)' },
+        },
+        'gradient-pan': {
+          '0%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+          '100%': { backgroundPosition: '0% 50%' },
+        },
+      },
+      animation: {
+        blob: 'blob 7s infinite',
+        twinkle: 'twinkle 3s ease-in-out infinite',
+        'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+        'pulse-ring': 'pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        pop: 'pop 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+        magnetic: 'magnetic 1.5s ease-in-out infinite',
+        'gradient-pan': 'gradient-pan 3s ease infinite',
+      },
     },
   },
   plugins: [],

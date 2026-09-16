@@ -17,8 +17,6 @@ import {
   AlertCircle,
 } from 'lucide-react'
 
-
-
 const MODE_OPTIONS: { id: ActiveMode; label: string; subtitle: string; icon: typeof Recycle }[] = [
   { id: 'selling', label: 'Sell', subtitle: 'List industrial by-products', icon: Recycle },
   { id: 'sourcing', label: 'Buy', subtitle: 'Source secondary materials', icon: PackageSearch },
@@ -33,6 +31,14 @@ function validateAuthenticEmail(rawEmail: string): string | null {
   return null
 }
 
+function Sparkle({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} style={style} aria-hidden>
+      <path d="M12 0 L14 10 L24 12 L14 14 L12 24 L10 14 L0 12 L10 10 Z" />
+    </svg>
+  );
+}
+
 export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => void; defaultStep?: 'signin' | 'signup' | 'reset' }) {
   const [step, setStep] = useState<'signin' | 'signup' | 'reset'>(defaultStep)
   const [email, setEmail] = useState('')
@@ -45,6 +51,14 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
   const [oauthLoading, setOauthLoading] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [successMsg, setSuccessMsg] = useState<string | null>(null)
+
+  const [emailFocus, setEmailFocus] = useState(false)
+  const [pwFocus, setPwFocus] = useState(false)
+  const [nameFocus, setNameFocus] = useState(false)
+  const [companyFocus, setCompanyFocus] = useState(false)
+
+  const isSignin = step === 'signin';
+  const isReset = step === 'reset';
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -153,63 +167,102 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50">
-      {/* Ambient background */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-32 -top-32 h-[500px] w-[500px] rounded-full bg-emerald-200/40 blur-[120px]" />
-        <div className="absolute -right-32 bottom-0 h-[400px] w-[400px] rounded-full bg-teal-200/40 blur-[100px]" />
-        <div className="absolute left-1/2 top-1/2 h-[300px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-green-200/40 blur-[80px]" />
-      </div>
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 text-slate-900">
+      {/* Landing-style dot pattern */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle, rgba(16,185,129,0.25) 1px, transparent 1px)',
+          backgroundSize: '22px 22px',
+        }}
+      />
 
-      {/* Subtle grid */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.35]"
-        style={{ backgroundImage: 'radial-gradient(circle, rgba(16,185,129,0.25) 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
+      {/* Landing-style drifting blobs (3 like the landing) */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-32 -left-24 h-[480px] w-[480px] rounded-full bg-emerald-200/40 blur-3xl animate-blob"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute top-1/2 -right-20 h-[420px] w-[420px] rounded-full bg-teal-200/40 blur-3xl animate-blob"
+        style={{ animationDelay: '3s' }}
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-32 left-1/3 h-[380px] w-[380px] rounded-full bg-green-200/40 blur-3xl animate-blob"
+        style={{ animationDelay: '6s' }}
+      />
 
-      <div className="relative z-10 w-full max-w-md px-4 py-8 sm:px-0">
-        {/* Logo */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8 flex flex-col items-center"
-        >
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-emerald-100">
-            <Leaf className="text-emerald-600" size={28} strokeWidth={2.2} />
+      {/* Twinkling sparkles scattered like the hero */}
+      <Sparkle className="absolute left-[8%] top-[14%] h-4 w-4 text-emerald-500 animate-twinkle" />
+      <Sparkle className="absolute right-[10%] top-[20%] h-3 w-3 text-emerald-400 animate-twinkle" style={{ animationDelay: '0.5s' }} />
+      <Sparkle className="absolute left-[12%] bottom-[18%] h-3 w-3 text-amber-400 animate-twinkle" style={{ animationDelay: '1s' }} />
+      <Sparkle className="absolute right-[14%] bottom-[24%] h-2 w-2 text-emerald-400 animate-twinkle" style={{ animationDelay: '1.5s' }} />
+      <Sparkle className="absolute left-[20%] top-[55%] h-2.5 w-2.5 text-amber-300 animate-twinkle" style={{ animationDelay: '2s' }} />
+
+      <main className="relative z-10 flex min-h-screen flex-col items-center justify-center px-5 py-10">
+        {/* ===== Logo + branding (landing style) ===== */}
+        <div className="mb-7 flex animate-fade-in-up flex-col items-center gap-3">
+          <div className="relative">
+            <div className="absolute inset-0 -m-2 animate-pulse-ring rounded-full bg-emerald-400/40" />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-xl shadow-emerald-700/20 ring-1 ring-emerald-100 animate-pop">
+              <Leaf className="h-7 w-7 text-emerald-600" strokeWidth={2.2} />
+            </div>
           </div>
-          <p className="mt-4 text-2xl font-extrabold tracking-tight text-slate-900 font-display">
-            CIRCULAR<span className="text-emerald-500">MATCH</span>
-          </p>
-          <p className="mt-1 text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
-            Material Intelligence Platform
-          </p>
-        </motion.div>
+          <div className="text-center">
+            <div className="text-2xl font-extrabold tracking-tight text-slate-900 font-display">
+              CIRCULAR<span className="text-emerald-500">MATCH</span>
+            </div>
+            {/* Material intelligence plate — slight emerald tint, mirroring the brand */}
+            <div className="mt-1.5 inline-block rounded-full bg-emerald-100/70 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.28em] text-emerald-700">
+              MATERIAL INTELLIGENCE PLATFORM
+            </div>
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-          className="rounded-3xl border border-slate-200/60 bg-white p-7 shadow-2xl shadow-emerald-900/5 ring-1 ring-slate-100 sm:p-10"
+        {/* ===== Auth card (light theme matching landing) ===== */}
+        <div
+          className="relative w-full max-w-[420px] animate-fade-in-up rounded-3xl border border-emerald-100/60 bg-white/80 p-7 shadow-2xl shadow-emerald-900/10 backdrop-blur-xl sm:p-8"
+          style={{ animationDelay: '0.15s' }}
         >
+          {/* Top emerald accent line */}
+          <div className="absolute -top-px left-10 right-10 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
+
           {step !== 'reset' && (
             <>
-              {/* Tab switcher */}
-              <div className="mb-8 flex rounded-xl bg-slate-100/80 p-1 ring-1 ring-slate-200/50">
-                {(['signin', 'signup'] as const).map((s) => (
+              {/* Mode toggle */}
+              <div className="relative mb-6 rounded-full border border-emerald-100 bg-emerald-50/60 p-1 shadow-inner">
+                <div
+                  className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 shadow-lg shadow-emerald-700/30 transition-all duration-500 ease-out"
+                  style={{ left: isSignin ? '4px' : 'calc(50% + 0px)' }}
+                />
+                <div className="relative flex">
                   <button
-                    key={s}
-                    onClick={() => { setStep(s); setError(null); setSuccessMsg(null) }}
-                    className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition-all duration-200 ${step === s ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200' : 'text-slate-500 hover:text-slate-700'}`}
+                    onClick={() => { setStep('signin'); setError(null); setSuccessMsg(null); }}
+                    className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 ${
+                      isSignin ? 'text-white' : 'text-slate-600 hover:text-emerald-700'
+                    }`}
                   >
-                    {s === 'signin' ? 'Sign in' : 'Create account'}
+                    Sign in
                   </button>
-                ))}
+                  <button
+                    onClick={() => { setStep('signup'); setError(null); setSuccessMsg(null); }}
+                    className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 ${
+                      !isSignin ? 'text-white' : 'text-slate-600 hover:text-emerald-700'
+                    }`}
+                  >
+                    Create account
+                  </button>
+                </div>
               </div>
 
-              {/* Google login button */}
-              <button
+              {/* Google button */}
+              <button 
                 onClick={() => void handleOAuth('google')}
                 disabled={oauthLoading !== null}
-                className="group flex w-full items-center justify-center gap-2.5 rounded-xl border border-slate-200 bg-white py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:shadow disabled:opacity-60"
+                className="group shine-wrap relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-full bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-md ring-1 ring-slate-200 transition-all duration-300 hover:scale-[1.02] hover:bg-slate-50 hover:shadow-lg hover:ring-emerald-200 disabled:opacity-60"
               >
                 {oauthLoading === 'google' ? (
                   <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -217,77 +270,102 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                   </svg>
                 ) : (
-                  <svg viewBox="0 0 24 24" className="h-5 w-5 transition-transform group-hover:scale-110" aria-hidden>
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                  <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden>
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.25 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z" />
+                    <path fill="#FBBC05" d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.12-1.43.34-2.1V7.07H2.18a11 11 0 0 0 0 9.86l3.66-2.83z" />
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.16 14.97 1 12 1A11 11 0 0 0 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38z" />
                   </svg>
                 )}
                 Continue with Google
               </button>
 
-              <div className="my-6 flex items-center gap-3">
-                <div className="h-px flex-1 bg-slate-200" />
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">or with email</span>
-                <div className="h-px flex-1 bg-slate-200" />
+              {/* Divider */}
+              <div className="my-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                <span className="h-px flex-1 bg-slate-200" />
+                or with email
+                <span className="h-px flex-1 bg-slate-200" />
               </div>
             </>
           )}
 
-          {step === 'reset' && (
+          {isReset && (
             <div className="mb-6 text-center">
               <h2 className="text-xl font-bold text-slate-900">Reset Password</h2>
               <p className="mt-1 text-sm text-slate-500">Enter your email to receive a reset link</p>
             </div>
           )}
 
-          <form onSubmit={step === 'reset' ? handleResetPassword : handleEmailAuth} className="space-y-4">
+          {/* Form */}
+          <form
+            onSubmit={isReset ? handleResetPassword : handleEmailAuth}
+            className="space-y-4"
+          >
             {step === 'signup' && (
               <>
-                <div>
-                  <label className="mb-1.5 block text-xs font-bold text-slate-700" htmlFor="reg-name">Full name</label>
-                  <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <div className="space-y-1.5">
+                  <label htmlFor="reg-name" className="text-[12px] font-bold text-slate-700">
+                    Full name
+                  </label>
+                  <div
+                    className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 ${
+                      nameFocus
+                        ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60'
+                        : 'border-slate-200 ring-slate-100 hover:border-emerald-300'
+                    }`}
+                  >
+                    <User className={`h-4 w-4 transition-colors ${nameFocus ? 'text-emerald-600' : 'text-slate-400'}`} />
                     <input
                       id="reg-name"
                       type="text"
                       required
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                      onFocus={() => setNameFocus(true)}
+                      onBlur={() => setNameFocus(false)}
                       placeholder="Your full name"
+                      className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="mb-1.5 block text-xs font-bold text-slate-700" htmlFor="reg-company">Company name</label>
-                  <div className="relative">
-                    <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <div className="space-y-1.5">
+                  <label htmlFor="reg-company" className="text-[12px] font-bold text-slate-700">
+                    Company name
+                  </label>
+                  <div
+                    className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 ${
+                      companyFocus
+                        ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60'
+                        : 'border-slate-200 ring-slate-100 hover:border-emerald-300'
+                    }`}
+                  >
+                    <Building2 className={`h-4 w-4 transition-colors ${companyFocus ? 'text-emerald-600' : 'text-slate-400'}`} />
                     <input
                       id="reg-company"
                       type="text"
                       required
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                      onFocus={() => setCompanyFocus(true)}
+                      onBlur={() => setCompanyFocus(false)}
                       placeholder="Organisation name"
+                      className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <p className="mb-1.5 block text-xs font-bold text-slate-700">I want to:</p>
+                <div className="space-y-1.5">
+                  <p className="text-[12px] font-bold text-slate-700">I want to:</p>
                   <div className="grid grid-cols-2 gap-2">
                     {MODE_OPTIONS.map(({ id, label, icon: Icon }) => (
                       <button
                         key={id}
                         type="button"
                         onClick={() => setActiveMode(id)}
-                        className={`flex flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-all ${
+                        className={`flex flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-all duration-300 ${
                           activeMode === id
-                            ? 'border-emerald-500 bg-emerald-50 text-emerald-700 shadow-sm'
+                            ? 'border-emerald-400 bg-emerald-50 text-emerald-700 shadow-md ring-1 ring-emerald-200'
                             : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-300 hover:bg-slate-50'
                         }`}
                       >
@@ -300,51 +378,85 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
               </>
             )}
 
-            <div>
-              <label className="mb-1.5 block text-xs font-bold text-slate-700" htmlFor="auth-email">Email</label>
-              <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+            {/* Email */}
+            <div className="space-y-1.5">
+              <label htmlFor="email" className="text-[12px] font-bold text-slate-700">
+                Email
+              </label>
+              <div
+                className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 ${
+                  emailFocus
+                    ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60'
+                    : 'border-slate-200 ring-slate-100 hover:border-emerald-300'
+                }`}
+              >
+                <Mail
+                  className={`h-4 w-4 transition-colors ${
+                    emailFocus ? 'text-emerald-600' : 'text-slate-400'
+                  }`}
+                />
                 <input
-                  id="auth-email"
+                  id="email"
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                  onFocus={() => setEmailFocus(true)}
+                  onBlur={() => setEmailFocus(false)}
                   placeholder="you@company.com"
+                  className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
                 />
               </div>
             </div>
 
+            {/* Password */}
             {step !== 'reset' && (
-              <div>
-                <div className="mb-1.5 flex items-center justify-between">
-                  <label className="block text-xs font-bold text-slate-700" htmlFor="auth-password">Password</label>
-                  {step === 'signin' && (
-                    <button type="button" onClick={() => { setStep('reset'); setError(null); setSuccessMsg(null); }} className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:underline">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="text-[12px] font-bold text-slate-700">
+                    Password
+                  </label>
+                  {isSignin && (
+                    <button
+                      type="button"
+                      onClick={() => { setStep('reset'); setError(null); setSuccessMsg(null); }}
+                      className="text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline"
+                    >
                       Forgot password?
                     </button>
                   )}
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <div
+                  className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 ${
+                    pwFocus
+                      ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60'
+                      : 'border-slate-200 ring-slate-100 hover:border-emerald-300'
+                  }`}
+                >
+                  <Lock
+                    className={`h-4 w-4 transition-colors ${
+                      pwFocus ? 'text-emerald-600' : 'text-slate-400'
+                    }`}
+                  />
                   <input
-                    id="auth-password"
+                    id="password"
                     type={showPw ? 'text' : 'password'}
                     required
                     minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-11 text-sm text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all"
+                    onFocus={() => setPwFocus(true)}
+                    onBlur={() => setPwFocus(false)}
                     placeholder={step === 'signup' ? 'Min. 6 characters' : '••••••••'}
+                    className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
                   />
                   <button
                     type="button"
-                    onClick={() => setShowPw(!showPw)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-emerald-600 transition-colors"
+                    onClick={() => setShowPw((s) => !s)}
+                    className="rounded p-1 text-slate-400 transition hover:text-emerald-700 active:scale-90"
                     aria-label={showPw ? 'Hide password' : 'Show password'}
                   >
-                    {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                    {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
@@ -375,10 +487,11 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
               </div>
             )}
 
+            {/* Submit — emerald primary button (landing style) */}
             <button
               type="submit"
               disabled={loading}
-              className="group shine-wrap relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-emerald-700 py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-700/25 ring-1 ring-emerald-800/30 transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-800 hover:shadow-emerald-800/40 disabled:opacity-50 disabled:hover:scale-100"
+              className="group shine-wrap relative mt-2 flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-emerald-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-700/30 ring-1 ring-emerald-800/30 transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-800 hover:shadow-emerald-800/40 disabled:opacity-50 disabled:hover:scale-100"
             >
               {loading ? (
                 <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -388,14 +501,15 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
               ) : null}
               <span className="relative z-10">
                 {loading ? (step === 'signin' ? 'Signing in…' : step === 'reset' ? 'Sending...' : 'Creating account…') : (
-                  <>{step === 'signin' ? 'Sign in' : step === 'reset' ? 'Send reset link' : 'Create account'} <ArrowRight size={16} className="inline-block transition-transform group-hover:translate-x-1" /></>
+                  <>{step === 'signin' ? 'Sign in' : step === 'reset' ? 'Send reset link' : 'Create account'}</>
                 )}
               </span>
-              <span className="absolute inset-0 -z-0 animate-gradient-pan rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              {!loading && <ArrowRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:animate-magnetic" />}
+              <span className="absolute inset-0 -z-0 animate-gradient-pan rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </button>
-            
-            {step === 'reset' && (
-              <div className="text-center">
+
+            {isReset && (
+              <div className="text-center pt-2">
                 <button
                   type="button"
                   onClick={() => { setStep('signin'); setError(null); setSuccessMsg(null); }}
@@ -407,14 +521,31 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
             )}
           </form>
 
-          <p className="mt-6 text-center text-[11px] font-medium text-slate-500">
+          {/* Legal */}
+          <p className="mt-5 text-center text-[11px] text-slate-500">
             By continuing, you agree to our{' '}
-            <a href="#" className="font-bold text-slate-700 underline hover:text-emerald-700">Terms of Service</a>{' '}
+            <a href="#" className="font-semibold text-emerald-700 underline-offset-2 hover:text-emerald-800 hover:underline">
+              Terms of Service
+            </a>{' '}
             and{' '}
-            <a href="#" className="font-bold text-slate-700 underline hover:text-emerald-700">Privacy Policy</a>.
+            <a href="#" className="font-semibold text-emerald-700 underline-offset-2 hover:text-emerald-800 hover:underline">
+              Privacy Policy
+            </a>
+            .
           </p>
-        </motion.div>
-      </div>
+        </div>
+
+        {/* Footer line (mirrors landing tagline) */}
+        <div
+          className="mt-8 flex animate-fade-in-up items-center gap-2 text-[11px] font-semibold text-slate-600"
+          style={{ animationDelay: '0.3s' }}
+        >
+          <Leaf className="h-3 w-3 animate-pop text-emerald-600" />
+          <span>
+            Cleaner Industries. <span className="text-emerald-700">A Greener Tomorrow.</span>
+          </span>
+        </div>
+      </main>
     </div>
-  )
+  );
 }
