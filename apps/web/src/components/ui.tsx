@@ -140,10 +140,7 @@ export function ScoreRing({ score, label = 'match score', size = 88 }: { score: 
         </g>
       </svg>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className="text-[1.25rem] font-extrabold tracking-tight text-ink leading-none translate-x-[2px] flex items-baseline">
-          {displayScore}
-          <span className="text-[0.65em] font-bold text-[#5a736a] ml-[1px]">%</span>
-        </span>
+        <span className="text-[1.25rem] font-extrabold tracking-tight text-ink">{displayScore}%</span>
       </div>
     </div>
   )
