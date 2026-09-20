@@ -14,7 +14,6 @@ import {
   TrendingUp,
   Sparkles,
   Recycle,
-  Filter,
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { get } from '../lib/api'

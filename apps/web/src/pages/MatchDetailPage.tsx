@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowRight, Check, CheckCircle2, CircleDollarSign, ClipboardCheck, Contact, Factory, FileCheck2, FlaskConical, Leaf, Loader2, MapPinned, PackageCheck, Route, Send, ShieldAlert, Sparkles, TestTube2, Truck, WalletCards } from 'lucide-react'
+import { ArrowRight, CheckCircle2, CircleDollarSign, ClipboardCheck, Contact, Factory, FileCheck2, FlaskConical, Leaf, Loader2, PackageCheck, Route, Send, ShieldAlert, Sparkles, TestTube2, Truck, WalletCards } from 'lucide-react'
 import { get, patch, post } from '../lib/api'
 import { formatCurrency, formatKg, formatNumber, titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { MapPoint, MapRoute, MatchDetail, Role } from '../types'
 import { NetworkMap } from '../components/NetworkMap'
-import { StatusBadge, Disclosure, ErrorPanel, PageSkeleton, PageHeader, QualityPill, ScoreBar, ScoreRing, ConfirmDialog, Breadcrumb } from '../components/ui'
+import { StatusBadge, ErrorPanel, PageSkeleton, PageHeader, QualityPill, ScoreBar, ScoreRing, ConfirmDialog, Breadcrumb } from '../components/ui'
 
 const eligibilityTone: Record<string, string> = {
   eligible: 'border-[#bee7ce] bg-[#eaf8ef] text-[#1e694d]',

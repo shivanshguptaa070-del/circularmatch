@@ -4,7 +4,7 @@ import { get } from '../lib/api'
 import { formatCurrency, formatKg, titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { Listing, Role } from '../types'
-import { StatusBadge, Disclosure, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, Breadcrumb } from '../components/ui'
+import { StatusBadge, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, Breadcrumb } from '../components/ui'
 
 export function ListingsPage({ role }: { role: Role }) {
   const mine = role === 'generator'

@@ -5,7 +5,7 @@ import { formatKg } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { MapPoint, MapRoute } from '../types'
 import { NetworkMap } from '../components/NetworkMap'
-import { StatusBadge, Disclosure, ErrorPanel, PageSkeleton, PageHeader } from '../components/ui'
+import { StatusBadge, ErrorPanel, PageSkeleton, PageHeader } from '../components/ui'
 
 export function MapPage() {
   const [params] = useSearchParams()

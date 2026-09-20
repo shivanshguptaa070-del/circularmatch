@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
-import { ArrowRight, Bot, CheckCircle2, CircleDollarSign, Factory, Leaf, Loader2, MapPin, PackageSearch, Recycle, Route, Sparkles } from 'lucide-react'
+import { ArrowRight, Bot, CheckCircle2, Factory, Loader2, MapPin, PackageSearch, Recycle, Route, Sparkles } from 'lucide-react'
 import { get, post } from '../lib/api'
 import { formatCurrency, formatKg, titleCase } from '../lib/format'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useToast } from '../components/ToastProvider'
 import type { Listing, MatchCard, Material, Role } from '../types'
-import { StatusBadge, Disclosure, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, ScoreBar, ScoreRing } from '../components/ui'
+import { StatusBadge, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, ScoreBar, ScoreRing } from '../components/ui'
 import { motion } from 'framer-motion'
 
 export function ListingMatchesPage({ role }: { role: Role }) {
@@ -24,7 +24,7 @@ export function ListingMatchesPage({ role }: { role: Role }) {
     queryFn: () => get<Material[]>('/api/reference/materials').then((response) => response.data)
   })
 
-  const { toast, success, error: toastError } = useToast()
+  const { success, error: toastError } = useToast()
   const [results, setResults] = useState<MatchCard[] | null>(null)
 
   const { mutate: runMatch, isPending: analyzing } = useMutation({

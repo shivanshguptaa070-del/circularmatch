@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Factory, Loader2, MapPin, PackageSearch, Plus, Ruler, Target, Trash2, Edit2 } from 'lucide-react'
+import { ArrowRight, Factory, Loader2, PackageSearch, Plus, Ruler, Target, Trash2, Edit2 } from 'lucide-react'
 import { get, post, del, put } from '../lib/api'
 import { DELHI_NCR_CITIES, QUALITY_OPTIONS } from '../lib/constants'
 import { formatCurrency, formatKg, titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { BuyerRequirement, MatchCard, Material, Role } from '../types'
-import { StatusBadge, Disclosure, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, ScoreRing, ConfirmDialog } from '../components/ui'
+import { StatusBadge, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, ScoreRing, ConfirmDialog } from '../components/ui'
 import { toast } from 'sonner'
 
-export function BuyerRequirementsPage({ role }: { role: Role }) {
+export function BuyerRequirementsPage({ role: _role }: { role: Role }) {
   const materials = useAsync(() => get<Material[]>('/api/reference/materials').then((response) => response.data), [])
   const requirements = useAsync(() => get<BuyerRequirement[]>('/api/buyer-requirements?mine=true').then((response) => response.data), [])
   const [selectedRequirementId, setSelectedRequirementId] = useState<string | null>(null)

@@ -26,7 +26,7 @@ import {
 } from 'lucide-react'
 import { get, post } from '../lib/api'
 import { DELHI_NCR_CITIES, SAMPLE_GENERATOR_TEXT, QUALITY_OPTIONS } from '../lib/constants'
-import { formatKg, titleCase } from '../lib/format'
+import { titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import { useToast } from '../components/ToastProvider'
 import type { ExtractionResult, Listing, Material, Role } from '../types'
