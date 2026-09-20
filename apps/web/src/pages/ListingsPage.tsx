@@ -5,6 +5,7 @@ import { formatCurrency, formatKg, titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { Listing, Role } from '../types'
 import { StatusBadge, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, Breadcrumb } from '../components/ui'
+import { MaterialThumbnail } from '../lib/materialImages'
 
 export function ListingsPage({ role }: { role: Role }) {
   const mine = role === 'generator'
@@ -54,9 +55,17 @@ export function ListingsPage({ role }: { role: Role }) {
               className="card card-interactive lift-hover shine-wrap flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 shadow-sm transition-all duration-300"
             >
               <div className="flex items-start justify-between bg-[#edf7f0] p-5 gap-3">
-                <div className="min-w-0">
-                  <span className="eyebrow truncate block text-[10.5px] font-bold tracking-[0.14em] text-emerald-800">{listing.category}</span>
-                  <h2 className="mt-1.5 text-[20px] font-bold tracking-tight text-ink truncate">{listing.material}</h2>
+                <div className="flex items-center gap-3 min-w-0">
+                  <MaterialThumbnail
+                    material={listing.material}
+                    category={listing.category}
+                    sizeClassName="h-12 w-12 shrink-0"
+                    className="shadow-sm"
+                  />
+                  <div className="min-w-0">
+                    <span className="eyebrow truncate block text-[10.5px] font-bold tracking-[0.14em] text-emerald-800">{listing.category}</span>
+                    <h2 className="mt-1 text-[18px] font-bold tracking-tight text-ink truncate">{listing.material}</h2>
+                  </div>
                 </div>
                 <div className="shrink-0 rounded-xl bg-white px-3.5 py-2 text-right shadow-sm border border-emerald-100/60">
                   <p className="text-[18px] font-extrabold tracking-tight text-spruce">{formatKg(listing.normalized_kg_per_week)}</p>

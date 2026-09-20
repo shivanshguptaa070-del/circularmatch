@@ -18,6 +18,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { get } from '../lib/api'
 import { formatCurrency, formatKg, formatNumber } from '../lib/format'
+import { getMaterialImage, MaterialThumbnail } from '../lib/materialImages'
 import type { SellerDashboardSummary, Listing } from '../types'
 
 interface ListingItem {
@@ -40,27 +41,57 @@ const DEFAULT_LISTINGS: ListingItem[] = [
     loc: 'Noida, UP',
     price: '₹48/kg',
     status: 'Active',
-    img: 'https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=80&h=80&fit=crop',
+    img: '/materials/pet-flakes.jpg',
   },
   {
     id: '2',
+    title: 'Mild-Steel Fabrication Scrap',
+    spec: 'Clean offcuts · Low contaminant',
+    qty: '3,000 kg',
+    loc: 'Noida, UP',
+    price: '₹14/kg',
+    status: 'Active',
+    img: '/materials/mild-steel.jpg',
+  },
+  {
+    id: '3',
+    title: 'Cotton Textile Cutting Waste',
+    spec: 'Garment cuttings · 100% Cotton',
+    qty: '600 kg',
+    loc: 'Noida, UP',
+    price: '₹25/kg',
+    status: 'Active',
+    img: '/materials/cotton-textile.jpg',
+  },
+  {
+    id: '4',
     title: 'Aluminium Scrap',
     spec: '6061 alloy · Sorted, clean',
     qty: '2,400 kg',
     loc: 'Delhi NCR',
     price: '₹172/kg',
     status: 'Matching',
-    img: 'https://images.unsplash.com/photo-1605557202138-cdcd99c4d6c2?w=80&h=80&fit=crop',
+    img: '/materials/al-scrap.jpg',
   },
   {
-    id: '3',
+    id: '5',
+    title: 'Corrugated Box Offcuts',
+    spec: 'Kraft paper grade · Dry baled',
+    qty: '4,000 kg',
+    loc: 'Faridabad, HR',
+    price: '₹12/kg',
+    status: 'Completed',
+    img: '/materials/cardboard-paper.jpg',
+  },
+  {
+    id: '6',
     title: 'Wood Waste',
     spec: 'Pallet offcuts · Untreated',
     qty: '8,000 kg',
     loc: 'Gurugram, HR',
     price: '₹9/kg',
     status: 'Active',
-    img: 'https://images.unsplash.com/photo-1601057282102-c0d20c5b8b37?w=80&h=80&fit=crop',
+    img: '/materials/wood-waste.jpg',
   },
 ]
 
@@ -104,7 +135,7 @@ export function SellerDashboard() {
         loc: l.city || 'Delhi NCR',
         price: l.asking_price_per_kg ? `₹${l.asking_price_per_kg}/kg` : 'Negotiable',
         status: (l.status === 'matched' ? 'Matching' : l.status === 'closed' ? 'Completed' : 'Active') as 'Active' | 'Matching' | 'Completed',
-        img: DEFAULT_LISTINGS[idx % DEFAULT_LISTINGS.length].img,
+        img: getMaterialImage(l.material || l.raw_description, l.category),
       }))
     : DEFAULT_LISTINGS
 
@@ -714,11 +745,13 @@ function ActivityRow({
               {/* Emerald sweep on hover */}
               <div className="absolute inset-y-0 left-0 w-1 origin-top scale-y-0 bg-emerald-500 transition-transform duration-300 group-hover:scale-y-100" />
               <div className="col-span-5 flex items-center gap-3 min-w-0">
-                <div className="relative shrink-0 overflow-hidden rounded-lg ring-1 ring-slate-200">
-                  <img
+                <div className="relative shrink-0 overflow-hidden rounded-lg">
+                  <MaterialThumbnail
+                    material={l.title}
                     src={l.img}
-                    alt=""
-                    className="h-10 w-10 object-cover transition-transform duration-500 group-hover:scale-110"
+                    alt={l.title}
+                    sizeClassName="h-10 w-10"
+                    className="transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
                 <div className="min-w-0">

@@ -23,12 +23,14 @@ import {
   Tag,
   Calendar,
   Layers,
+  Camera,
 } from 'lucide-react'
 import { get, post } from '../lib/api'
 import { DELHI_NCR_CITIES, SAMPLE_GENERATOR_TEXT, QUALITY_OPTIONS } from '../lib/constants'
 import { titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import { useToast } from '../components/ToastProvider'
+import { getMaterialImage } from '../lib/materialImages'
 import type { ExtractionResult, Listing, Material, Role } from '../types'
 
 const DEFAULT_CATALOG: Material[] = [
@@ -930,6 +932,43 @@ export function ListWastePage({ role: _role }: { role: Role }) {
           </div>
 
           <div className="lg:col-span-1 space-y-4">
+            {/* AI Identified Material Visual Card */}
+            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                    <Camera className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                      Material Visual Match
+                    </h3>
+                    <p className="text-[11px] text-slate-500">{selectedMaterial?.canonical_name || 'Standard stream'}</p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200">
+                  AI Verified
+                </span>
+              </div>
+
+              <div className="group relative mt-3 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100">
+                <img
+                  src={getMaterialImage(selectedMaterial?.canonical_name, selectedMaterial?.category)}
+                  alt={selectedMaterial?.canonical_name}
+                  className="h-36 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+                <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between text-white text-[11px]">
+                  <span className="font-semibold truncate">{selectedMaterial?.canonical_name}</span>
+                  <span className="shrink-0 rounded bg-white/20 px-1.5 py-0.5 text-[9px] backdrop-blur-sm">Verified Spec</span>
+                </div>
+              </div>
+
+              <p className="mt-2.5 text-[11px] text-slate-500 leading-snug">
+                This photorealistic reference will display on your listing and Material Passport until you attach facility batch photos.
+              </p>
+            </div>
+
             {/* Potential Industrial Uses Card */}
             <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
               <div className="flex items-center gap-2">

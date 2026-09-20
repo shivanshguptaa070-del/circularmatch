@@ -34,12 +34,14 @@ import {
   Upload,
   UploadCloud,
   Wind,
+  Camera,
 } from 'lucide-react'
 import { get, patch, post } from '../lib/api'
 import { formatKg, titleCase } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { ListingPassport, MaterialLot, QualityEvidence, Role } from '../types'
 import { Breadcrumb, Disclosure, EmptyPanel, ErrorPanel, PageSkeleton } from '../components/ui'
+import { MaterialThumbnail, getMaterialImage } from '../lib/materialImages'
 
 export function MaterialPassportPage({ role }: { role: Role }) {
   const { listingId } = useParams<{ listingId: string }>()
@@ -543,8 +545,11 @@ export function MaterialPassportPage({ role }: { role: Role }) {
           </section>
         </div>
 
-        {/* Right 1 Column: Evidence Checklist, Documents, Impact & Audit Log */}
+        {/* Right 1 Column: Visual Lot Inspection, Evidence Checklist, Documents, Impact & Audit Log */}
         <div className="space-y-5 lg:col-span-1">
+          {/* MATERIAL LOT VISUAL INSPECTION (AI HD Photo) */}
+          <MaterialVisualCard material={materialName} category={categoryName} />
+
           {/* EVIDENCE STATUS (5 items) */}
           <EvidenceChecklist
             items={evidenceItems}
@@ -724,15 +729,22 @@ function PassportHeader({
       <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-emerald-200/30 blur-3xl" />
 
       <div className="relative flex flex-wrap items-center justify-between gap-6">
-        {/* Left: Material name, ID, tags */}
-        <div className="min-w-0 flex-1">
-          <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/70 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.16em] text-emerald-800">
-            <Stamp className="h-3 w-3 text-emerald-700" />
-            MATERIAL PASSPORT · v2.1
-          </div>
-          <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-2xl font-black tracking-tight text-transparent sm:text-3xl md:text-4xl">
-            {material}
-          </h1>
+        {/* Left: Material name, ID, tags + Thumbnail */}
+        <div className="flex items-start gap-4 min-w-0 flex-1">
+          <MaterialThumbnail
+            material={material}
+            category={category}
+            sizeClassName="h-16 w-16 sm:h-20 sm:w-20 shrink-0"
+            className="rounded-2xl shadow-md border-2 border-white ring-2 ring-emerald-100"
+          />
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/70 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.16em] text-emerald-800">
+              <Stamp className="h-3 w-3 text-emerald-700" />
+              MATERIAL PASSPORT · v2.1
+            </div>
+            <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-2xl font-black tracking-tight text-transparent sm:text-3xl md:text-4xl">
+              {material}
+            </h1>
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 font-mono text-xs font-bold tracking-wider text-emerald-300 shadow-sm">
               {passportId}
@@ -754,6 +766,7 @@ function PassportHeader({
             </span>
           </div>
         </div>
+      </div>
 
         {/* Right: Score ring + Action buttons */}
         <div className="flex shrink-0 flex-wrap items-center gap-6">
@@ -1472,3 +1485,66 @@ function ImpactCard({ quantityKg }: { quantityKg: number }) {
     </div>
   )
 }
+
+/* ============================================================ */
+/*  MATERIAL VISUAL LOT INSPECTION CARD                          */
+/* ============================================================ */
+function MaterialVisualCard({
+  material,
+  category,
+}: {
+  material: string
+  category: string
+}) {
+  const imgSrc = getMaterialImage(material, category)
+  return (
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+            <Camera className="h-4 w-4" />
+          </div>
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+              Material Lot Inspection
+            </h3>
+            <p className="text-[11px] text-slate-500">Verified stream reference</p>
+          </div>
+        </div>
+        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200">
+          AI Verified
+        </span>
+      </div>
+
+      <div className="group relative mt-3.5 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100">
+        <img
+          src={imgSrc}
+          alt={material}
+          className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+        <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white">
+          <div className="min-w-0">
+            <p className="truncate text-xs font-bold">{material}</p>
+            <p className="text-[10px] text-slate-200">Standard Secondary Lot</p>
+          </div>
+          <span className="shrink-0 rounded-md bg-white/20 px-2 py-0.5 text-[9px] font-semibold backdrop-blur-md">
+            HD Preview
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+        <span>AI Generated stream reference</span>
+        <button
+          type="button"
+          onClick={() => alert('Photo upload drawer will allow plant camera uploads.')}
+          className="font-semibold text-emerald-700 hover:underline"
+        >
+          Add custom photo
+        </button>
+      </div>
+    </div>
+  )
+}
+

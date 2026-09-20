@@ -18,6 +18,7 @@ import {
 import { useQuery } from '@tanstack/react-query'
 import { get } from '../lib/api'
 import { formatCurrency, formatKg, formatNumber } from '../lib/format'
+import { getMaterialImage, MaterialThumbnail } from '../lib/materialImages'
 import type { BuyerDashboardSummary, BuyerRequirement } from '../types'
 
 interface SourcingTargetItem {
@@ -35,14 +36,14 @@ interface SourcingTargetItem {
 const DEFAULT_TARGETS: SourcingTargetItem[] = [
   {
     id: '1',
-    title: 'HDPE Granules / Regrind',
+    title: 'PET Plastic Flakes',
     spec: 'MFI 0.3 - 0.8 · Blow molding grade',
     qty: '3,000 kg / wk',
     loc: 'North India (Delhi / NCR)',
-    maxPrice: 'Max ₹62/kg',
+    maxPrice: 'Max ₹48/kg',
     status: 'Matching',
     matchesCount: 3,
-    img: 'https://images.unsplash.com/photo-1595278069441-2cf29f8005a4?w=80&h=80&fit=crop',
+    img: '/materials/pet-flakes.jpg',
   },
   {
     id: '2',
@@ -53,7 +54,7 @@ const DEFAULT_TARGETS: SourcingTargetItem[] = [
     maxPrice: 'Max ₹175/kg',
     status: 'Active',
     matchesCount: 1,
-    img: 'https://images.unsplash.com/photo-1605557202138-cdcd99c4d6c2?w=80&h=80&fit=crop',
+    img: '/materials/al-scrap.jpg',
   },
   {
     id: '3',
@@ -64,7 +65,29 @@ const DEFAULT_TARGETS: SourcingTargetItem[] = [
     maxPrice: 'Max ₹12/kg',
     status: 'Sourced',
     matchesCount: 4,
-    img: 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=80&h=80&fit=crop',
+    img: '/materials/cardboard-paper.jpg',
+  },
+  {
+    id: '4',
+    title: 'Mild-Steel Fabrication Scrap',
+    spec: 'Clean offcuts · Low contaminant',
+    qty: '3,000 kg / wk',
+    loc: 'Noida, UP',
+    maxPrice: 'Max ₹14/kg',
+    status: 'Active',
+    matchesCount: 2,
+    img: '/materials/mild-steel.jpg',
+  },
+  {
+    id: '5',
+    title: 'Cotton Textile Cutting Waste',
+    spec: 'Garment cuttings · 100% Cotton',
+    qty: '600 kg / wk',
+    loc: 'Noida, UP',
+    maxPrice: 'Max ₹25/kg',
+    status: 'Matching',
+    matchesCount: 3,
+    img: '/materials/cotton-textile.jpg',
   },
 ]
 
@@ -109,7 +132,7 @@ export function BuyerDashboard() {
         maxPrice: r.target_price_per_kg ? `Max ₹${r.target_price_per_kg}/kg` : 'Negotiable',
         status: (r.status === 'fulfilled' ? 'Sourced' : r.status === 'matched' ? 'Matching' : 'Active') as 'Matching' | 'Sourced' | 'Active',
         matchesCount: 2,
-        img: DEFAULT_TARGETS[idx % DEFAULT_TARGETS.length].img,
+        img: getMaterialImage(r.material, r.category),
       }))
     : DEFAULT_TARGETS
 
@@ -716,11 +739,13 @@ function ActivityRow({
               {/* Emerald sweep on hover */}
               <div className="absolute inset-y-0 left-0 w-1 origin-top scale-y-0 bg-emerald-500 transition-transform duration-300 group-hover:scale-y-100" />
               <div className="col-span-5 flex items-center gap-3 min-w-0">
-                <div className="relative shrink-0 overflow-hidden rounded-lg ring-1 ring-slate-200">
-                  <img
+                <div className="relative shrink-0 overflow-hidden rounded-lg">
+                  <MaterialThumbnail
+                    material={l.title}
                     src={l.img}
-                    alt=""
-                    className="h-10 w-10 object-cover transition-transform duration-500 group-hover:scale-110"
+                    alt={l.title}
+                    sizeClassName="h-10 w-10"
+                    className="transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
                 <div className="min-w-0">
