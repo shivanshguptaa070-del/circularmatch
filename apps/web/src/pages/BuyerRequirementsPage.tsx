@@ -20,14 +20,14 @@ export function BuyerRequirementsPage({ role: _role }: { role: Role }) {
     [selectedRequirementId],
   )
   const [form, setForm] = useState({
-    material_id: 'mat-pet',
-    minimum_quantity_kg_week: '2000',
-    maximum_quantity_kg_week: '5000',
-    minimum_quality_grade: 'industrial',
-    maximum_distance_km: '150',
-    target_price_per_kg: '17.5',
+    material_id: '',
+    minimum_quantity_kg_week: '',
+    maximum_quantity_kg_week: '',
+    minimum_quality_grade: 'standard',
+    maximum_distance_km: '200',
+    target_price_per_kg: '',
     allow_partial_quantity: true,
-    city: 'Delhi',
+    city: '',
   })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -56,7 +56,7 @@ export function BuyerRequirementsPage({ role: _role }: { role: Role }) {
   const handleEdit = (req: BuyerRequirement) => {
     setEditingId(req.id)
     setForm({
-      material_id: req.material_id || 'mat-pet',
+      material_id: req.material_id || '',
       minimum_quantity_kg_week: String(req.minimum_quantity_kg_week),
       maximum_quantity_kg_week: String(req.maximum_quantity_kg_week),
       minimum_quality_grade: req.minimum_quality_grade,

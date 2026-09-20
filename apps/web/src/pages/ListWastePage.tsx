@@ -132,22 +132,22 @@ interface ListingFormState {
 }
 
 const initialForm: ListingFormState = {
-  material_id: 'mat-pet',
-  quantity_kg: '3000',
+  material_id: '',
+  quantity_kg: '',
   frequency: 'weekly',
   quality_grade: 'standard',
-  quality_notes: 'Clean post-industrial PET flakes, low moisture.',
-  availability: 'Available every Monday',
-  city: 'Noida',
-  asking_price_per_kg: '14',
-  disposal_cost_per_kg: '8',
-  selected_use_id: 'use-pet-fiber',
-  material_form: 'Manufacturing trim',
+  quality_notes: '',
+  availability: '',
+  city: '',
+  asking_price_per_kg: '',
+  disposal_cost_per_kg: '',
+  selected_use_id: '',
+  material_form: '',
   source_status: 'pre_consumer',
-  colour: 'Clear / Natural',
-  packaging: 'Baled sacks',
-  storage_condition: 'Covered indoor storage',
-  sample_available: true,
+  colour: '',
+  packaging: '',
+  storage_condition: '',
+  sample_available: false,
   compliance_triage: 'not_assessed',
   document_name: '',
   document_url: '',
@@ -162,7 +162,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
   const catalog = materials.data && materials.data.length > 0 ? materials.data : DEFAULT_CATALOG
 
   const [step, setStep] = useState<1 | 2>(1)
-  const [description, setDescription] = useState(SAMPLE_GENERATOR_TEXT)
+  const [description, setDescription] = useState('')
   const [extraction, setExtraction] = useState<ExtractionResult | null>(null)
   const [form, setForm] = useState<ListingFormState>(initialForm)
   const [analyzing, setAnalyzing] = useState(false)

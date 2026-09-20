@@ -6,7 +6,7 @@ import { formatCurrency, formatKg, titleCase } from '../lib/format'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { useToast } from '../components/ToastProvider'
 import type { Listing, MatchCard, Material, Role } from '../types'
-import { StatusBadge, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, ScoreBar, ScoreRing } from '../components/ui'
+import { StatusBadge, Disclosure, EmptyPanel, ErrorPanel, PageSkeleton, PageHeader, QualityPill, ScoreBar, ScoreRing } from '../components/ui'
 import { motion } from 'framer-motion'
 
 export function ListingMatchesPage({ role }: { role: Role }) {
