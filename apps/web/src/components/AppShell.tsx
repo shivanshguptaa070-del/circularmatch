@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { ActiveMode, UserProfile } from '../lib/supabase'
+import { supabase } from '../lib/supabase'
 import type { Notification } from '../types'
 import { getNotifications, markNotificationRead } from '../lib/api'
 
@@ -534,7 +535,8 @@ export function AppShell({
                   <button
                     key={role}
                     id={`demo-switch-${role}`}
-                    onClick={() => {
+                    onClick={async () => {
+                      await supabase.auth.signOut()
                       localStorage.setItem('cm_demo', role)
                       window.location.href = `/dashboard?demo=${role}`
                     }}

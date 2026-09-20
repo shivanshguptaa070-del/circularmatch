@@ -245,7 +245,8 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
               <button
                 key={role}
                 id={`demo-login-${role}`}
-                onClick={() => {
+                onClick={async () => {
+                  await supabase.auth.signOut()
                   localStorage.setItem('cm_demo', role)
                   window.location.href = `/dashboard?demo=${role}`
                 }}

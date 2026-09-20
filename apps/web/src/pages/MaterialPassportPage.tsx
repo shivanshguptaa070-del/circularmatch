@@ -80,6 +80,15 @@ export function MaterialPassportPage({ role }: { role: Role }) {
   const [error, setError] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [evidenceStates, setEvidenceStates] = useState<
+    Record<number, 'reviewed' | 'verified' | 'uploaded' | 'pending' | 'notstarted'>
+  >({
+    1: 'reviewed',
+    2: 'uploaded',
+    3: 'uploaded',
+    4: 'pending',
+    5: 'notstarted',
+  })
 
   const handleDownload = async (evidence: Partial<QualityEvidence> & { document_url?: string | null }) => {
     if (evidence.document_url) {
@@ -239,47 +248,57 @@ export function MaterialPassportPage({ role }: { role: Role }) {
   const qualityScore = isGradeA && isLowContamination ? 16 : isGradeB ? 14 : 10
   const locationScore = hasLocation ? 15 : 0
 
+  const isSupplier = role === 'generator' || role === 'admin'
+
+  const handleToggleEvidence = (id: number) => {
+    if (!isSupplier) return
+    setEvidenceStates((prev) => {
+      const current = prev[id]
+      // In supplier view, make items clickable to simulate upload (toggle to Uploaded state)
+      const next = current === 'uploaded' ? (id === 5 ? 'notstarted' : 'pending') : 'uploaded'
+      return { ...prev, [id]: next }
+    })
+  }
+
   // Evidence list with 5 specification items:
-  // ✓ Material Details — Reviewed
-  // ✓ Photos — Uploaded
-  // ✓ Quantity Document — Uploaded
-  // ⚠ Quality Certificate — Pending
-  // ○ Third-Party Verify — Not Started
+  // ✓ Green  = Reviewed or Verified
+  // ⚠ Yellow = Uploaded or Pending
+  // ○ Grey   = Not Started
   const evidenceItems = [
     {
       id: 1,
       label: 'Material Details',
-      status: 'reviewed' as const,
+      status: evidenceStates[1] || 'reviewed',
       hint: `Reviewed by ${data.listing.company || 'Generator'} and verified for catalog match.`,
     },
     {
       id: 2,
       label: 'Photos',
-      status: 'uploaded' as const,
+      status: evidenceStates[2] || 'uploaded',
       hint: 'Batch and storage photos uploaded for verification.',
     },
     {
       id: 3,
       label: 'Quantity Document',
-      status: 'uploaded' as const,
+      status: evidenceStates[3] || 'uploaded',
       hint: `Weighbridge slip / lot record attached (${formatKg(primaryLot?.available_quantity_kg || 5000)}).`,
     },
     {
       id: 4,
       label: 'Quality Certificate',
-      status: 'pending' as const,
+      status: evidenceStates[4] || 'pending',
       hint: 'Awaiting laboratory assay report or supplier certificate upload.',
     },
     {
       id: 5,
       label: 'Third-Party Verify',
-      status: 'notstarted' as const,
+      status: evidenceStates[5] || 'notstarted',
       hint: 'Optional third-party testing or certification audit.',
     },
   ]
 
   const completedEvidenceCount = evidenceItems.filter(
-    (i) => i.status === 'reviewed' || i.status === 'uploaded',
+    (i) => i.status === 'reviewed' || i.status === 'verified' || i.status === 'uploaded',
   ).length
   const evidenceScore = Math.min(10, completedEvidenceCount * 2)
 
@@ -554,6 +573,8 @@ export function MaterialPassportPage({ role }: { role: Role }) {
           <EvidenceChecklist
             items={evidenceItems}
             onAddClick={() => setShowEvidenceForm((prev) => !prev)}
+            isSupplier={isSupplier}
+            onItemClick={handleToggleEvidence}
           />
 
           {/* ADD EVIDENCE FORM DRAWER (if toggled) */}
@@ -1144,17 +1165,23 @@ function CompositionCard({
 function EvidenceChecklist({
   items,
   onAddClick,
+  isSupplier,
+  onItemClick,
 }: {
   items: readonly {
     id: number
     label: string
-    status: 'reviewed' | 'uploaded' | 'pending' | 'notstarted'
+    status: 'reviewed' | 'verified' | 'uploaded' | 'pending' | 'notstarted'
     hint: string
   }[]
   onAddClick: () => void
+  isSupplier?: boolean
+  onItemClick?: (id: number) => void
 }) {
   const total = items.length
-  const done = items.filter((i) => i.status === 'reviewed' || i.status === 'uploaded').length
+  const done = items.filter(
+    (i) => i.status === 'reviewed' || i.status === 'verified' || i.status === 'uploaded',
+  ).length
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
@@ -1184,6 +1211,14 @@ function EvidenceChecklist({
           </button>
         </div>
 
+        {/* Supplier view interaction tip */}
+        {isSupplier && (
+          <div className="mt-2.5 flex items-center gap-1.5 rounded-xl border border-emerald-200/70 bg-emerald-50/70 px-2.5 py-1.5 text-[11px] font-medium text-emerald-800">
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+            <span>Supplier view: Click any item below to simulate upload.</span>
+          </div>
+        )}
+
         {/* Progress mini bar */}
         <div className="mt-3">
           <div className="h-2 overflow-hidden rounded-full bg-slate-100">
@@ -1203,7 +1238,12 @@ function EvidenceChecklist({
         {/* 5 specification items */}
         <ul className="mt-4 space-y-2">
           {items.map((it) => (
-            <EvidenceRow key={it.id} item={it} />
+            <EvidenceRow
+              key={it.id}
+              item={it}
+              isSupplier={isSupplier}
+              onClick={isSupplier ? () => onItemClick?.(it.id) : undefined}
+            />
           ))}
         </ul>
       </div>
@@ -1213,56 +1253,80 @@ function EvidenceChecklist({
 
 function EvidenceRow({
   item,
+  isSupplier,
+  onClick,
 }: {
   item: {
     id: number
     label: string
-    status: 'reviewed' | 'uploaded' | 'pending' | 'notstarted'
+    status: 'reviewed' | 'verified' | 'uploaded' | 'pending' | 'notstarted'
     hint: string
   }
+  isSupplier?: boolean
+  onClick?: () => void
 }) {
-  const cfg = {
-    reviewed: {
-      Icon: CheckCircle2,
-      label: 'Reviewed',
-      pill: 'bg-emerald-50 text-emerald-800 ring-emerald-300/80 border-emerald-200',
-      iconBg: 'bg-emerald-100 text-emerald-700',
-    },
-    uploaded: {
-      Icon: CheckCircle2,
-      label: 'Uploaded',
-      pill: 'bg-emerald-50 text-emerald-800 ring-emerald-300/80 border-emerald-200',
-      iconBg: 'bg-emerald-100 text-emerald-700',
-    },
-    pending: {
-      Icon: AlertCircle,
-      label: 'Pending',
-      pill: 'bg-amber-50 text-amber-800 ring-amber-300/80 border-amber-200',
-      iconBg: 'bg-amber-100 text-amber-700',
-    },
-    notstarted: {
-      Icon: CircleDashed,
-      label: 'Not Started',
-      pill: 'bg-slate-50 text-slate-600 ring-slate-200 border-slate-200',
-      iconBg: 'bg-slate-100 text-slate-500',
-    },
-  }[item.status]
+  // Spec:
+  // ✓ Green  = Reviewed or Verified
+  // ⚠ Yellow = Uploaded or Pending
+  // ○ Grey   = Not Started
+  const isGreen = item.status === 'reviewed' || item.status === 'verified'
+  const isYellow = item.status === 'uploaded' || item.status === 'pending'
+
+  const cfg = isGreen
+    ? {
+        symbol: '✓',
+        Icon: CheckCircle2,
+        label: item.status === 'verified' ? 'Verified' : 'Reviewed',
+        pill: 'bg-emerald-50 text-emerald-800 ring-emerald-300/80 border-emerald-200',
+        iconBg: 'bg-emerald-100 text-emerald-700',
+      }
+    : isYellow
+    ? {
+        symbol: '⚠',
+        Icon: AlertCircle,
+        label: item.status === 'uploaded' ? 'Uploaded' : 'Pending',
+        pill: 'bg-amber-50 text-amber-800 ring-amber-300/80 border-amber-200',
+        iconBg: 'bg-amber-100 text-amber-700',
+      }
+    : {
+        symbol: '○',
+        Icon: CircleDashed,
+        label: 'Not Started',
+        pill: 'bg-slate-100 text-slate-600 ring-slate-200 border-slate-200',
+        iconBg: 'bg-slate-100 text-slate-500',
+      }
 
   return (
-    <li className="flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition hover:bg-white hover:shadow-sm">
+    <li
+      onClick={onClick}
+      className={`group flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition ${
+        isSupplier
+          ? 'cursor-pointer hover:border-emerald-300 hover:bg-emerald-50/40 active:scale-[0.99]'
+          : 'hover:bg-white hover:shadow-sm'
+      }`}
+      title={isSupplier ? `Click to simulate upload (toggle state) for ${item.label}` : undefined}
+    >
       <div
         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${cfg.iconBg} ring-1 ring-inset ring-white/60`}
       >
         <cfg.Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-xs font-bold text-slate-900">{item.label}</div>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs font-bold text-slate-900">{item.label}</span>
+          {isSupplier && (
+            <span className="opacity-0 transition group-hover:opacity-100 text-[10px] font-semibold text-emerald-700">
+              (Click to toggle)
+            </span>
+          )}
+        </div>
         <div className="truncate text-[10.5px] text-slate-500">{item.hint}</div>
       </div>
       <span
-        className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset ${cfg.pill}`}
+        className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset ${cfg.pill}`}
       >
-        {cfg.label}
+        <span>{cfg.symbol}</span>
+        <span>{cfg.label}</span>
       </span>
     </li>
   )

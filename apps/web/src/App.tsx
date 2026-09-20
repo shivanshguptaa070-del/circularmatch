@@ -22,6 +22,7 @@ const BuyerAcceptanceSpecPage = lazy(() => import('./pages/BuyerAcceptanceSpecPa
 const MatchDetailPage = lazy(() => import('./pages/MatchDetailPage').then(m => ({ default: m.MatchDetailPage })))
 const MapPage = lazy(() => import('./pages/MapPage').then(m => ({ default: m.MapPage })))
 const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })))
+const ImpactPage = lazy(() => import('./pages/ImpactPage').then(m => ({ default: m.ImpactPage })))
 
 const queryClient = new QueryClient()
 
@@ -105,6 +106,7 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
           <Route path="/admin" element={isAdmin ? <AdminPage role={legacyRole} /> : <Navigate to="/dashboard" replace />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/impact" element={<ImpactPage />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Suspense>
@@ -218,6 +220,7 @@ export default function App() {
                   <Route path="/" element={<LandingPage />} />
                   <Route path="/terms" element={<TermsPage />} />
                   <Route path="/privacy" element={<PrivacyPage />} />
+                  <Route path="/impact" element={<ImpactPage />} />
                   
                   {!session ? (
                     <>
