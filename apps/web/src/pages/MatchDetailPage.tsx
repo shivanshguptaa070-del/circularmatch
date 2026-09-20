@@ -76,7 +76,8 @@ export function MatchDetailPage({ role }: { role: Role }) {
       } else if (type === 'sample_accept') {
         const sample = latest('sample_request')
         if (!sample) throw new Error('Create a sample request before recording a sample decision.')
-        response = await patch<{ message: string }>(`/api/sample-requests/${sample.record.id}`, { status: 'accepted', note: 'Illustrative demo sample acceptance; not a laboratory certification.' })
+        const sampleId = (sample.record as { id?: string } | undefined)?.id || sample.id
+        response = await patch<{ message: string }>(`/api/sample-requests/${sampleId}`, { status: 'accepted', note: 'Illustrative demo sample acceptance; not a laboratory certification.' })
       } else if (type === 'offer') {
         response = await post<{ message: string }>(`/api/matches/${matchId}/offers`, {
           price_per_kg: requirement.target_price_per_kg || listing.asking_price_per_kg || 0,
@@ -87,7 +88,8 @@ export function MatchDetailPage({ role }: { role: Role }) {
       } else if (type === 'offer_accept') {
         const offer = latest('offer')
         if (!offer) throw new Error('Create an illustrative offer before accepting it.')
-        response = await patch<{ message: string }>(`/api/offers/${offer.record.id}`, { status: 'accepted', note: 'Formal offer acceptance; pending final confirmation.' })
+        const offerId = (offer.record as { id?: string } | undefined)?.id || offer.id
+        response = await patch<{ message: string }>(`/api/offers/${offerId}`, { status: 'accepted', note: 'Formal offer acceptance; pending final confirmation.' })
       } else if (type === 'shipment') {
         response = await post<{ message: string }>(`/api/matches/${matchId}/shipments`, {
           planned_quantity_kg: Math.min(listing.normalized_kg_per_week, requirement.maximum_quantity_kg_week),
@@ -98,8 +100,10 @@ export function MatchDetailPage({ role }: { role: Role }) {
       } else {
         const shipment = latest('shipment')
         if (!shipment) throw new Error('Plan a demo pickup before recording receipt.')
-        const receiptWeight = shipment.record.planned_quantity_kg || Math.min(listing.normalized_kg_per_week, requirement.maximum_quantity_kg_week)
-        response = await patch<{ message: string }>(`/api/shipments/${shipment.record.id}`, { status: 'received', dispatched_weight_kg: receiptWeight, received_weight_kg: receiptWeight, receipt_note: 'Material receipt; replace with weighbridge/receipt evidence in production.' })
+        const shipmentId = (shipment.record as { id?: string } | undefined)?.id || shipment.id
+        const shipmentRec = shipment.record as { planned_quantity_kg?: number } | undefined
+        const receiptWeight = shipmentRec?.planned_quantity_kg || Math.min(listing.normalized_kg_per_week, requirement.maximum_quantity_kg_week)
+        response = await patch<{ message: string }>(`/api/shipments/${shipmentId}`, { status: 'received', dispatched_weight_kg: receiptWeight, received_weight_kg: receiptWeight, receipt_note: 'Material receipt; replace with weighbridge/receipt evidence in production.' })
       }
       setMessage(response.data.message)
       await detail.reload()

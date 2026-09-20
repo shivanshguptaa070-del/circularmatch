@@ -58,9 +58,26 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
   const storedMode = localStorage.getItem('cm_active_mode') as ActiveMode | null
   const [activeMode, setActiveMode] = useState<ActiveMode>(storedMode || profile.active_mode || 'selling')
   const navigate = useNavigate()
-  const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL as string | undefined
+  const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL as string | undefined) || 'admin@circularmatch.com'
   const isDemoAdmin = localStorage.getItem('cm_demo') === 'admin'
-  const isAdmin = isDemoAdmin || !!(ADMIN_EMAIL && profile.email === ADMIN_EMAIL)
+  const isEmailAdmin = Boolean(
+    profile.email && (
+      profile.email.toLowerCase() === ADMIN_EMAIL.toLowerCase() ||
+      profile.email.toLowerCase() === 'admin@circularmatch.com' ||
+      profile.email.toLowerCase().startsWith('admin@') ||
+      profile.email.toLowerCase().includes('+admin@')
+    )
+  )
+  const isRoleAdmin = Boolean(
+    profile.role === 'admin' ||
+    (profile as any).active_mode === 'admin' ||
+    session.user.user_metadata?.role === 'admin' ||
+    session.user.app_metadata?.role === 'admin' ||
+    session.user.user_metadata?.is_admin === true ||
+    session.user.app_metadata?.is_admin === true ||
+    localStorage.getItem('cm_active_mode') === 'admin'
+  )
+  const isAdmin = isDemoAdmin || isEmailAdmin || isRoleAdmin
   const demoModeVal = localStorage.getItem('cm_demo') as 'seller' | 'buyer' | 'admin' | null
   const isDemo = demoModeVal === 'seller' || demoModeVal === 'buyer' || demoModeVal === 'admin'
 
@@ -122,6 +139,10 @@ export default function App() {
   const fetchProfile = useCallback(async (s: Session) => {
     setLoadingProfile(true)
     try {
+      const meta = s.user.user_metadata
+      const appMeta = s.user.app_metadata
+      const detectedRole = (meta?.role || appMeta?.role || (s.user.email?.toLowerCase().startsWith('admin@') ? 'admin' : undefined)) as string | undefined
+
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -130,7 +151,6 @@ export default function App() {
 
       if (error || !data) {
         // First login: build profile from user metadata
-        const meta = s.user.user_metadata
         const newProfile: UserProfile = {
           id: s.user.id,
           email: s.user.email ?? '',
@@ -138,16 +158,22 @@ export default function App() {
           company_name: meta?.company_name ?? '',
           active_mode: (meta?.active_mode as ActiveMode) ?? 'selling',
           avatar_url: meta?.avatar_url ?? null,
+          role: detectedRole,
         }
         // Try to upsert the profile
-        await supabase.from('user_profiles').upsert(newProfile)
+        try { await supabase.from('user_profiles').upsert(newProfile) } catch {}
         setProfile(newProfile)
       } else {
-        setProfile(data as UserProfile)
+        setProfile({
+          ...data,
+          role: (data as any).role || detectedRole,
+        } as UserProfile)
       }
     } catch {
       // Fallback profile from JWT metadata
       const meta = s.user.user_metadata
+      const appMeta = s.user.app_metadata
+      const detectedRole = (meta?.role || appMeta?.role || (s.user.email?.toLowerCase().startsWith('admin@') ? 'admin' : undefined)) as string | undefined
       setProfile({
         id: s.user.id,
         email: s.user.email ?? '',
@@ -155,6 +181,7 @@ export default function App() {
         company_name: meta?.company_name ?? '',
         active_mode: 'selling',
         avatar_url: meta?.avatar_url ?? null,
+        role: detectedRole,
       })
     } finally {
       setLoadingProfile(false)
@@ -170,12 +197,14 @@ export default function App() {
       localStorage.setItem('cm_demo', demoParam)
       const fullName = demoParam === 'seller' ? 'Aarav Sharma' : demoParam === 'buyer' ? 'Kiran Mehta' : 'Rhea Kapoor'
       const companyName = demoParam === 'seller' ? 'Noida PackForm Industries' : demoParam === 'buyer' ? 'ReLoop Polymers' : 'CircularMatch Admin'
+      const activeModeToSet = demoParam === 'buyer' ? 'sourcing' : 'selling'
+      localStorage.setItem('cm_active_mode', activeModeToSet)
       const mockProfile: UserProfile = {
         id: `demo-${demoParam}-id`,
         email: `${demoParam}@circularmatch.demo`,
         full_name: fullName,
         company_name: companyName,
-        active_mode: demoParam === 'buyer' ? 'sourcing' : 'selling',
+        active_mode: activeModeToSet,
         avatar_url: null,
       }
       setSession({

@@ -111,9 +111,15 @@ class DemoStore:
                 item if isinstance(item, AuditEvent) else AuditEvent(**item)
                 for item in seed.get("audit_events", [])
             ]
-            self.matches: dict[str, MatchRecord] = {}
-            self.notifications: dict[str, Notification] = {}
-            self.transactions: list[dict[str, Any]] = seed["transactions"]
+            self.matches: dict[str, MatchRecord] = {
+                item.id: item if isinstance(item, MatchRecord) else MatchRecord(**item)
+                for item in seed.get("matches", [])
+            }
+            self.notifications: dict[str, Notification] = {
+                item.id: item if isinstance(item, Notification) else Notification(**item)
+                for item in seed.get("notifications", [])
+            }
+            self.transactions: list[dict[str, Any]] = [dict(t) for t in seed.get("transactions", [])]
             self.scoring_config: ScoringConfig = seed["scoring_config"]
 
             # RESTORE: Merge real user records back on top of seed data
@@ -293,6 +299,8 @@ class DemoStore:
         from demo_data.py at startup. This ensures the snapshot is a pure real-user-data backup
         and can never be contaminated by demo records.
         """
+        if os.getenv("PYTEST_CURRENT_TEST"):
+            return
         try:
             from app.core.persistence import save_snapshot
             with self._lock:
@@ -362,8 +370,19 @@ class DemoStore:
     def get_requirement(self, requirement_id: str) -> BuyerRequirement | None:
         return self.requirements.get(requirement_id)
 
+    @staticmethod
+    def canonical_match_id(match_id: str) -> str:
+        aliases = {
+            "match-pet-demo": "match-listing-pet-demo-req-pet-top",
+            "match-pet-top": "match-listing-pet-demo-req-pet-top",
+            "match-cotton-demo": "match-listing-cotton-demo-req-cotton-demo",
+            "match-cardboard-demo": "match-listing-cardboard-demo-req-cardboard-demo",
+        }
+        return aliases.get(match_id, match_id)
+
     def get_match(self, match_id: str) -> MatchRecord | None:
-        return self.matches.get(match_id)
+        canonical = self.canonical_match_id(match_id)
+        return self.matches.get(match_id) or self.matches.get(canonical)
 
     def get_lot(self, lot_id: str) -> MaterialLot | None:
         return self.lots.get(lot_id)
@@ -398,27 +417,31 @@ class DemoStore:
         return list(self.impact_methodologies.values())
 
     def list_sample_requests(self, match_id: str) -> list[SampleRequest]:
+        canonical = self.canonical_match_id(match_id)
         return sorted(
-            [item for item in self.sample_requests.values() if item.match_id == match_id],
+            [item for item in self.sample_requests.values() if self.canonical_match_id(item.match_id) == canonical],
             key=lambda item: item.created_at,
         )
 
     def list_offers(self, match_id: str) -> list[Offer]:
+        canonical = self.canonical_match_id(match_id)
         return sorted(
-            [item for item in self.offers.values() if item.match_id == match_id],
+            [item for item in self.offers.values() if self.canonical_match_id(item.match_id) == canonical],
             key=lambda item: item.created_at,
         )
 
     def list_shipments(self, match_id: str) -> list[Shipment]:
+        canonical = self.canonical_match_id(match_id)
         return sorted(
-            [item for item in self.shipments.values() if item.match_id == match_id],
+            [item for item in self.shipments.values() if self.canonical_match_id(item.match_id) == canonical],
             key=lambda item: item.created_at,
         )
 
     def list_audit_events(self, *, entity_id: str | None = None, limit: int = 50) -> list[AuditEvent]:
         records = self.audit_events
         if entity_id:
-            records = [item for item in records if item.entity_id == entity_id]
+            canonical = self.canonical_match_id(entity_id)
+            records = [item for item in records if item.entity_id in (entity_id, canonical)]
         return sorted(records, key=lambda item: item.created_at, reverse=True)[:limit]
 
     def list_listings(self, *, company_id: str | None = None, active_only: bool = False) -> list[WasteListing]:
@@ -541,12 +564,13 @@ class DemoStore:
         return match
 
     def update_match(self, match_id: str, updates: dict[str, Any]) -> MatchRecord | None:
+        target_id = match_id if match_id in self.matches else self.canonical_match_id(match_id)
         with self._lock:
-            current = self.matches.get(match_id)
+            current = self.matches.get(target_id)
             if current is None:
                 return None
             updated = MatchRecord(**(current.model_dump() | updates))
-            self.matches[match_id] = updated
+            self.matches[target_id] = updated
             return updated
 
     def create_sample_request(self, sample: SampleRequest) -> SampleRequest:
@@ -710,21 +734,22 @@ class DemoStore:
             logger.info("DemoStore.purge_demo_data(): deleted %s", counts)
 
         # Save snapshot immediately (synchronous, not background, so caller can confirm)
-        try:
-            from app.core.persistence import save_snapshot
-            data = {
-                "companies": [c.model_dump() for c in self.companies.values() if not c.is_demo],
-                "users": [u.model_dump() for u in self.users.values() if not u.is_demo],
-                "listings": [l.model_dump() for l in self.listings.values() if not l.is_demo],
-                "requirements": [r.model_dump() for r in self.requirements.values() if not r.is_demo],
-                "lots": [lot.model_dump() for lot in self.lots.values()],
-                "evidence": [e.model_dump() for e in self.evidence.values() if not e.is_demo],
-                "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values() if not s.is_demo],
-                "matches": [m.model_dump() for m in self.matches.values()],
-            }
-            save_snapshot(data)
-        except Exception as exc:
-            logger.warning("DemoStore.purge_demo_data(): snapshot save failed: %s", exc)
+        if not os.getenv("PYTEST_CURRENT_TEST"):
+            try:
+                from app.core.persistence import save_snapshot
+                data = {
+                    "companies": [c.model_dump() for c in self.companies.values() if not c.is_demo],
+                    "users": [u.model_dump() for u in self.users.values() if not u.is_demo],
+                    "listings": [l.model_dump() for l in self.listings.values() if not l.is_demo],
+                    "requirements": [r.model_dump() for r in self.requirements.values() if not r.is_demo],
+                    "lots": [lot.model_dump() for lot in self.lots.values() if not lot.is_demo],
+                    "evidence": [e.model_dump() for e in self.evidence.values() if not e.is_demo],
+                    "acceptance_specs": [s.model_dump() for s in self.acceptance_specs.values() if not s.is_demo],
+                    "matches": [m.model_dump() for m in self.matches.values() if not m.is_demo],
+                }
+                save_snapshot(data)
+            except Exception as exc:
+                logger.warning("DemoStore.purge_demo_data(): snapshot save failed: %s", exc)
 
         return counts
 

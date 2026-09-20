@@ -248,6 +248,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                 onClick={async () => {
                   await supabase.auth.signOut()
                   localStorage.setItem('cm_demo', role)
+                  localStorage.setItem('cm_active_mode', role === 'seller' ? 'selling' : role === 'buyer' ? 'sourcing' : 'admin')
                   window.location.href = `/dashboard?demo=${role}`
                 }}
                 className={`group flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-left transition-all duration-200 hover:scale-[1.015] hover:shadow-md ${

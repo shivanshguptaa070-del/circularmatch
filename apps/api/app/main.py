@@ -509,8 +509,9 @@ def timeline_for_match(store: DemoStore, match_id: str) -> list[dict[str, Any]]:
             "created_at": shipment.created_at,
             "record": shipment.model_dump(),
         })
+    canonical_id = store.canonical_match_id(match_id)
     for transaction in store.transactions:
-        if transaction.get("match_id") == match_id:
+        if transaction.get("match_id") in (match_id, canonical_id):
             events.append({
                 "id": transaction["id"],
                 "type": "contact",

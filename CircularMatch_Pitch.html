@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CircularMatch — HACKDAY 1.0 Presentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --g1: #4ade80;
+      --g2: #22c55e;
+      --g3: #16a34a;
+      --t1: #2dd4bf;
+      --t2: #14b8a6;
+      --accent: #a3e635;
+      --bg: #050a12;
+      --bg-card: rgba(13, 20, 34, 0.78);
+      --glass: rgba(255, 255, 255, 0.04);
+      --glass-b: rgba(255, 255, 255, 0.09);
+      --text: rgba(255, 255, 255, 0.94);
+      --muted: rgba(255, 255, 255, 0.58);
+      --red: rgba(239, 68, 68, 0.12);
+      --red-b: rgba(239, 68, 68, 0.35);
+      --yellow: #fbbf24;
+      --blue: #38bdf8;
+      --purple: #c084fc;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      font-family: 'Outfit', 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient Background Pulse */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(22, 163, 74, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(20, 184, 166, 0.1) 0%, transparent 45%),
+        radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Progress Bar */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      z-index: 999;
+    }
+    #progress-fill {
+      height: 100%;
+      width: 14.285%;
+      background: linear-gradient(90deg, var(--g1), var(--t1));
+      transition: width 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 12px var(--g1);
+    }
+
+    /* Deck Container */
+    #deck {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1400px;
+    }
+
+    /* Fixed Top Action Bar */
+    #top-bar {
+      position: fixed;
+      top: 14px;
+      left: 24px;
+      right: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 500;
+      pointer-events: none;
+    }
+    .top-left {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(13, 20, 34, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Space Grotesk', sans-serif;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 6px 24px rgba(0,0,0,0.5);
+    }
+    .brand-pill span.logo-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--g1);
+      box-shadow: 0 0 12px var(--g1);
+      animation: pulseDot 2s infinite alternate;
+    }
+    @keyframes pulseDot {
+      from { transform: scale(0.9); opacity: 0.8; }
+      to { transform: scale(1.2); opacity: 1; }
+    }
+
+    .top-right {
+      pointer-events: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(13, 20, 34, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: rgba(255, 255, 255, 0.82);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      backdrop-filter: blur(14px);
+      transition: all 0.22s;
+    }
+    .action-btn:hover {
+      background: rgba(74, 222, 128, 0.16);
+      border-color: rgba(74, 222, 128, 0.4);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .action-btn.btn-accent {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.22), rgba(20, 184, 166, 0.22));
+      border-color: rgba(74, 222, 128, 0.45);
+      color: var(--g1);
+    }
+    .action-btn.btn-accent:hover {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.38), rgba(20, 184, 166, 0.38));
+      color: #fff;
+      box-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+    }
+
+    /* 16:9 Widescreen Standard Slide Frame (1280x720) */
+    .slide {
+      position: absolute;
+      width: 1280px;
+      height: 720px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border-radius: 24px;
+      overflow: hidden;
+      background: #08101a;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 40px 140px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.04);
+      display: none;
+      opacity: 0;
+      z-index: 10;
+    }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      animation: keynoteIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .slide.out {
+      animation: keynoteOut 0.32s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+    }
+
+    @keyframes keynoteIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) perspective(1200px) rotateY(6deg) scale(0.96);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, -50%) perspective(1200px) rotateY(0deg) scale(1);
+      }
+    }
+    @keyframes keynoteOut {
+      from {
+        opacity: 1;
+        transform: translate(-50%, -50%) perspective(1200px) rotateY(0deg) scale(1);
+      }
+      to {
+        opacity: 0;
+        transform: translate(-50%, -50%) perspective(1200px) rotateY(-6deg) scale(0.96);
+      }
+    }
+
+    /* Staggered Element Entrance Animations */
+    .slide.active .stagger-1 { animation: fadeInUp 0.45s ease backwards 0.08s; }
+    .slide.active .stagger-2 { animation: fadeInUp 0.45s ease backwards 0.16s; }
+    .slide.active .stagger-3 { animation: fadeInUp 0.45s ease backwards 0.24s; }
+    .slide.active .stagger-4 { animation: fadeInUp 0.45s ease backwards 0.32s; }
+    .slide.active .stagger-5 { animation: fadeInUp 0.45s ease backwards 0.40s; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Ambient Glowing Orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(100px);
+      z-index: 0;
+      opacity: 0.18;
+      animation: orbBreathe 7s ease-in-out infinite alternate;
+    }
+    @keyframes orbBreathe {
+      from { transform: scale(1) translate(0, 0); }
+      to   { transform: scale(1.15) translate(10px, 10px); }
+    }
+
+    /* Bottom Brand Bar on every slide */
+    .brand-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 44px;
+      background: rgba(5, 10, 18, 0.82);
+      border-top: 1px solid rgba(255, 255, 255, 0.07);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      z-index: 20;
+    }
+    .brand-bar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      color: var(--g1);
+    }
+    .brand-bar-left span {
+      color: rgba(255, 255, 255, 0.4);
+      font-weight: 400;
+      font-size: 12px;
+    }
+    .brand-bar-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.45);
+    }
+    .brand-bar-right strong {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 500;
+    }
+
+    /* Floating Navigation Controls */
+    #nav {
+      position: fixed;
+      bottom: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(9, 18, 30, 0.94);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 40px;
+      padding: 6px 16px;
+      backdrop-filter: blur(18px);
+      z-index: 500;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    }
+    .nav-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.08);
+      color: #fff;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: rgba(74, 222, 128, 0.25);
+      color: var(--g1);
+      transform: scale(1.08);
+    }
+    .dots { display: flex; gap: 6px; }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .dot.active {
+      background: var(--g1);
+      width: 24px;
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--g1);
+    }
+    #counter {
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.55);
+      font-family: 'JetBrains Mono', monospace;
+      min-width: 44px;
+      text-align: center;
+    }
+
+    /* Common Typography & Chips */
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      width: fit-content;
+    }
+    .chip-green {
+      background: rgba(74, 222, 128, 0.12);
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      color: var(--g1);
+    }
+    .chip-teal {
+      background: rgba(45, 212, 191, 0.12);
+      border: 1px solid rgba(45, 212, 191, 0.35);
+      color: var(--t1);
+    }
+    .chip-yellow {
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: var(--yellow);
+    }
+
+    .headline-large {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 33px;
+      font-weight: 700;
+      line-height: 1.16;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+    .headline-large .hl-gradient {
+      background: linear-gradient(90deg, var(--g1), var(--t1));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .headline-sub {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--t1);
+      line-height: 1.4;
+    }
+
+    .bottom-line-banner {
+      width: 100%;
+      padding: 11px 18px;
+      background: linear-gradient(90deg, rgba(74, 222, 128, 0.1), rgba(45, 212, 191, 0.06));
+      border: 1px solid rgba(74, 222, 128, 0.28);
+      border-radius: 12px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.45;
+    }
+    .bottom-line-banner strong {
+      color: var(--g1);
+      font-weight: 700;
+    }
+
+    /* ═════════════════════════════════════════════════
+       MOCKUP WINDOW STYLES FOR SCREENSHOTS
+       ═════════════════════════════════════════════════ */
+    .screen-window {
+      background: rgba(10, 16, 26, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(74, 222, 128, 0.15);
+      position: relative;
+      cursor: zoom-in;
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0.1, 1), border-color 0.25s, box-shadow 0.3s;
+    }
+    .screen-window:hover {
+      transform: translateY(-3px) scale(1.01);
+      border-color: rgba(74, 222, 128, 0.45);
+      box-shadow: 0 22px 55px rgba(0, 0, 0, 0.8), 0 0 25px rgba(74, 222, 128, 0.2);
+    }
+    .screen-header {
+      height: 26px;
+      background: rgba(15, 23, 42, 0.92);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+    .screen-dots { display: flex; gap: 5px; }
+    .screen-dots span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot-r { background: #ef4444; }
+    .dot-y { background: #f59e0b; }
+    .dot-g { background: #10b981; }
+    .screen-title {
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      color: rgba(255, 255, 255, 0.6);
+      letter-spacing: 0.04em;
+    }
+    .screen-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+      object-position: top;
+      transition: transform 0.4s ease;
+    }
+
+    /* ═════════════════════════════════════════════════
+       SLIDE 0 — COVER / FRONT PAGE
+       ═════════════════════════════════════════════════ */
+    #s0 {
+      background: radial-gradient(circle at 18% 28%, #052617 0%, #061525 50%, #030710 100%);
+      flex-direction: row;
+    }
+    #s0 .col-left {
+      width: 53%;
+      padding: 34px 24px 52px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    #s0 .col-right {
+      width: 47%;
+      padding: 34px 48px 52px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    .cover-title {
+      font-family: 'Outfit', 'Space Grotesk', sans-serif;
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: #fff;
+    }
+    .cover-subtitle {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--t1);
+      margin-top: 6px;
+      line-height: 1.35;
+    }
+    .cover-tagline {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.78);
+      margin-top: 6px;
+      line-height: 1.45;
+      max-width: 96%;
+    }
+    .cover-features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin: 8px 0;
+    }
+    .cover-card {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 12px;
+      padding: 9px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      position: relative;
+      transition: all 0.25s;
+    }
+    .cover-card:hover {
+      background: rgba(74, 222, 128, 0.06);
+      border-color: rgba(74, 222, 128, 0.3);
+      transform: translateY(-2px);
+    }
+    .cover-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 12px;
+      right: 12px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--g1), var(--t1));
+      border-radius: 2px;
+    }
+    .cover-card-title {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'Outfit', 'Space Grotesk', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .cover-card-desc {
+      font-size: 10px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .cover-cred-box {
+      background: rgba(13, 20, 34, 0.88);
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      border-radius: 12px;
+      padding: 10px 14px;
+    }
+
+    /* ═════════════════════════════════════════════════
+       SLIDE 1 — PROBLEM STATEMENT
+       ═════════════════════════════════════════════════ */
+    #s1 {
+      background: radial-gradient(circle at 15% 30%, #072615 0%, #07131d 50%, #040910 100%);
+      flex-direction: row;
+    }
+    #s1 .col-left {
+      width: 52%;
+      padding: 38px 30px 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    #s1 .col-right {
+      width: 48%;
+      padding: 38px 48px 56px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    .pain-card {
+      background: rgba(239, 68, 68, 0.07);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 12px;
+      padding: 11px 14px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      transition: all 0.2s;
+    }
+    .pain-card:hover {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.4);
+      transform: translateX(3px);
+    }
+    .pain-icon { font-size: 20px; line-height: 1; flex-shrink: 0; }
+    .pain-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fca5a5;
+      margin-bottom: 2px;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .pain-card p {
+      font-size: 11.5px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.4;
+    }
+    .hero-stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 14px;
+      padding: 12px 16px;
+      margin-top: 10px;
+    }
+    .hero-stat-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 34px;
+      font-weight: 800;
+      color: var(--g1);
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    /* ═════════════════════════════════════════════════
+       SLIDE 2 — PROPOSED SOLUTION
+       ═════════════════════════════════════════════════ */
+    #s2 {
+      background: radial-gradient(circle at 85% 20%, #062b1b 0%, #071524 50%, #040911 100%);
+      flex-direction: row;
+    }
+    #s2 .col-left {
+      width: 53%;
+      padding: 38px 24px 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    #s2 .col-right {
+      width: 47%;
+      padding: 38px 48px 56px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+    }
+    .s2-features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .s2-card {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: relative;
+      transition: all 0.25s;
+    }
+    .s2-card:hover {
+      background: rgba(74, 222, 128, 0.06);
+      border-color: rgba(74, 222, 128, 0.3);
+      transform: translateY(-2px);
+    }
+    .s2-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 12px;
+      right: 12px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--g1), var(--t1));
+      border-radius: 2px;
+    }
+    .s2-card-title {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .s2-card-desc {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .flow-steps-bar-mini {
+      display: flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 8px 10px;
+      gap: 6px;
+      width: 100%;
+    }
+    .flow-step-item-mini {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .step-badge-mini {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--g2), var(--t2));
+      color: #05101a;
+      font-size: 9.5px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-info-title-mini {
+      font-size: 9.5px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.2;
+    }
+
+    /* ═════════════════════════════════════════════════
+       SLIDE 3 — TARGET USERS
+       ═════════════════════════════════════════════════ */
+    #s3 {
+      background: radial-gradient(circle at 15% 15%, #06241b 0%, #071624 50%, #040911 100%);
+      flex-direction: row;
+    }
+    #s3 .col-left {
+      width: 53%;
+      padding: 34px 24px 50px 44px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    #s3 .col-right {
+      width: 47%;
+      padding: 34px 44px 50px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    .user-card-horizontal {
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 14px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.25s;
+    }
+    .user-card-horizontal:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .user-card-horizontal.supplier { border-left: 4px solid var(--g1); }
+    .user-card-horizontal.buyer { border-left: 4px solid var(--t1); }
+
+    /* Laser Pointer */
+    #laser-pointer {
+      position: fixed;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 16px 6px #ef4444, 0 0 32px #dc2626;
+      pointer-events: none;
+      z-index: 99999;
+      display: none;
+      transform: translate(-50%, -50%);
+      transition: transform 0.04s ease-out;
+    }
+
+    /* Speaker Notes Bar */
+    #speaker-notes-bar {
+      position: fixed;
+      bottom: 64px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(900px, 90vw);
+      background: rgba(10, 18, 30, 0.95);
+      border: 1px solid rgba(74, 222, 128, 0.35);
+      border-radius: 14px;
+      padding: 10px 18px;
+      display: none;
+      align-items: center;
+      gap: 14px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.8);
+      z-index: 550;
+      animation: fadeInUp 0.25s ease;
+    }
+    #speaker-notes-bar.active { display: flex; }
+    .notes-tag {
+      background: rgba(74, 222, 128, 0.2);
+      color: var(--g1);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      white-space: nowrap;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    #notes-content {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.9);
+      line-height: 1.4;
+      flex: 1;
+    }
+    .notes-close {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
+    }
+
+    /* Slide Sorter Drawer */
+    #sorter-drawer {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 10, 18, 0.88);
+      backdrop-filter: blur(24px);
+      z-index: 600;
+      display: none;
+      padding: 32px 48px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #sorter-drawer.active { display: flex; }
+    .sorter-header {
+      width: 100%;
+      max-width: 1100px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+    .sorter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      width: 100%;
+      max-width: 1100px;
+    }
+    .sorter-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .sorter-card:hover, .sorter-card.active {
+      border-color: var(--g1);
+      background: rgba(74, 222, 128, 0.08);
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .sorter-card.active {
+      box-shadow: 0 0 18px rgba(74, 222, 128, 0.3);
+    }
+    .sorter-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--g1);
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .sorter-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .sorter-desc {
+      font-size: 10.5px;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    /* ═════════════════════════════════════════════════
+       SLIDE 4 — TECHNICAL APPROACH
+       ═════════════════════════════════════════════════ */
+    #s4 {
+      background: radial-gradient(circle at 20% 80%, #082420 0%, #06131c 50%, #03080f 100%);
+      flex-direction: row;
+    }
+    #s4 .col-left {
+      width: 48%;
+      padding: 38px 20px 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    #s4 .col-right {
+      width: 52%;
+      padding: 38px 48px 56px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    .stack-table-mini {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.65);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 8px 0;
+    }
+    .stack-table-mini th {
+      text-align: left;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 9.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .stack-table-mini td {
+      padding: 5px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.3;
+    }
+    .stack-table-mini tr:last-child td { border-bottom: none; }
+    .stack-table-mini td.layer-col { color: var(--t1); font-weight: 600; width: 95px; }
+
+    /* ═════════════════════════════════════════════════
+       SLIDE 5 — MARKET & BUSINESS POTENTIAL
+       ═════════════════════════════════════════════════ */
+    #s5 {
+      background: radial-gradient(circle at 80% 30%, #0b2615 0%, #071522 50%, #030811 100%);
+      flex-direction: row;
+    }
+    #s5 .col-left {
+      width: 50%;
+      padding: 38px 20px 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    #s5 .col-right {
+      width: 50%;
+      padding: 38px 48px 56px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    .biz-table-mini {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.65);
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 6px 0;
+    }
+    .biz-table-mini th {
+      text-align: left;
+      padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 9.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .biz-table-mini td {
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.3;
+    }
+    .biz-table-mini tr:last-child td { border-bottom: none; }
+    .biz-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 9.5px;
+    }
+    .biz-badge.hook { background: rgba(56, 189, 248, 0.15); color: #38bdf8; }
+    .biz-badge.rev { background: rgba(74, 222, 128, 0.15); color: var(--g1); }
+    .biz-badge.up { background: rgba(251, 191, 36, 0.15); color: var(--yellow); }
+
+    /* ═════════════════════════════════════════════════
+       SLIDE 6 — SCALABILITY & FUTURE
+       ═════════════════════════════════════════════════ */
+    #s6 {
+      background: radial-gradient(circle at 50% 90%, #0a251b 0%, #061421 55%, #030710 100%);
+      flex-direction: row;
+    }
+    #s6 .col-left {
+      width: 52%;
+      padding: 38px 20px 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    #s6 .col-right {
+      width: 48%;
+      padding: 38px 48px 56px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    .timeline-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .timeline-strip-box {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 8px 10px;
+      border-top: 2px solid var(--g1);
+    }
+    .timeline-strip-box .t-badge {
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--g1);
+      text-transform: uppercase;
+    }
+    .timeline-strip-box .t-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: #fff;
+      margin: 2px 0;
+    }
+    .timeline-strip-box .t-desc {
+      font-size: 9px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    /* ═════════════════════════════════════════════════
+       SLIDE 7 — IF WE HAD MORE TIME
+       ═════════════════════════════════════════════════ */
+    #s7 {
+      background: radial-gradient(circle at 50% 50%, #09202c 0%, #05101a 60%, #03070e 100%);
+      flex-direction: row;
+    }
+    #s7 .col-left {
+      width: 53%;
+      padding: 36px 20px 56px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    #s7 .col-right {
+      width: 47%;
+      padding: 36px 48px 56px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      z-index: 2;
+    }
+    .priority-item-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      transition: all 0.2s;
+    }
+    .priority-item-row:hover {
+      background: rgba(74, 222, 128, 0.05);
+      border-color: rgba(74, 222, 128, 0.3);
+      transform: translateX(3px);
+    }
+    .priority-badge-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(74, 222, 128, 0.18);
+      color: var(--g1);
+      font-size: 10px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .priority-text h5 {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .priority-text p {
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.35;
+    }
+
+    /* Lightbox Modal */
+    #lightbox-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(16px);
+      z-index: 2000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+      padding: 40px;
+    }
+    #lightbox-modal.open { display: flex; animation: fadeIn 0.25s ease; }
+    #lightbox-img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 30px 100px rgba(0,0,0,0.9);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.97); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+
+    /* Submission Modal */
+    #submission-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      z-index: 1500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    #submission-modal.open { display: flex; animation: fadeIn 0.2s ease; }
+    .modal-card {
+      width: 680px;
+      max-width: 90vw;
+      background: #0d1726;
+      border: 1px solid rgba(74, 222, 128, 0.3);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 30px 90px rgba(0,0,0,0.9);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .modal-field { margin-bottom: 14px; }
+    .modal-field label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--g1);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+    .modal-field .field-val {
+      background: rgba(0,0,0,0.4);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12.5px;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      user-select: all;
+    }
+
+    /* ═════════════════════════════════════════════════
+       PRINT / PDF STYLES
+       ═════════════════════════════════════════════════ */
+    @media print {
+      body, html {
+        background: #08101a !important;
+        overflow: visible !important;
+        height: auto !important;
+        width: 100% !important;
+      }
+      #progress-bar, #nav, #top-bar, #submission-modal, #lightbox-modal, .bg-mesh {
+        display: none !important;
+      }
+      #deck {
+        display: block !important;
+        height: auto !important;
+        width: 100% !important;
+        position: static !important;
+      }
+      .slide {
+        display: flex !important;
+        opacity: 1 !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .brand-bar { position: absolute !important; bottom: 0 !important; }
+    }
+
+    @media (max-width: 1320px) {
+      .slide { transform: translate(-50%, -50%) scale(0.88); }
+    }
+    @media (max-width: 1120px) {
+      .slide { transform: translate(-50%, -50%) scale(0.75); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Mesh Glow -->
+  <div class="bg-mesh"></div>
+
+  <!-- Top Progress Bar -->
+  <div id="progress-bar"><div id="progress-fill"></div></div>
+
+  <!-- Top Navigation / Action Bar -->
+  <header id="top-bar">
+    <div class="top-left">
+      <div class="brand-pill">
+        <span class="logo-dot"></span>
+        <span>CircularMatch</span>
+        <span style="color:rgba(255,255,255,0.35); font-weight:400;">/ HACKDAY 1.0</span>
+      </div>
+    </div>
+    <div class="top-right">
+      <button class="action-btn" id="autoplay-btn" onclick="toggleAutoPlay()" title="Toggle Auto-Play Slideshow (Shortcut: P)">
+        <span id="play-icon">▶</span> <span id="play-text">Auto-Play</span>
+      </button>
+      <button class="action-btn" onclick="toggleSlideSorter()" title="Slide Sorter Overview (Shortcut: S)">
+        🗂️ Slides
+      </button>
+      <button class="action-btn" id="laser-btn" onclick="toggleLaser()" title="Laser Pointer (Shortcut: L)">
+        🔴 Laser
+      </button>
+      <button class="action-btn" id="notes-btn" onclick="toggleNotes()" title="Speaker Prompter Notes (Shortcut: N)">
+        📝 Notes
+      </button>
+      <a class="action-btn btn-accent" href="CircularMatch_HACKDAY_Pitch.pptx" download="CircularMatch_HACKDAY_Pitch.pptx" title="Download Real Animated Microsoft PowerPoint File">
+        📊 Download PPTX
+      </a>
+      <a class="action-btn btn-accent" href="CircularMatch_Pitch_Deck.pdf" download="CircularMatch_Pitch_Deck.pdf" title="Download High-Res PDF Presentation">
+        📄 PDF Deck
+      </a>
+      <button class="action-btn" onclick="openModal()" title="HACKDAY 1.0 Submission Data">
+        📋 Form Details
+      </button>
+      <button class="action-btn" onclick="toggleFullscreen()" title="Fullscreen (Shortcut: F)">
+        ⛶ Fullscreen
+      </button>
+    </div>
+  </header>
+
+  <!-- Presentation Deck -->
+  <main id="deck">
+
+    <!-- ═════════════════════════════════════════════════
+         SLIDE 0 — COVER / FRONT PAGE
+         ═════════════════════════════════════════════════ -->
+    <section class="slide active" id="s0">
+      <div class="orb" style="width:540px; height:540px; top:-90px; left:-80px; background:#16a34a;"></div>
+      <div class="orb" style="width:460px; height:460px; bottom:-80px; right:-60px; background:#0284c7;"></div>
+      
+      <div class="col-left">
+        <div class="stagger-1">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+            <span class="chip chip-green">
+              🟢 HACKDAY 1.0 SUBMISSION
+            </span>
+            <span class="chip chip-teal">
+              TEAM DECODEP
+            </span>
+            <span class="chip chip-yellow">
+              CLEANTECH &amp; AI
+            </span>
+          </div>
+
+          <h1 class="cover-title">
+            Circular<span class="hl-gradient">Match</span>
+          </h1>
+          <p class="cover-subtitle">
+            AI-Assisted Industrial Material Qualification &amp; Matching Platform
+          </p>
+          <p class="cover-tagline">
+            Standardizing plain-language industrial waste into verified Material Passports and matching them against buyer acceptance criteria with explainable AI &amp; verifiable SEBI BRSR compliance.
+          </p>
+        </div>
+
+        <div class="cover-features-grid stagger-2">
+          <div class="cover-card">
+            <div class="cover-card-title">💬 Plain-Language AI</div>
+            <div class="cover-card-desc">Natural description → schema-validated JSON records instantly via Gemini 2.0.</div>
+          </div>
+          <div class="cover-card">
+            <div class="cover-card-title">📋 Material Passports</div>
+            <div class="cover-card-desc">Digital evidence tracking: grade, lot location, contamination &amp; eligibility gates.</div>
+          </div>
+          <div class="cover-card">
+            <div class="cover-card-title">🎯 6-D Matching Engine</div>
+            <div class="cover-card-desc">Deterministic scoring against buyer specs with 100% mathematical transparency.</div>
+          </div>
+          <div class="cover-card">
+            <div class="cover-card-title">⚖️ SEBI BRSR Audit Trail</div>
+            <div class="cover-card-desc">Verifiable chain-of-custody eliminating legal liability for corporate filers.</div>
+          </div>
+        </div>
+
+        <div class="cover-cred-box stagger-3">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div>
+              <span style="font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; display:block;">Team / Creator</span>
+              <strong style="color:#fff; font-size:13px; font-family:'Outfit',sans-serif;">Solo Levelling — Shivansh Gupta</strong>
+            </div>
+            <div>
+              <span style="font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; display:block;">Live Demonstration</span>
+              <span style="color:var(--g1); font-size:11.5px; font-family:'JetBrains Mono',monospace;">localhost:5173/dashboard?demo=seller</span>
+            </div>
+            <div>
+              <span style="font-size:9.5px; color:var(--muted); text-transform:uppercase; letter-spacing:0.08em; display:block;">GitHub Repository</span>
+              <span style="color:var(--t1); font-size:11.5px; font-family:'JetBrains Mono',monospace;">github.com/.../circularmatch</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-right">
+        <!-- Live App Preview Hero Window -->
+        <div class="screen-window stagger-2" onclick="openLightbox('screenshots/slide1_landing.png')">
+          <div class="screen-header">
+            <div class="screen-dots">
+              <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+            </div>
+            <div class="screen-title" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:9.5px;">app.circularmatch.in · NCR Secondary Material Platform</div>
+            <span class="chip chip-green" style="font-size:8px; padding:1px 6px;">Live Platform</span>
+          </div>
+          <img class="screen-img" src="screenshots/slide1_landing.png" alt="CircularMatch Platform Preview" style="max-height: 380px;" />
+        </div>
+
+        <!-- 3-Pillar Stat Box -->
+        <div class="stagger-3" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:8px;">
+          <div style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:9px 10px; text-align:center;">
+            <div style="font-size:19px; font-weight:800; color:var(--g1); font-family:'Outfit',sans-serif;">30–60%</div>
+            <div style="font-size:9px; color:var(--muted); margin-top:2px;">Gate Rejection Cut</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:9px 10px; text-align:center;">
+            <div style="font-size:19px; font-weight:800; color:var(--t1); font-family:'Outfit',sans-serif;">100%</div>
+            <div style="font-size:9px; color:var(--muted); margin-top:2px;">BRSR Compliance</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:9px 10px; text-align:center;">
+            <div style="font-size:19px; font-weight:800; color:var(--yellow); font-family:'Outfit',sans-serif;">&lt; 50ms</div>
+            <div style="font-size:9px; color:var(--muted); margin-top:2px;">Scoring Engine</div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="brand-bar">
+        <div class="brand-bar-left">
+          <span>♻</span> CircularMatch <span>| HACKDAY 1.0 — team DECODEP</span>
+        </div>
+        <div class="brand-bar-right">
+          <span>Team: <strong>Solo Levelling (Shivansh Gupta)</strong></span>
+          <span>Cover Page</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ═════════════════════════════════════════════════
+         SLIDE 1 — PROBLEM STATEMENT + LANDING SCREENSHOT
+         ═════════════════════════════════════════════════ -->
+    <section class="slide" id="s1">
+      <div class="orb" style="width:480px; height:480px; top:-60px; left:-60px; background:#16a34a;"></div>
+      
+      <div class="col-left">
+        <div class="stagger-1">
+          <span class="chip chip-green">Slide 1 of 7 — Problem Statement</span>
+          <h1 class="headline-large" style="margin-top:10px;">
+            India's <span class="hl-gradient">₹80,000 Cr</span> industrial waste market runs on WhatsApp, phone calls & handwritten receipts.
+          </h1>
+          <p class="headline-sub" style="margin-top:10px;">
+            The real problem is not discovery. It is qualification.
+          </p>
+        </div>
+
+        <div class="stagger-2">
+          <div class="pain-card">
+            <div class="pain-icon">🚫</div>
+            <div>
+              <h4>30–60% Rejected at the Gate</h4>
+              <p>Industrial buyers reject 30–60% of material upon arrival — wrong grade, mismatched technical specs, or undisclosed contamination.</p>
+            </div>
+          </div>
+
+          <div class="pain-card">
+            <div class="pain-icon">📜</div>
+            <div>
+              <h4>SEBI Mandate, Zero Digital Documentation</h4>
+              <p>Top 1,000 listed companies must prove waste recycling in annual BRSR audits, yet rely on unverified manual chits.</p>
+            </div>
+          </div>
+
+          <div class="pain-card">
+            <div class="pain-icon">⚖️</div>
+            <div>
+              <h4>Brokers Create Regulatory Liability</h4>
+              <p>Brokers move material fast but produce no compliant paper trail — creating direct regulatory liability under SEBI.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-line-banner stagger-3">
+          <strong>Bottom line:</strong> Factories have material. Buyers have requirements. Nobody can prove the material actually meets them.
+        </div>
+      </div>
+
+      <div class="col-right">
+        <!-- Live App Screenshot: Landing Page -->
+        <div class="screen-window stagger-2" onclick="openLightbox('screenshots/slide1_landing.png')">
+          <div class="screen-header">
+            <div class="screen-dots">
+              <span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span>
+            </div>
+            <div class="screen-title">app.circularmatch.in · Delhi NCR Secondary Material Intelligence</div>
+            <span class="chip chip-green" style="font-size:8px; padding:1px 6px;">Live App</span>
+          </div>
+          <img class="screen-img" src="screenshots/slide1_landing.png" alt="CircularMatch Landing Screen" style="max-height: 480px;" />
+        </div>
+
+        <div class="hero-stat-badge stagger-3" style="margin-top: 8px;">
+          <div class="hero-stat-val">30–60%</div>
+          <div class="hero-stat-label">
+            <strong>Average gate rejection rate</strong> on unverified industrial secondary material lots in NCR clusters.
+          </div>
+        </div>
+      </div>
+
+      <footer class="brand-bar">
+        <div class="brand-bar-left">
+          <span>♻</span> CircularMatch <span>| HACKDAY 1.0</span>
+        </div>
+        <div class="brand-bar-right">
+          <span>Team: <strong>Solo Levelling (Shivansh Gupta)</strong></span>
+          <span>Slide 1/7</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ═════════════════════════════════════════════════
+         SLIDE 2 — PROPOSED SOLUTION + FLOW SCREENSHOTS
+         ═════════════════════════════════════════════════ -->
+    <section class="slide" id="s2">
+      <div class="orb" style="width:420px; height:420px; top:-60px; right:-50px; background:#0d9488;"></div>
+      
+      <div class="col-left">
+        <div class="stagger-1">
+          <span class="chip chip-green">Slide 2 of 7 — Proposed Solution</span>
+          <h2 class="headline-large" style="margin-top:8px;">
+            <span class="hl-gradient">CircularMatch</span> — AI-assisted industrial qualification & matching platform
+          </h2>
+          <p style="font-size:12px; color:var(--muted); margin-top:4px;">
+            Turning unstructured waste listings into standardized Material Passports matched deterministically against buyer specs.
+          </p>
+        </div>
+
+        <div class="s2-features-grid stagger-2">
+          <div class="s2-card">
+            <div class="s2-card-title">💬 Plain Language Input</div>
+            <div class="s2-card-desc">Supplier describes waste naturally — Gemini AI structures it instantly into a standardized, schema-validated material record.</div>
+          </div>
+          <div class="s2-card">
+            <div class="s2-card-title">📋 Material Passport</div>
+            <div class="s2-card-desc">Every batch gets a digital passport tracking grade, quantity, lot location, evidence state, and eligibility gates.</div>
+          </div>
+          <div class="s2-card">
+            <div class="s2-card-title">🎯 6-Dimension Engine</div>
+            <div class="s2-card-desc">Proprietary matching algorithm scores lots against exact buyer acceptance criteria with 100% transparency.</div>
+          </div>
+          <div class="s2-card">
+            <div class="s2-card-title">💡 "Why This Match?" AI</div>
+            <div class="s2-card-desc">Generates human-readable explanations of strengths, potential risks, and recommendations — no black-box scores.</div>
+          </div>
+        </div>
+
+        <!-- The Core Flow -->
+        <div class="flow-steps-bar-mini stagger-3">
+          <div class="flow-step-item-mini"><div class="step-badge-mini">1</div><div class="step-info-title-mini">Plain Language</div></div>
+          <span style="color:var(--g1); font-size:10px;">→</span>
+          <div class="flow-step-item-mini"><div class="step-badge-mini">2</div><div class="step-info-title-mini">AI Extraction</div></div>
+          <span style="color:var(--g1); font-size:10px;">→</span>
+          <div class="flow-step-item-mini"><div class="step-badge-mini">3</div><div class="step-info-title-mini">Passport</div></div>
+          <span style="color:var(--g1); font-size:10px;">→</span>
+          <div class="flow-step-item-mini"><div class="step-badge-mini">4</div><div class="step-info-title-mini">6-D Matching</div></div>
+          <span style="color:var(--g1); font-size:10px;">→</span>
+          <div class="flow-step-item-mini"><div class="step-badge-mini">5</div><div class="step-info-title-mini">Explainable AI</div></div>
+          <span style="color:var(--g1); font-size:10px;">→</span>
+          <div class="flow-step-item-mini"><div class="step-badge-mini">6</div><div class="step-info-title-mini">Shipment</div></div>
+        </div>
+      </div>
+
+      <div class="col-right">
+        <!-- Dual Collaged Screenshots: Natural Language Input & Material Passport -->
+        <div class="screen-window stagger-2" onclick="openLightbox('screenshots/slide2_list_waste.png')" style="margin-bottom:8px;">
+          <div class="screen-header">
+            <div class="screen-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <div class="screen-title">1. Natural Language Extraction · Gemini 2.0</div>
+            <span class="chip chip-teal" style="font-size:8px; padding:1px 6px;">AI Parser</span>
+          </div>
+          <img class="screen-img" src="screenshots/slide2_list_waste.png" alt="List Waste Screen" style="height:230px;" />
+        </div>
+
+        <div class="screen-window stagger-3" onclick="openLightbox('screenshots/slide2_passport.png')">
+          <div class="screen-header">
+            <div class="screen-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <div class="screen-title">2. Material Passport with Chain-of-Custody</div>
+            <span class="chip chip-green" style="font-size:8px; padding:1px 6px;">Passport</span>
+          </div>
+          <img class="screen-img" src="screenshots/slide2_passport.png" alt="Material Passport Screen" style="height:230px;" />
+        </div>
+      </div>
+
+      <footer class="brand-bar">
+        <div class="brand-bar-left">
+          <span>♻</span> CircularMatch <span>| HACKDAY 1.0</span>
+        </div>
+        <div class="brand-bar-right">
+          <span>Core Flow: <strong>Input → Extraction → Passport → Match → Shipment</strong></span>
+          <span>Slide 2/7</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ═════════════════════════════════════════════════
+         SLIDE 3 — TARGET USERS + BALANCED DUAL MOCKUP
+         ═════════════════════════════════════════════════ -->
+    <section class="slide" id="s3">
+      <div class="col-left">
+        <div class="stagger-1">
+          <span class="chip chip-teal">Slide 3 of 7 — Target Users</span>
+          <h2 class="headline-large" style="margin-top:6px; font-size:27px;">
+            Two sides. <span class="hl-gradient">One regulatory & financial imperative.</span>
+          </h2>
+          <p class="subtitle" style="font-size:12px; margin-top:3px;">Solving compliance failure for sellers and gate rejection financial loss for buyers.</p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px; margin:8px 0;">
+          <!-- Supplier Card -->
+          <div class="user-card-horizontal supplier stagger-2">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+              <span class="chip chip-green" style="font-size:9.5px; padding:2px 8px;">🏭 SUPPLIER SIDE</span>
+              <strong style="color:var(--g1); font-size:12.5px; font-family:'Space Grotesk',sans-serif;">EHS / Operations Manager</strong>
+            </div>
+            <p style="font-size:11px; color:rgba(255,255,255,0.85); line-height:1.35;">
+              <strong>Profile:</strong> BSE/NSE-listed factory in Noida generating recurring industrial scraps (PET, cotton, corrugated) with mandatory SEBI BRSR Core filing.
+            </p>
+            <div style="background:rgba(239,68,68,0.09); border:1px solid rgba(239,68,68,0.25); border-radius:6px; padding:5px 8px; margin-top:5px; font-size:10.5px; color:#fca5a5;">
+              ⚠️ <strong>Pain Point:</strong> BRSR auditors reject broker receipts. They need verifiable digital chain-of-custody for statutory audits — currently zero digital records exist.
+            </div>
+          </div>
+
+          <!-- Buyer Card -->
+          <div class="user-card-horizontal buyer stagger-3">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+              <span class="chip chip-teal" style="font-size:9.5px; padding:2px 8px;">🔄 BUYER SIDE</span>
+              <strong style="color:var(--t1); font-size:12.5px; font-family:'Space Grotesk',sans-serif;">Procurement / Sourcing Manager</strong>
+            </div>
+            <p style="font-size:11px; color:rgba(255,255,255,0.85); line-height:1.35;">
+              <strong>Profile:</strong> Sourcing manager at registered recyclers or brand owners building EPR compliance supply chains needing pre-qualified lots.
+            </p>
+            <div style="background:rgba(239,68,68,0.09); border:1px solid rgba(239,68,68,0.25); border-radius:6px; padding:5px 8px; margin-top:5px; font-size:10.5px; color:#fca5a5;">
+              📉 <strong>Pain Point:</strong> 30–60% gate rejection rate on unverified lots. Every rejected truckload incurs 100% freight cost with zero usable material.
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom-line-banner stagger-4" style="font-size:11px; padding:8px 12px; margin-top:0;">
+          <strong>Why these two:</strong> The supplier has a regulatory mandate making documentation non-optional. The buyer has a financial loss making pre-qualification worth paying for.
+        </div>
+      </div>
+
+      <div class="col-right stagger-3">
+        <!-- Dual Mockup Window -->
+        <div class="screen-window" onclick="openLightbox('screenshots/slide3_dual_workspaces.png')" style="height:100%; display:flex; flex-direction:column;">
+          <div class="screen-header">
+            <div class="screen-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <div class="screen-title">Dual Workspaces · Seller (EHS) & Buyer (Procurement) Dashboards</div>
+            <span style="font-size:9px; color:var(--g1); font-weight:600;">🔍 Zoom</span>
+          </div>
+          <div style="flex:1; overflow:hidden; display:flex; align-items:center; justify-content:center; background:#07101c;">
+            <img class="screen-img" src="screenshots/slide3_dual_workspaces.png" alt="Dual Workspace Mockup" style="width:100%; height:100%; object-fit:contain;" />
+          </div>
+        </div>
+      </div>
+
+      <footer class="brand-bar">
+        <div class="brand-bar-left">
+          <span>♻</span> CircularMatch <span>| HACKDAY 1.0</span>
+        </div>
+        <div class="brand-bar-right">
+          <span>Market Focus: <strong>Delhi NCR Industrial Clusters (Noida / Gr. Noida)</strong></span>
+          <span>Slide 3/7</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ═════════════════════════════════════════════════
+         SLIDE 4 — TECHNICAL APPROACH + MATCH BREAKDOWN SCREENSHOT
+         ═════════════════════════════════════════════════ -->
+    <section class="slide" id="s4">
+      <div class="col-left">
+        <div class="stagger-1">
+          <span class="chip chip-teal">Slide 4 of 7 — Technical Approach</span>
+          <h2 class="headline-large" style="margin-top:6px; font-size:28px;">
+            Full-Stack <span class="hl-gradient">System Architecture</span>
+          </h2>
+        </div>
+
+        <!-- Stack Table -->
+        <table class="stack-table-mini stagger-2">
+          <thead>
+            <tr><th>Layer</th><th>Technology</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="layer-col">Frontend</td><td>React 18 + TypeScript + Vite + Tailwind CSS</td></tr>
+            <tr><td class="layer-col">Backend</td><td>FastAPI (Python) + Uvicorn + Pydantic v2</td></tr>
+            <tr><td class="layer-col">Database</td><td>Supabase PostgreSQL (migrations written)</td></tr>
+            <tr><td class="layer-col">AI Core</td><td>Google Gemini 2.0 Flash — structured JSON output</td></tr>
+            <tr><td class="layer-col">AI Fallback</td><td>Deterministic rule-based regex extractor (zero API failure)</td></tr>
+            <tr><td class="layer-col">Maps</td><td>Leaflet — Delhi NCR match routes rendered</td></tr>
+            <tr><td class="layer-col">Deploy</td><td>Vercel (Frontend) + Render (API backend)</td></tr>
+          </tbody>
+        </table>
+
+        <!-- Two AI Features -->
+        <div class="stagger-3" style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 12px; font-size:11px; margin-bottom:6px;">
+          <strong style="color:var(--g1);">Feature 1 — Natural Language Extraction:</strong>
+          <div style="color:rgba(255,255,255,0.65); font-family:'JetBrains Mono',monospace; font-size:10px; margin-top:2px;">
+            "2 tonnes cotton cutting waste from Noida, Grade A" → extracted into schema instantly
+          </div>
+        </div>
+
+        <div class="stagger-4" style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 12px; font-size:11px;">
+          <strong style="color:var(--t1);">Feature 2 — Match Explanation ("Why this match?"):</strong>
+          <div style="color:rgba(255,255,255,0.65); font-size:10.5px; margin-top:2px;">
+            Deterministic 6-D score passed to Gemini → 2–3 sentence breakdown of strengths and risks. <em>AI explains the score — does not determine it.</em>
+          </div>
+        </div>
+
+        <div class="stagger-5" style="background:rgba(74,222,128,0.08); border:1px solid rgba(74,222,128,0.25); border-radius:8px; padding:6px 12px; font-size:10.5px; color:rgba(255,255,255,0.85); margin-top:4px;">
+          🛡️ <strong>Reliability:</strong> Gemini fails → rule-based extractor takes over automatically.
+        </div>
+      </div>
+
+      <div class="col-right">
+        <!-- Live App Screenshot: Match Results & Score Breakdown -->
+        <div class="screen-window stagger-2" onclick="openLightbox('screenshots/slide4_match_detail.png')">
+          <div class="screen-header">
+            <div class="screen-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <div class="screen-title">Match Detail · 6-D Score Breakdown & Gemini Explanation</div>
+            <span class="chip chip-green" style="font-size:8px; padding:1px 6px;">Live Engine</span>
+          </div>
+          <img class="screen-img" src="screenshots/slide4_match_detail.png" alt="Match Breakdown Screen" style="height: 440px;" />
+        </div>
+
+        <div class="stagger-3" style="display:flex; gap:6px; margin-top:6px;">
+          <span class="chip chip-green" style="font-size:9px;">Eligible Gate</span>
+          <span class="chip chip-yellow" style="font-size:9px;">Needs Sample</span>
+          <span class="chip chip-teal" style="font-size:9px;">Distance & CO2e</span>
+        </div>
+      </div>
+
+      <footer class="brand-bar">
+        <div class="brand-bar-left">
+          <span>♻</span> CircularMatch <span>| HACKDAY 1.0</span>
+        </div>
+        <div class="brand-bar-right">
+          <span>Repo: <strong>github.com/shivanshguptaa070-del/circularmatch</strong></span>
+          <span>Slide 4/7</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ═════════════════════════════════════════════════
+         SLIDE 5 — MARKET & BUSINESS + IMPACT SCREENSHOT
+         ═════════════════════════════════════════════════ -->
+    <section class="slide" id="s5">
+      <div class="col-left">
+        <div class="stagger-1">
+          <span class="chip chip-green">Slide 5 of 7 — Market & Business Potential</span>
+          <h2 class="headline-large" style="margin-top:6px; font-size:28px;">
+            Market Size & <span class="hl-gradient">Monetization Model</span>
+          </h2>
+        </div>
+
+        <!-- Market Size Metrics -->
+        <div class="stagger-2" style="display:flex; gap:8px; margin:8px 0;">
+          <div style="flex:1; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 10px;">
+            <div style="font-size:9.5px; color:var(--muted); text-transform:uppercase;">TAM (India)</div>
+            <div style="font-size:17px; font-weight:800; color:var(--g1); font-family:'Space Grotesk',sans-serif;">₹80K–1.2L Cr</div>
+            <div style="font-size:9.5px; color:var(--muted);">Secondary materials</div>
+          </div>
+          <div style="flex:1; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 10px;">
+            <div style="font-size:9.5px; color:var(--muted); text-transform:uppercase;">SAM (NCR)</div>
+            <div style="font-size:17px; font-weight:800; color:var(--t1); font-family:'Space Grotesk',sans-serif;">₹3K–10K Cr</div>
+            <div style="font-size:9.5px; color:var(--muted);">Industrial clusters</div>
+          </div>
+          <div style="flex:1; background:rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 10px;">
+            <div style="font-size:9.5px; color:var(--muted); text-transform:uppercase;">Wedge</div>
+            <div style="font-size:17px; font-weight:800; color:var(--yellow); font-family:'Space Grotesk',sans-serif;">500 Cos</div>
+            <div style="font-size:9.5px; color:var(--muted);">BRSR mandated</div>
+          </div>
+        </div>
+
+        <!-- 3-Layer Business Model Table -->
+        <table class="biz-table-mini stagger-3">
+          <thead>
+            <tr><th>Layer</th><th>Product</th><th>Price</th><th>Why Sticky</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="biz-badge hook">Hook</span></td>
+              <td>Free listing + matching</td>
+              <td><strong>₹0</strong></td>
+              <td>Acquires both sides rapidly</td>
+            </tr>
+            <tr>
+              <td><span class="biz-badge rev">Revenue</span></td>
+              <td>EHS Compliance SaaS</td>
+              <td><strong>₹5K–15K/mo</strong></td>
+              <td>BRSR audit trail lives here — bypass = failure</td>
+            </tr>
+            <tr>
+              <td><span class="biz-badge up">Upsell</span></td>
+              <td>Verification per lot</td>
+              <td><strong>₹500–5K/lot</strong></td>
+              <td>Eliminates 30–60% buyer gate rejection risk</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="bottom-line-banner stagger-4" style="font-size:11.5px; padding:8px 12px; margin-top:4px;">
+          <strong>The un-bypassable insight:</strong> We don't charge transaction fees. We charge for the compliance audit trail their SEBI auditor legally requires. <em>Leave the platform — lose the audit record.</em>
+        </div>
+      </div>
+
+      <div class="col-right">
+        <!-- Live App Screenshot: Impact & Economics Screen -->
+        <div class="screen-window stagger-2" onclick="openLightbox('screenshots/slide5_impact.png')">
+          <div class="screen-header">
+            <div class="screen-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <div class="screen-title">Impact & Economics Dashboard · Tonnes, Value & CO2e</div>
+            <span class="chip chip-green" style="font-size:8px; padding:1px 6px;">Live Impact</span>
+          </div>
+          <img class="screen-img" src="screenshots/slide5_impact.png" alt="Impact Dashboard Screen" style="height: 440px;" />
+        </div>
+
+        <div class="stagger-3" style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:8px; padding:6px 12px; font-size:10.5px; color:rgba(255,255,255,0.8); margin-top:6px;">
+          📈 <strong>Proven Scale:</strong> Recykal reached <strong>₹1,498 Cr GMV</strong> in FY26 — validating massive demand for digital waste networks.
+        </div>
+      </div>
+
+      <footer class="brand-bar">
+        <div class="brand-bar-left">
+          <span>♻</span> CircularMatch <span>| HACKDAY 1.0</span>
+        </div>
+        <div class="brand-bar-right">
+          <span>Commercial Model: <strong>SaaS Compliance + Lot Verification (Zero Tx Tax)</strong></span>
+          <span>Slide 5/7</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ═════════════════════════════════════════════════
+         SLIDE 6 — SCALABILITY & ADMIN CONFIG SCREENSHOT
+         ═════════════════════════════════════════════════ -->
+    <section class="slide" id="s6">
+      <div class="col-left">
+        <div class="stagger-1">
+          <span class="chip chip-green">Slide 6 of 7 — Scalability & Future</span>
+          <h2 class="headline-large" style="margin-top:6px; font-size:28px;">
+            Modular Architecture <span class="hl-gradient">Built to Scale</span>
+          </h2>
+        </div>
+
+        <!-- Architecture Live Capabilities -->
+        <div class="stagger-2" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:8px 0;">
+          <div style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 10px;">
+            <div style="font-size:11px; font-weight:700; color:#fff;">🗄️ In-Memory → Supabase</div>
+            <div style="font-size:9.5px; color:var(--muted); line-height:1.35;">Swap demo to live Postgres with 0 code changes (migrations written).</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 10px;">
+            <div style="font-size:11px; font-weight:700; color:#fff;">🤖 Pluggable AI Service</div>
+            <div style="font-size:9.5px; color:var(--muted); line-height:1.35;">Swap Gemini model/provider without touching application logic.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 10px;">
+            <div style="font-size:11px; font-weight:700; color:#fff;">⚖️ Configurable Weights</div>
+            <div style="font-size:9.5px; color:var(--muted); line-height:1.35;">Tunable matching weights via the built-in admin panel.</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 10px;">
+            <div style="font-size:11px; font-weight:700; color:#fff;">🏢 Multi-Company Schema</div>
+            <div style="font-size:9.5px; color:var(--muted); line-height:1.35;">Organization model and RBAC already structured in database.</div>
+          </div>
+        </div>
+
+        <!-- 12-Month Roadmap Strip -->
+        <div class="stagger-3" style="font-size:10px; font-weight:700; text-transform:uppercase; color:var(--t1); margin-top:4px;">
+          12-Month Commercial Roadmap
+        </div>
+        <div class="timeline-strip stagger-3">
+          <div class="timeline-strip-box">
+            <div class="t-badge">Month 1–3</div>
+            <div class="t-title">5 Pilots</div>
+            <div class="t-desc">Paying EHS clients in Noida</div>
+          </div>
+          <div class="timeline-strip-box">
+            <div class="t-badge">Month 3–6</div>
+            <div class="t-title">Live Tx</div>
+            <div class="t-desc">Audited chain-of-custody</div>
+          </div>
+          <div class="timeline-strip-box">
+            <div class="t-badge">Month 6–9</div>
+            <div class="t-title">BRSR PDF</div>
+            <div class="t-desc">Certificate generation live</div>
+          </div>
+          <div class="timeline-strip-box">
+            <div class="t-badge">Month 9–12</div>
+            <div class="t-title">Pre-Seed</div>
+            <div class="t-desc">Greenovation Oct 31, 2026</div>
+          </div>
+        </div>
+
+        <div class="bottom-line-banner stagger-4" style="font-size:11px; padding:8px 12px; margin-top:4px;">
+          <strong>Data Moat:</strong> First mover with labeled industrial scrap quality outcomes & rejections owns the pricing intelligence layer.
+        </div>
+      </div>
+
+      <div class="col-right">
+        <!-- Live App Screenshot: Admin Config -->
+        <div class="screen-window stagger-2" onclick="openLightbox('screenshots/slide6_admin.png')">
+          <div class="screen-header">
+            <div class="screen-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <div class="screen-title">Admin Console · Configurable Matching Weights & Catalogs</div>
+            <span class="chip chip-yellow" style="font-size:8px; padding:1px 6px;">Admin Panel</span>
+          </div>
+          <img class="screen-img" src="screenshots/slide6_admin.png" alt="Admin Screen" style="height: 440px;" />
+        </div>
+
+        <div class="stagger-3" style="font-size:10px; color:var(--muted); text-align:right; margin-top:6px;">
+          Scale Path: NCR → Mumbai → Surat → Ludhiana | 50+ categories | EU DPP (Feb 2027)
+        </div>
+      </div>
+
+      <footer class="brand-bar">
+        <div class="brand-bar-left">
+          <span>♻</span> CircularMatch <span>| HACKDAY 1.0</span>
+        </div>
+        <div class="brand-bar-right">
+          <span>Scale Architecture: <strong>Configurable Weights + Pluggable AI + Supabase</strong></span>
+          <span>Slide 6/7</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- ═════════════════════════════════════════════════
+         SLIDE 7 — IF WE HAD MORE TIME + MAP ROUTING SCREENSHOT
+         ═════════════════════════════════════════════════ -->
+    <section class="slide" id="s7">
+      <div class="col-left">
+        <div class="stagger-1">
+          <span class="chip chip-teal">Slide 7 of 7 — Next Phase Engineering</span>
+          <h2 class="headline-large" style="margin-top:6px; font-size:26px;">
+            If We Had More Time — <span class="hl-gradient">Prioritized Next Steps</span>
+          </h2>
+        </div>
+
+        <div class="stagger-2">
+          <div class="priority-item-row">
+            <div class="priority-badge-circle">1</div>
+            <div class="priority-text">
+              <h5>BRSR Compliance Certificate Generator</h5>
+              <p>Cryptographically signed chain-of-custody PDF directly accepted in SEBI audit filings.</p>
+            </div>
+          </div>
+
+          <div class="priority-item-row">
+            <div class="priority-badge-circle">2</div>
+            <div class="priority-text">
+              <h5>AI Photo Quality Grading</h5>
+              <p>Computer vision analyzes scrap photo for contamination score & grade before dispatch.</p>
+            </div>
+          </div>
+
+          <div class="priority-item-row">
+            <div class="priority-badge-circle">3</div>
+            <div class="priority-text">
+              <h5>Live Supabase Cloud Persistence</h5>
+              <p>Migrations & Auth schemas written. 1 env var away from persistent cloud storage.</p>
+            </div>
+          </div>
+
+          <div class="priority-item-row">
+            <div class="priority-badge-circle">4</div>
+            <div class="priority-text">
+              <h5>EPR Credit Chain Documentation</h5>
+              <p>Connect EPR brands directly with CPCB-registered recyclers with traceable plastic credits.</p>
+            </div>
+          </div>
+
+          <div class="priority-item-row">
+            <div class="priority-badge-circle">5</div>
+            <div class="priority-text">
+              <h5>EU Digital Product Passport (DPP)</h5>
+              <p>JSON-LD passports with GS1 QR codes for Indian exporters facing EU ESPR by Feb 2027.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Submission Bar -->
+        <div class="stagger-3" style="background:rgba(15,23,42,0.85); border:1px solid rgba(74,222,128,0.3); border-radius:10px; padding:8px 12px; display:flex; justify-content:space-between; font-size:11px;">
+          <div>
+            <span style="color:var(--muted); text-transform:uppercase; font-size:9px; font-weight:700;">Project:</span>
+            <strong style="color:var(--g1); margin-left:4px;">CircularMatch</strong>
+          </div>
+          <div>
+            <span style="color:var(--muted); text-transform:uppercase; font-size:9px; font-weight:700;">Team:</span>
+            <strong style="margin-left:4px;">Solo Levelling (Shivansh Gupta)</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-right">
+        <!-- Live App Screenshot: Delhi NCR Map Routing -->
+        <div class="screen-window stagger-2" onclick="openLightbox('screenshots/slide7_map.png')">
+          <div class="screen-header">
+            <div class="screen-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+            <div class="screen-title">Interactive Geospatial Routing · Delhi NCR Matching Hubs</div>
+            <span class="chip chip-green" style="font-size:8px; padding:1px 6px;">Map Engine</span>
+          </div>
+          <img class="screen-img" src="screenshots/slide7_map.png" alt="Geospatial Map Routing" style="height: 420px;" />
+        </div>
+
+        <div class="stagger-3" style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:11px;">
+          <span style="color:var(--muted);">Repo: <a href="https://github.com/shivanshguptaa070-del/circularmatch" target="_blank" style="color:var(--t1); text-decoration:none;">github.com/shivanshguptaa070-del/circularmatch</a></span>
+          <span style="color:var(--g1); font-weight:700;">HACKDAY 1.0</span>
+        </div>
+      </div>
+
+      <footer class="brand-bar">
+        <div class="brand-bar-left">
+          <span>♻</span> CircularMatch <span>| HACKDAY 1.0</span>
+        </div>
+        <div class="brand-bar-right">
+          <span>Final Status: <strong>Ready for Submission (HACKDAY 1.0 — team DECODEP)</strong></span>
+          <span>Slide 7/7</span>
+        </div>
+      </footer>
+    </section>
+
+  </main>
+
+  <!-- Bottom Floating Navigation -->
+  <nav id="nav">
+    <button class="nav-btn" onclick="navigate(-1)" title="Previous slide (Left Arrow)">◀</button>
+    <div class="dots" id="nav-dots"></div>
+    <span id="counter">Cover · 1/8</span>
+    <button class="nav-btn" onclick="navigate(1)" title="Next slide (Right Arrow / Space)">▶</button>
+  </nav>
+
+  <!-- Laser Pointer Dot -->
+  <div id="laser-pointer"></div>
+
+  <!-- Speaker Notes Prompter Bar -->
+  <div id="speaker-notes-bar">
+    <span class="notes-tag">SPEAKER NOTE</span>
+    <div id="notes-content">Slide talking points loading...</div>
+    <button class="notes-close" onclick="toggleNotes()">✕</button>
+  </div>
+
+  <!-- Slide Sorter Drawer -->
+  <div id="sorter-drawer">
+    <div class="sorter-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:20px;">🗂️</span>
+        <h3 style="font-family:'Outfit','Space Grotesk',sans-serif; color:var(--g1); font-size:20px; font-weight:700;">
+          Slide Sorter & Jump Overview
+        </h3>
+        <span style="font-size:12px; color:var(--muted);">(Click any slide or press 0–7)</span>
+      </div>
+      <button class="modal-close" onclick="toggleSlideSorter()">✕</button>
+    </div>
+    <div class="sorter-grid" id="sorter-grid-container"></div>
+  </div>
+
+  <!-- Lightbox Modal for Full-Res Screenshot Viewing -->
+  <div id="lightbox-modal" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="Full Resolution Screenshot" />
+  </div>
+
+  <!-- Submission Details Modal for easy copy-pasting -->
+  <div id="submission-modal">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <h3 style="font-family:'Space Grotesk',sans-serif; color:var(--g1); font-size:22px; margin-bottom:16px;">
+        📋 HACKDAY 1.0 Submission Details
+      </h3>
+
+      <div class="modal-field">
+        <label>Project Title</label>
+        <div class="field-val">CircularMatch</div>
+      </div>
+
+      <div class="modal-field">
+        <label>One-Line Description</label>
+        <div class="field-val">AI-assisted industrial material qualification and matching platform — turning waste listings into structured Material Passports and matching them against buyer requirements with explainable AI reasoning.</div>
+      </div>
+
+      <div class="modal-field">
+        <label>Team Name & Members</label>
+        <div class="field-val">Solo Levelling — Shivansh Gupta</div>
+      </div>
+
+      <div class="modal-field">
+        <label>GitHub Repository</label>
+        <div class="field-val">https://github.com/shivanshguptaa070-del/circularmatch</div>
+      </div>
+
+      <div class="modal-field">
+        <label>Live Demo URL</label>
+        <div class="field-val">http://localhost:5173/dashboard?demo=seller</div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:16px;">
+        <a class="action-btn btn-accent" href="CircularMatch_HACKDAY_Pitch.pptx" download="CircularMatch_HACKDAY_Pitch.pptx">Download PPTX</a>
+        <a class="action-btn btn-accent" href="CircularMatch_Pitch_Deck.pdf" download="CircularMatch_Pitch_Deck.pdf">Download PDF</a>
+        <button class="action-btn btn-accent" onclick="window.print()">Print / PDF</button>
+        <button class="action-btn" onclick="closeModal()">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dotsContainer = document.getElementById('nav-dots');
+    const counterEl = document.getElementById('counter');
+    const progressFill = document.getElementById('progress-fill');
+    let currentSlide = 0;
+
+    // Speaker Notes Data
+    const speakerNotes = [
+      "Cover Page: Welcome judges to CircularMatch — AI-Assisted Industrial Material Qualification & Matching Platform for HACKDAY 1.0 (team DECODEP). Built by Solo Levelling (Shivansh Gupta). We solve India's ₹80,000 Cr industrial waste qualification crisis by turning plain-language scrap into verified Material Passports and matching them against buyer specs with explainable AI & SEBI BRSR compliance.",
+      "Slide 1 (Problem): Hook judges on the ₹80,000 Cr scale. Highlight that discovery is solved by WhatsApp, but QUALIFICATION has a 30-60% gate rejection rate and SEBI BRSR creates regulatory liability for undocumented waste.",
+      "Slide 2 (Solution): Walk through the 4 pillars: Plain language input -> Structured Material Passport -> 6-D deterministic engine -> Gemini explainable reasoning. Note: AI explains the score, does NOT determine it.",
+      "Slide 3 (Target Users): Contrast the two sides: Suppliers have mandatory BRSR Core filing and lack digital proof; Buyers have financial losses from 30-60% gate rejections. Both need CircularMatch.",
+      "Slide 4 (Technical Approach): Production-ready stack: FastAPI + React 18 + Supabase PostgreSQL + Gemini 2.0 Flash with deterministic regex fallback for zero-downtime reliability.",
+      "Slide 5 (Business Potential): The un-bypassable insight: Don't charge transaction fees that brokers bypass. Charge for the statutory compliance audit trail. Leave platform = fail BRSR audit.",
+      "Slide 6 (Scalability): Show system maturity: In-memory to Supabase switch ready, pluggable AI providers, admin weights calibration dashboard, multi-tenant RBAC.",
+      "Slide 7 (Roadmap): Show ambition: Cryptographic BRSR certificates, Computer Vision photo grading, EPR credit tracking, and EU Digital Product Passport (DPP) compliance."
+    ];
+
+    const slideMeta = [
+      { num: "00", title: "Cover Page", desc: "CircularMatch — HACKDAY 1.0 Official Submission · team DECODEP" },
+      { num: "01", title: "Problem Statement", desc: "₹80k Cr market, 30-60% gate rejection, SEBI BRSR audit failure" },
+      { num: "02", title: "Proposed Solution", desc: "Plain language AI parsing, Material Passports, 6-D engine" },
+      { num: "03", title: "Target Users", desc: "EHS Manager (Sellers) vs Procurement Manager (Buyers)" },
+      { num: "04", title: "Technical Approach", desc: "FastAPI + React 18 + Supabase + Gemini 2.0 with regex fallback" },
+      { num: "05", title: "Market & Business", desc: "₹80k-120k Cr TAM, EHS SaaS compliance lock-in" },
+      { num: "06", title: "Scalability & Future", desc: "Modular architecture, tunable weights, 12-mo commercial roadmap" },
+      { num: "07", title: "If We Had More Time", desc: "BRSR Certificates, CV Photo Grading, EU DPP, EPR Credits" }
+    ];
+
+    // Subtle audio feedback using Web Audio API
+    const audioCtx = (window.AudioContext || window.webkitAudioContext) ? new (window.AudioContext || window.webkitAudioContext)() : null;
+    function playSlideSound() {
+      if (!audioCtx) return;
+      try {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+      } catch(e) {}
+    }
+
+    // Build dot indicators
+    slides.forEach((_, idx) => {
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (idx === 0 ? ' active' : '');
+      dot.onclick = () => goToSlide(idx);
+      dotsContainer.appendChild(dot);
+    });
+
+    // Populate Slide Sorter
+    const sorterContainer = document.getElementById('sorter-grid-container');
+    slideMeta.forEach((meta, idx) => {
+      const card = document.createElement('div');
+      card.className = 'sorter-card' + (idx === 0 ? ' active' : '');
+      card.id = `sorter-card-${idx}`;
+      card.innerHTML = `
+        <span class="sorter-num">SLIDE ${meta.num}</span>
+        <div class="sorter-title">${meta.title}</div>
+        <div class="sorter-desc">${meta.desc}</div>
+      `;
+      card.onclick = () => {
+        goToSlide(idx);
+        toggleSlideSorter();
+      };
+      sorterContainer.appendChild(card);
+    });
+
+    function updateSpeakerNotes() {
+      const notesContent = document.getElementById('notes-content');
+      if (notesContent && speakerNotes[currentSlide]) {
+        notesContent.textContent = speakerNotes[currentSlide];
+      }
+    }
+
+    function goToSlide(targetIdx) {
+      if (targetIdx === currentSlide) return;
+      playSlideSound();
+      
+      const prevIdx = currentSlide;
+      slides[prevIdx].classList.remove('active');
+      slides[prevIdx].classList.add('out');
+      
+      setTimeout(() => {
+        slides[prevIdx].classList.remove('out');
+      }, 320);
+
+      currentSlide = (targetIdx + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+
+      document.querySelectorAll('.dot')[prevIdx]?.classList.remove('active');
+      document.querySelectorAll('.dot')[currentSlide]?.classList.add('active');
+
+      document.querySelectorAll('.sorter-card')[prevIdx]?.classList.remove('active');
+      document.querySelectorAll('.sorter-card')[currentSlide]?.classList.add('active');
+
+      if (currentSlide === 0) {
+        counterEl.textContent = `Cover · 1/8`;
+      } else {
+        counterEl.textContent = `Slide ${currentSlide} / 7`;
+      }
+      progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+
+      updateSpeakerNotes();
+    }
+
+    function navigate(direction) {
+      goToSlide(currentSlide + direction);
+    }
+
+    // Auto-Play Slideshow Mode
+    let autoPlayTimer = null;
+    let autoPlayActive = false;
+    function toggleAutoPlay() {
+      autoPlayActive = !autoPlayActive;
+      const playBtn = document.getElementById('autoplay-btn');
+      const playIcon = document.getElementById('play-icon');
+      const playText = document.getElementById('play-text');
+      
+      if (autoPlayActive) {
+        playBtn.classList.add('btn-accent');
+        playIcon.textContent = '⏸';
+        playText.textContent = 'Pause';
+        autoPlayTimer = setInterval(() => {
+          navigate(1);
+        }, 8000);
+      } else {
+        playBtn.classList.remove('btn-accent');
+        playIcon.textContent = '▶';
+        playText.textContent = 'Auto-Play';
+        if (autoPlayTimer) clearInterval(autoPlayTimer);
+      }
+    }
+
+    // Laser Pointer Mode
+    let laserActive = false;
+    const laserEl = document.getElementById('laser-pointer');
+    function toggleLaser() {
+      laserActive = !laserActive;
+      const laserBtn = document.getElementById('laser-btn');
+      if (laserActive) {
+        laserEl.style.display = 'block';
+        laserBtn.classList.add('btn-accent');
+        document.body.style.cursor = 'none';
+      } else {
+        laserEl.style.display = 'none';
+        laserBtn.classList.remove('btn-accent');
+        document.body.style.cursor = 'default';
+      }
+    }
+    document.addEventListener('mousemove', (e) => {
+      if (laserActive) {
+        laserEl.style.left = e.clientX + 'px';
+        laserEl.style.top = e.clientY + 'px';
+      }
+    });
+
+    // Speaker Notes Prompter
+    let notesActive = false;
+    function toggleNotes() {
+      notesActive = !notesActive;
+      const bar = document.getElementById('speaker-notes-bar');
+      const notesBtn = document.getElementById('notes-btn');
+      if (notesActive) {
+        bar.classList.add('active');
+        notesBtn.classList.add('btn-accent');
+        updateSpeakerNotes();
+      } else {
+        bar.classList.remove('active');
+        notesBtn.classList.remove('btn-accent');
+      }
+    }
+
+    // Slide Sorter Drawer
+    function toggleSlideSorter() {
+      const drawer = document.getElementById('sorter-drawer');
+      drawer.classList.toggle('active');
+    }
+
+    // Keyboard Navigation & Shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        navigate(1);
+        if (e.key === ' ') e.preventDefault();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        navigate(-1);
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      } else if (e.key.toLowerCase() === 'p') {
+        toggleAutoPlay();
+      } else if (e.key.toLowerCase() === 'l') {
+        toggleLaser();
+      } else if (e.key.toLowerCase() === 'n') {
+        toggleNotes();
+      } else if (e.key.toLowerCase() === 's') {
+        toggleSlideSorter();
+      } else if (e.key === '0') {
+        goToSlide(0);
+      } else if (e.key >= '1' && e.key <= '7') {
+        goToSlide(parseInt(e.key));
+      } else if (e.key === 'Escape') {
+        closeModal();
+        closeLightbox();
+        document.getElementById('sorter-drawer').classList.remove('active');
+        if (notesActive) toggleNotes();
+        if (laserActive) toggleLaser();
+      }
+    });
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
+    }
+
+    // Lightbox handlers
+    function openLightbox(src) {
+      const modal = document.getElementById('lightbox-modal');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      modal.classList.add('open');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox-modal').classList.remove('open');
+    }
+
+    // Modal helpers
+    function openModal() {
+      document.getElementById('submission-modal').classList.add('open');
+    }
+    function closeModal() {
+      document.getElementById('submission-modal').classList.remove('open');
+    }
+
+    // Initialize Notes
+    updateSpeakerNotes();
+  </script>
+</body>
+</html>

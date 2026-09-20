@@ -317,6 +317,7 @@ export interface TimelineEvent {
   detail: string
   created_at: string
   record: Record<string, any>
+  is_demo?: boolean
 }
 
 export interface MatchDetail {

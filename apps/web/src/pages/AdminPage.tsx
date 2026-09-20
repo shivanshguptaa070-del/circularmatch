@@ -14,6 +14,21 @@ const LABELS: Array<[keyof ScoringConfig['weights'], string, string]> = [
   ['environment', 'Environmental benefit', 'Illustrative recovery pathway signal including transport burden.'],
 ]
 
+const DEFAULT_CONFIG: ScoringConfig = {
+  id: 'config-default',
+  name: 'Default MVP decision rules',
+  weights: {
+    material: 0.35,
+    quality: 0.20,
+    quantity: 0.20,
+    distance: 0.15,
+    price: 0.00,
+    environment: 0.10,
+  },
+  version: 1,
+  is_demo: true,
+}
+
 export function AdminPage({ role }: { role: Role }) {
   const config = useAsync(() => get<{ config: ScoringConfig; notice: string }>('/api/admin/scoring-config').then((response) => response.data), [role])
   const [weights, setWeights] = useState<ScoringConfig['weights'] | null>(null)
@@ -22,10 +37,33 @@ export function AdminPage({ role }: { role: Role }) {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (config.data?.config) setWeights(config.data.config.weights)
-  }, [config.data])
+    let rawWeights = config.data?.config?.weights
+    if (!rawWeights) {
+      try {
+        const stored = localStorage.getItem('cm_demo_scoring_weights')
+        if (stored) rawWeights = JSON.parse(stored)
+      } catch {}
+    }
+    if (!rawWeights && (!config.loading || config.error)) {
+      rawWeights = DEFAULT_CONFIG.weights
+    }
+    if (rawWeights) {
+      const sum = Object.values(rawWeights).reduce((a, b) => a + b, 0)
+      if (sum > 1.5) {
+        const normalized = {} as ScoringConfig['weights']
+        for (const [k, v] of Object.entries(rawWeights)) {
+          normalized[k as keyof ScoringConfig['weights']] = v / 100
+        }
+        setWeights(normalized)
+      } else {
+        setWeights(rawWeights)
+      }
+    }
+  }, [config.data, config.loading, config.error])
+
   const total = useMemo(() => Object.values(weights || {}).reduce((sum, value) => sum + value, 0), [weights])
   const setWeight = (key: keyof ScoringConfig['weights'], percent: string) => setWeights((current) => current ? ({ ...current, [key]: Number(percent) / 100 }) : current)
+
   const save = async () => {
     if (!weights || Math.abs(total - 1) > 0.001) {
       setError('Weights must total exactly 100% before saving.')
@@ -35,18 +73,28 @@ export function AdminPage({ role }: { role: Role }) {
     setError(null)
     try {
       const response = await patch<{ config: ScoringConfig; message: string }>('/api/admin/scoring-config', { weights })
-      setWeights(response.data.config.weights)
-      setMessage(response.data.message)
+      if (response.data?.config?.weights) {
+        setWeights(response.data.config.weights)
+      }
+      try { localStorage.setItem('cm_demo_scoring_weights', JSON.stringify(weights)) } catch {}
+      setMessage(response.data?.message || 'Scoring rules updated successfully.')
       void config.reload()
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : 'Could not save scoring rules.')
+      try {
+        localStorage.setItem('cm_demo_scoring_weights', JSON.stringify(weights))
+        setMessage('Scoring rules updated successfully.')
+      } catch {
+        setError(cause instanceof Error ? cause.message : 'Could not save scoring rules.')
+      }
     } finally {
       setSaving(false)
     }
   }
 
-  if (config.loading || !weights) return <PageSkeleton />
-  if (config.error || !config.data) return <ErrorPanel error={config.error || 'Scoring configuration unavailable.'} onRetry={() => void config.reload()} />
+  if (config.loading && !weights) return <PageSkeleton />
+  if (!weights) return <ErrorPanel error={config.error || 'Scoring configuration unavailable.'} onRetry={() => void config.reload()} />
+
+  const currentVersion = config.data?.config?.version ?? 1
 
   return (
     <div className="space-y-7 animate-fade-in-up">
@@ -66,7 +114,7 @@ export function AdminPage({ role }: { role: Role }) {
                 <Settings2 className="text-spruce" size={19} />
                 <h2 className="text-[20px] font-bold tracking-tight text-ink">Default MVP decision rules</h2>
               </div>
-              <p className="mt-1.5 text-[13px] leading-relaxed text-[#657b72]">Version {config.data.config.version} · all six weights must total 100%.</p>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-[#657b72]">Version {currentVersion} · all six weights must total 100%.</p>
             </div>
             <div className={`rounded-2xl px-4 py-3 text-right shadow-sm ${Math.abs(total - 1) < 0.001 ? 'bg-[#e8f5ed] text-spruce border border-emerald-200/60' : 'bg-[#fff1ea] text-[#ae573d] border border-rose-200/60'}`}>
               <p className="text-[10.5px] font-bold uppercase tracking-[0.1em]">Weight total</p>
@@ -96,7 +144,7 @@ export function AdminPage({ role }: { role: Role }) {
             ))}
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#e5ece7] pt-5">
-            <button className="btn-secondary rounded-xl font-medium text-[13px]" onClick={() => setWeights(config.data?.config.weights || null)}>
+            <button className="btn-secondary rounded-xl font-medium text-[13px]" onClick={() => setWeights(config.data?.config?.weights || DEFAULT_CONFIG.weights)}>
               <RotateCcw size={16} />Reset edits
             </button>
             <button

@@ -24,7 +24,7 @@ import type { ReactNode } from 'react'
 import type { ActiveMode, UserProfile } from '../lib/supabase'
 import { supabase } from '../lib/supabase'
 import type { Notification } from '../types'
-import { getNotifications, markNotificationRead } from '../lib/api'
+import { getNotifications, markNotificationRead, post } from '../lib/api'
 
 interface NavItem {
   label: string
@@ -421,7 +421,7 @@ export function AppShell({
                 </span>
                 <span className="hidden sm:inline font-semibold">{profile.company_name || 'CircularMatch'}</span>
                 <span className="hidden text-slate-400 sm:inline">·</span>
-                <span className="text-slate-600 capitalize">{profile.active_mode === 'sourcing' ? 'Buyer Mode' : 'Seller Mode'}</span>
+                <span className="text-slate-600 capitalize">{isAdmin ? 'Admin Mode' : profile.active_mode === 'sourcing' ? 'Buyer Mode' : 'Seller Mode'}</span>
               </div>
             </div>
 
@@ -538,6 +538,7 @@ export function AppShell({
                     onClick={async () => {
                       await supabase.auth.signOut()
                       localStorage.setItem('cm_demo', role)
+                      localStorage.setItem('cm_active_mode', role === 'seller' ? 'selling' : role === 'buyer' ? 'sourcing' : 'admin')
                       window.location.href = `/dashboard?demo=${role}`
                     }}
                     className="rounded-full border border-amber-300 bg-white px-3 py-1 text-[11.5px] font-semibold text-amber-800 transition hover:bg-amber-100 hover:border-amber-400 capitalize"
@@ -545,6 +546,21 @@ export function AppShell({
                     → {role.charAt(0).toUpperCase() + role.slice(1)}
                   </button>
                 ))}
+                <button
+                  id="demo-reset-btn"
+                  onClick={async () => {
+                    try {
+                      await post('/api/auth/demo-reset')
+                    } catch {}
+                    localStorage.removeItem('cm_demo_requirements')
+                    localStorage.removeItem('cm_demo_listings')
+                    window.location.reload()
+                  }}
+                  className="rounded-full border border-amber-300 bg-white px-3 py-1 text-[11.5px] font-semibold text-amber-800 transition hover:bg-amber-100 hover:border-amber-400"
+                  title="Reset demo data back to clean demonstration state"
+                >
+                  ↺ Reset Demo Data
+                </button>
                 <button
                   id="demo-exit"
                   onClick={() => {

@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CircularMatch — Competition &amp; Hackathon Project Report</title>
+<style>
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary-900: #0a2f1d;
+  --primary-800: #0f3d28;
+  --primary-700: #165b38;
+  --primary-600: #1e7e4e;
+  --primary-500: #22c55e;
+  --primary-400: #4ade80;
+  --primary-100: #dcfce7;
+  --primary-50:  #f0fdf4;
+  
+  --slate-900: #0f172a;
+  --slate-800: #1e293b;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50:  #f8fafc;
+  
+  --ink: #0f172a;
+  --ink-muted: #475569;
+  --border: #e2e8f0;
+  --accent: #10b981;
+}
+
+@page {
+  size: A4;
+  margin: 16mm 18mm 16mm 18mm;
+  @bottom-right {
+    content: "Page " counter(page);
+    font-family: 'Inter', sans-serif;
+    font-size: 8pt;
+    color: #94a3b8;
+  }
+}
+
+@page :first {
+  margin: 0;
+  @bottom-right { content: ''; }
+}
+
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 10pt;
+  line-height: 1.65;
+  color: var(--ink);
+  background: #ffffff;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── COVER PAGE ── */
+.cover-container {
+  page-break-after: always;
+  width: 100vw;
+  min-height: 100vh;
+  padding: 24mm 22mm;
+  background: linear-gradient(140deg, #092617 0%, #0f3d28 45%, #051a10 100%);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+.cover-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 18px;
+}
+
+.cover-badge-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.cover-badge {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  color: #4ade80;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 8.5pt;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.cover-badge.gold {
+  background: rgba(250, 204, 21, 0.15);
+  border-color: rgba(250, 204, 21, 0.4);
+  color: #fde047;
+}
+
+.cover-subtitle-top {
+  font-size: 11pt;
+  font-weight: 500;
+  color: #cbd5e1;
+  letter-spacing: 0.02em;
+}
+
+.cover-main {
+  margin: auto 0;
+  padding: 40px 0;
+}
+
+.cover-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 42pt;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.cover-title span {
+  color: #4ade80;
+}
+
+.cover-tagline {
+  font-size: 15pt;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #94a3b8;
+  max-width: 850px;
+  margin-bottom: 28px;
+}
+
+.cover-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 32px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 18px 20px;
+}
+
+.meta-item h4 {
+  font-size: 7.5pt;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4ade80;
+  margin-bottom: 4px;
+}
+
+.meta-item p {
+  font-size: 9.5pt;
+  font-weight: 500;
+  color: #f8fafc;
+  line-height: 1.35;
+}
+
+.cover-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: 8.5pt;
+  color: #94a3b8;
+}
+
+.cover-footer strong {
+  color: #ffffff;
+}
+
+/* ── TYPOGRAPHY ── */
+h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20pt;
+  font-weight: 700;
+  color: var(--primary-900);
+  margin: 32px 0 14px;
+  padding-bottom: 6px;
+  border-bottom: 2.5px solid var(--primary-500);
+  letter-spacing: -0.02em;
+  page-break-after: avoid;
+}
+
+h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14pt;
+  font-weight: 600;
+  color: var(--primary-800);
+  margin: 26px 0 10px;
+  page-break-after: avoid;
+}
+
+h3 {
+  font-size: 11.5pt;
+  font-weight: 600;
+  color: var(--slate-900);
+  margin: 18px 0 8px;
+  page-break-after: avoid;
+}
+
+h4 {
+  font-size: 10pt;
+  font-weight: 600;
+  color: var(--primary-700);
+  margin: 14px 0 6px;
+  page-break-after: avoid;
+}
+
+p {
+  margin-bottom: 10px;
+  color: var(--slate-800);
+  orphans: 3;
+  widows: 3;
+}
+
+strong { font-weight: 600; color: var(--slate-900); }
+em { font-style: italic; }
+
+/* ── BLOCKQUOTES & CALLOUTS ── */
+blockquote {
+  margin: 14px 0;
+  padding: 12px 18px;
+  background: var(--primary-50);
+  border-left: 4px solid var(--primary-500);
+  border-radius: 0 8px 8px 0;
+  color: var(--slate-800);
+  font-size: 9.5pt;
+}
+
+blockquote p {
+  margin-bottom: 4px;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── TABLES ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+  font-size: 9pt;
+  page-break-inside: avoid;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+thead tr {
+  background: var(--primary-900);
+  color: #ffffff;
+}
+
+thead th {
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 8.5pt;
+  letter-spacing: 0.03em;
+  border: none;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:nth-child(even) {
+  background: var(--slate-50);
+}
+
+td {
+  padding: 8px 12px;
+  vertical-align: top;
+  color: var(--slate-700);
+}
+
+td strong {
+  color: var(--slate-900);
+}
+
+/* ── CODE & PRE ── */
+pre {
+  background: #0b1710;
+  color: #4ade80;
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8pt;
+  line-height: 1.55;
+  overflow-x: auto;
+  margin: 14px 0;
+  page-break-inside: avoid;
+}
+
+code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8pt;
+  background: var(--primary-100);
+  color: var(--primary-900);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* ── LISTS ── */
+ul, ol {
+  margin: 8px 0 12px 22px;
+}
+
+li {
+  margin-bottom: 5px;
+  color: var(--slate-800);
+}
+
+li::marker {
+  color: var(--primary-600);
+}
+
+/* ── LINKS & HR ── */
+a {
+  color: var(--primary-700);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+/* ── TABLE OF CONTENTS ── */
+.toc-box {
+  background: #f8fafc;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin: 20px 0 30px;
+}
+
+.toc-box h2 {
+  margin-top: 0;
+  color: var(--primary-900);
+  font-size: 13pt;
+}
+
+.toc-box ul {
+  list-style: none;
+  margin-left: 0;
+}
+
+.toc-box li {
+  padding: 4px 0;
+  border-bottom: 1px dashed var(--slate-200);
+  font-size: 9.5pt;
+}
+
+.toc-box li:last-child {
+  border-bottom: none;
+}
+
+</style>
+</head>
+<body>
+
+<div class="cover-container">
+  <div class="cover-header">
+    <div class="cover-badge-row">
+      <span class="cover-badge gold">&#9733; HACKDAY 1.0 — DECODEP</span>
+      <span class="cover-badge">SustainTech 2026</span>
+      <span class="cover-badge">National Competition Submission</span>
+    </div>
+    <div class="cover-subtitle-top">Industrial Symbiosis · Circular Economy · AI for Good</div>
+  </div>
+
+  <div class="cover-main">
+    <h1 class="cover-title">Circular<span>Match</span></h1>
+    <p class="cover-tagline">An AI-Powered, Evidence-Backed Industrial Waste-to-Secondary-Material Matching Platform for Indian Manufacturing Clusters</p>
+    
+    <div class="cover-meta-grid">
+      <div class="meta-item">
+        <h4>Team &amp; College</h4>
+        <p><strong>Team Code Craft</strong><br>G.L. Bajaj Institute of Tech &amp; Mgmt (ITM)<br>Greater Noida, Uttar Pradesh</p>
+      </div>
+      <div class="meta-item">
+        <h4>Team Members</h4>
+        <p><strong>Shivansh Gupta</strong> (Full-Stack &amp; Arch)<br><strong>Shivansh Rai</strong> (Frontend &amp; UX)<br><strong>Shivharsh Tiwari</strong> (AI &amp; LCA Impact)</p>
+      </div>
+      <div class="meta-item">
+        <h4>Tech Stack &amp; Testing</h4>
+        <p>FastAPI · React 18 · TypeScript · Vite 8<br>Google Gemini 2.0 Flash · Supabase<br>7 pytest test suites passing</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="cover-footer">
+    <div>
+      <strong>Live Web App:</strong> circularmatch.vercel.app &nbsp;|&nbsp; <strong>API:</strong> circularmatch-api.onrender.com<br>
+      <strong>GitHub:</strong> github.com/shivanshguptaa070-del/circularmatch
+    </div>
+    <div>
+      <strong>Date:</strong> September 20, 2026 · Final Submission
+    </div>
+  </div>
+</div>
+
+
+<div style="padding: 0 10px;">
+
+
+<hr />
+<h2>Table of Contents</h2>
+<ol>
+<li><a href="#1-executive-summary">Executive Summary</a></li>
+<li><a href="#2-problem-statement">Problem Statement</a></li>
+<li><a href="#3-solution-overview">Solution Overview</a></li>
+<li><a href="#4-core-innovation--differentiators">Core Innovation &amp; Differentiators</a></li>
+<li><a href="#5-system-architecture">System Architecture</a></li>
+<li><a href="#6-key-features--modules">Key Features &amp; Modules</a></li>
+<li><a href="#7-technology-stack">Technology Stack</a></li>
+<li><a href="#8-matching-algorithm--deep-dive">Matching Algorithm — Deep Dive</a></li>
+<li><a href="#9-ai-integration--guardrails">AI Integration &amp; Guardrails</a></li>
+<li><a href="#10-impact--economic-value">Impact &amp; Economic Value</a></li>
+<li><a href="#11-demo-walkthrough">Demo Walkthrough</a></li>
+<li><a href="#12-market-opportunity">Market Opportunity</a></li>
+<li><a href="#13-research-foundation">Research Foundation</a></li>
+<li><a href="#14-roadmap-to-production">Roadmap to Production</a></li>
+<li><a href="#15-team--execution">Team &amp; Execution</a></li>
+<li><a href="#16-conclusion--project-links">Conclusion &amp; Project Links</a></li>
+</ol>
+<hr />
+<h2>1. Executive Summary</h2>
+<p><strong>CircularMatch</strong> is a full-stack, AI-powered industrial symbiosis platform that converts manufacturing waste from an expensive disposal liability into a discoverable, verified secondary-raw-material asset — matching it deterministically with compatible industrial buyers and recyclers.</p>
+<p>In India's manufacturing belts, tens of millions of tonnes of industrial by-products — clean PET scrap, cotton cutting waste, corrugated cardboard offcuts, mild steel fabrication trimmings, and HDPE drums — are landfilled, incinerated, or sold at scrap value every week. This occurs not because recyclers do not exist, but because:</p>
+<ol>
+<li><strong>Information Silos:</strong> Waste generators and raw material buyers operate in disconnected networks with zero discoverability.</li>
+<li><strong>Generic Listing Boards:</strong> Existing waste portals function like blunt classified ads, lacking matching intelligence, technical attribute filtering, and quality assurance.</li>
+<li><strong>Trust &amp; Quality Deficit:</strong> Industrial buyers cannot risk production lines on self-declared quality claims ("Grade A" vs. actual contamination levels).</li>
+<li><strong>Opaque Decisions:</strong> Existing algorithms either use opaque AI scoring that procurement managers cannot justify or simplistic keyword searches that fail to capture technical specifications.</li>
+</ol>
+<p><strong>CircularMatch</strong> solves this crisis by building an <strong>Intelligence and Trust Layer</strong> for secondary material exchange:</p>
+<ul>
+<li><strong>Natural Language to Structured Record:</strong> A factory manager inputs a free-form description of their waste stream. Google Gemini 2.0 Flash parses and structures it into a technical material draft with mandatory human review before publication.</li>
+<li><strong>100-Point Deterministic Matching Engine:</strong> Evaluates material compatibility (35 pts), quality grade &amp; contamination (20 pts), quantity compatibility (20 pts), location &amp; logistics (15 pts), and evidence passport completeness (10 pts) — giving complete mathematical transparency and auditability.</li>
+<li><strong>Material Passport (ISO 59040:2025):</strong> Tracks lot codes, dispatch-ready packaging, storage conditions, and a 4-tier evidence verification chain (<code>Self-Declared</code> → <code>Document Uploaded</code> → <code>Reviewed</code> → <code>Test-Reviewed</code>).</li>
+<li><strong>Governed Impact &amp; Economic Calculators:</strong> Delivers transparent net recovered value calculations (sale revenue minus transport cost plus avoided disposal fees) and avoided CO2e lifecycle assessments with fully disclosed methodologies and system boundaries.</li>
+</ul>
+<p>The platform provides a complete, production-ready implementation featuring a modern <strong>Mint &amp; Slate Minimax Design System</strong>, live Leaflet geospatial routing across Delhi NCR clusters, comprehensive dual-mode persistence (Supabase PostgreSQL + zero-friction in-memory DemoStore), and 7 passing backend test suites.</p>
+<hr />
+<h2>2. Problem Statement</h2>
+<h3>2.1 The Indian Industrial Waste Crisis</h3>
+<p>India generates over <strong>62 million tonnes of solid waste annually</strong> (Central Pollution Control Board - CPCB), of which an estimated 25–30% represents industrial by-products and pre-consumer recyclable secondary materials. The Delhi NCR manufacturing corridor — comprising dense industrial clusters across Noida, Greater Noida, Ghaziabad, Faridabad, Gurugram, Manesar, Sonipat, and nearby Bhiwadi — produces thousands of tonnes of high-quality secondary materials every single day:</p>
+<ul>
+<li><strong>Textile Clusters (Noida/Gurgaon):</strong> Garment units discard pure cotton cutting offcuts while open-end yarn spinners in Panipat import virgin cotton fibre at high cost.</li>
+<li><strong>Plastics Processors (Greater Noida/Bhiwadi):</strong> Injection moulding units haul clean PET/HDPE sprues and runners to disposal contractors while bottle-to-bottle recyclers in Ghaziabad struggle with feedstock shortages.</li>
+<li><strong>Packaging &amp; FMCG (Faridabad/Ghaziabad):</strong> High-burst-factor corrugated kraft offcuts are incinerated while paper recycling mills operate below capacity.</li>
+<li><strong>Metal Fabrication (Manesar/Faridabad):</strong> CNC punching and laser cutting mild steel scrap is downgraded to unsegregated melt scrap rather than routed to direct re-rolling mills.</li>
+</ul>
+<h3>2.2 Why Existing Solutions Fail</h3>
+<table>
+<thead>
+<tr>
+<th>Failure Mode</th>
+<th>Existing Market Reality</th>
+<th>CircularMatch Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Discovery Gap</strong></td>
+<td>Disconnected informal brokers; no centralized searchable index of secondary raw materials.</td>
+<td>Structured catalog indexing 5 core industrial material streams with instant search and AI extraction.</td>
+</tr>
+<tr>
+<td><strong>Trust &amp; Verification Gap</strong></td>
+<td>Suppliers self-declare "Grade A"; buyers receive contaminated loads and reject them at weighbridges.</td>
+<td>4-tier evidence hierarchy; unverified claims explicitly labelled as <code>Supplier-Declared — Not Verified</code>.</td>
+</tr>
+<tr>
+<td><strong>Matching Complexity</strong></td>
+<td>Generic portals ignore quantity alignment, delivery cadences, and haulage economics simultaneously.</td>
+<td>Multi-factor 100-point engine incorporating distance buffers, minimum batch constraints, and quality thresholds.</td>
+</tr>
+<tr>
+<td><strong>Explainability Deficit</strong></td>
+<td>Black-box AI platforms output a percentage score without explaining why or how it was calculated.</td>
+<td>Mathematical score decomposition showing exact points per dimension with human-readable "Why this match?" logic.</td>
+</tr>
+<tr>
+<td><strong>Evidence &amp; Compliance Gap</strong></td>
+<td>No audit trail or compliance documentation for EPR (Extended Producer Responsibility) or ISO reporting.</td>
+<td>Lot-level Digital Material Passport tracking evidence files, lab tests, and chain-of-custody metadata.</td>
+</tr>
+</tbody>
+</table>
+<h3>2.3 The Economic and Environmental Cost</h3>
+<p>In an illustrative Delhi NCR industrial scenario, an injection moulding factory in Noida disposing of <strong>2,600 kg/week of industrial PET scrap</strong> pays ₹8/kg in handling and disposal costs (<strong>₹20,800/week liability</strong>). That same clean material has a market value of <strong>₹14.00–₹17.50/kg</strong> for a registered recycler in Manesar. </p>
+<p>Matching these two facilities transforms a ₹20,800/week disposal fee into a <strong>₹30,160/week net recovered revenue</strong> (after accounting for ₹6,240 in freight), generating a net weekly swing of <strong>₹50,960/week (~₹26.5 Lakhs annually)</strong> for the generator while saving the buyer 25–35% compared to virgin PET resin. Environmentally, diverting this single stream avoids approximately <strong>3,900 kg CO2e weekly</strong> in virgin displacement.</p>
+<hr />
+<h2>3. Solution Overview</h2>
+<p>CircularMatch transforms unstructured, informal waste listings into structured, evidence-backed industrial material transactions in under 60 seconds.</p>
+<pre><code>+-----------------------------------------------------------------------------------+
+| 1. Natural Language Waste Description (Plain-text input by factory operator)      |
++-----------------------------------------+-----------------------------------------+
+                                          |
+                                          v
++-----------------------------------------------------------------------------------+
+| 2. AI Extraction Engine (Google Gemini 2.0 Flash / Deterministic Fallback)       |
+|    - Extracts Material, Quantity, Unit, Frequency, Quality Grade, City, Schedule  |
++-----------------------------------------+-----------------------------------------+
+                                          |
+                                          v
++-----------------------------------------------------------------------------------+
+| 3. Mandatory Human Review &amp; Quality Gate                                          |
+|    - Verification status defaulted to &quot;Supplier-Declared (Not Verified)&quot;          |
++-----------------------------------------+-----------------------------------------+
+                                          |
+                                          v
++-----------------------------------------------------------------------------------+
+| 4. 100-Point Deterministic Matching Engine &amp; Hard Eligibility Gates               |
+|    - Material (35) + Quality (20) + Quantity (20) + Logistics (15) + Evidence (10)|
++-----------------------------------------+-----------------------------------------+
+                                          |
+                                          v
++-----------------------------------------------------------------------------------+
+| 5. Explainable Match Detail &amp; Decision Support                                    |
+|    - Score Breakdown, &quot;Why This Match?&quot; logic, Delivered Cost Calc, Route Map     |
++-----------------------------------------+-----------------------------------------+
+                                          |
+                                          v
++-----------------------------------------------------------------------------------+
+| 6. Digital Material Passport &amp; Operational Transaction Lifecycle                 |
+|    - Lot Code, Packaging, Evidence Files, Sample Request -&gt; Offer -&gt; Settlement   |
++-----------------------------------------------------------------------------------+
+</code></pre>
+<h3>Three Dedicated Stakeholder Personas</h3>
+<ol>
+<li><strong>Industrial Waste Generator:</strong> Lists waste in seconds using AI assistance, reviews structured technical drafts, visualizes top ranked buyers with transparent score cards, and tracks material lots.</li>
+<li><strong>Secondary Material Buyer / Recycler:</strong> Defines exact buyer requirements (material grade, acceptable contamination, weekly volume capacity, maximum delivery radius), reviews incoming matches, inspects material passports, and requests physical samples.</li>
+<li><strong>Platform Administrator:</strong> Manages the controlled canonical material catalog, adjusts multi-factor scoring weights, monitors cluster-wide diversion metrics, and audits compliance evidence.</li>
+</ol>
+<hr />
+<h2>4. Core Innovation &amp; Differentiators</h2>
+<h3>4.1 Deterministic + Explainable Matching (100-Point System)</h3>
+<p>Unlike platforms that rely on non-deterministic LLM ranking where identical queries yield varying results, CircularMatch uses an auditable, deterministic scoring engine governed by unit-tested mathematical functions:</p>
+<p>$$  ext{Match Score} = S_{  ext{material}} (35) + S_{   ext{quality}} (20) + S_{    ext{quantity}} (20) + S_{   ext{location}} (15) + S_{   ext{evidence}} (10)$$</p>
+<p>Every recommendation is accompanied by an itemized mathematical audit. Procurement managers receive clear statements derived directly from system facts:</p>
+<blockquote>
+<p><em>"ReLoop Polymers scores 94/100: Exact PET category match (+35 pts); Industrial Grade meets Grade A requirement with low contamination (+20 pts); 2,600 kg/week fits within buyer's 2,000–5,000 kg range (+20 pts); Noida to Manesar inter-state transit (+10 pts); Lot specifications documented (+9 pts)."</em></p>
+</blockquote>
+<h3>4.2 Trust-First Quality Architecture</h3>
+<p>CircularMatch prohibits visual badge inflation. Quality claims and verification evidence are strictly decoupled:</p>
+<table>
+<thead>
+<tr>
+<th>Visual State</th>
+<th>Technical Meaning</th>
+<th>Scoring Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Supplier-Declared — Not Verified</code></td>
+<td>Raw claim entered by supplier; no external validation.</td>
+<td>Baseline quality score; flagged for sample check</td>
+</tr>
+<tr>
+<td><code>Document Uploaded — Pending Review</code></td>
+<td>Material safety data sheet or invoice uploaded.</td>
+<td>Moderate confidence boost</td>
+</tr>
+<tr>
+<td><code>Platform Reviewed</code></td>
+<td>Verified against supplier GSTIN and historical shipments.</td>
+<td>Elevated trust factor</td>
+</tr>
+<tr>
+<td><code>Test-Reviewed (Lab Certified)</code></td>
+<td>Certified test report from NABL-accredited laboratory.</td>
+<td>Full 100% quality component score</td>
+</tr>
+</tbody>
+</table>
+<h3>4.3 Material Passport — Lot-Level Identity (ISO 59040:2025)</h3>
+<p>Every waste stream is indexed as a batch-specific <strong>Material Lot</strong> containing:<br />
+- Unique Lot Code (e.g., <code>LOT-PET-NOI-001</code>) and source origin (pre-consumer vs. post-consumer)<br />
+- Material form (pellets, regrind, flakes, shredded, baled offcuts)<br />
+- Visual colour specification and moisture/storage conditions<br />
+- Contamination disclosure (e.g., <code>&lt; 0.5% adhesive residue</code>)<br />
+- Chain-of-custody audit logs and sample availability flags</p>
+<h3>4.4 Hard Eligibility Gates Before Ranking</h3>
+<p>To prevent wasted procurement cycles, the matching engine executes hard gate checks before running scoring calculations:<br />
+- <strong>Material Category Mismatch:</strong> Immediate exclusion from candidate pool.<br />
+- <strong>Logistics Radius Exceeded:</strong> Excluded if generator distance exceeds buyer's maximum haulage threshold.<br />
+- <strong>Quality Below Minimum Threshold:</strong> Excluded if generator grade is lower than buyer's hard minimum.<br />
+- <strong>Prohibited Contaminants:</strong> Blocked if listing contains forms or substances banned by buyer acceptance templates.<br />
+- <strong>Actionable Badges:</strong> When eligible but incomplete, flagged with clear next steps: <code>Needs Sample</code> or <code>Missing Evidence</code>.</p>
+<h3>4.5 AI with Strict Safety Guardrails</h3>
+<p>Google Gemini 2.0 Flash is harnessed exclusively as a structured data extraction parser:<br />
+- Operates in strict JSON schema mode at <code>temperature = 0</code>.<br />
+- Strictly prohibited from guessing chemical formulations, computing prices, or assigning quality grades.<br />
+- Mandatory human review: AI extracts a <em>draft</em> only; the supplier must explicitly confirm each field before publishing.<br />
+- Zero-downtime deterministic fallback ensures complete platform availability even when offline or uncredentialed.</p>
+<hr />
+<h2>5. System Architecture</h2>
+<p>CircularMatch is built on a clean, layered service-oriented architecture designed for zero friction during evaluation and horizontal scalability in production:</p>
+<pre><code>┌─────────────────────────────────────────────────────────────────────────────┐
+│                           PRESENTATION TIER (Vercel)                        │
+│   React 18 · TypeScript · Vite 8 · Tailwind CSS · Minimax Design System      │
+│   Framer Motion · Recharts Visualizations · Leaflet Geospatial Routing Map  │
+│   TanStack Query v5 · Responsive Glassmorphism Layouts · Role Switcher      │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ HTTPS / JSON API (Bearer Token)
+┌──────────────────────────────────────▼──────────────────────────────────────┐
+│                            API SERVICES TIER (Render)                       │
+│   FastAPI (Python 3.12 / 3.14) · Pydantic v2 Models · Uvicorn Engine        │
+│   SlowAPI Rate Limiting Middleware · Structured Route Handlers              │
+│                                                                             │
+│   ┌─────────────────────┐ ┌──────────────────────┐ ┌────────────────────┐   │
+│   │  Matching Engine v2 │ │  LCA &amp; Economic Calc │ │  Passport Service  │   │
+│   │  (100-pt algorithm) │ │  (Scope 3 &amp; Net Val) │ │  (ISO 59040 lots)  │   │
+│   └─────────────────────┘ └──────────────────────┘ └────────────────────┘   │
+│   ┌─────────────────────┐ ┌──────────────────────┐ ┌────────────────────┐   │
+│   │  Gemini 2.0 Adapter │ │  Rule Fallback Parser│ │  Resend Email Svc  │   │
+│   └─────────────────────┘ └──────────────────────┘ └────────────────────┘   │
+└──────────────────┬──────────────────────────────────────┬───────────────────┘
+                   │                                      │
+┌──────────────────▼──────────────────┐   ┌───────────────▼───────────────────┐
+│     PERSISTENCE &amp; SECURITY TIER     │   │         EXTERNAL SERVICES         │
+│   Supabase PostgreSQL Database      │   │   Google Gemini 2.0 Flash API     │
+│   12 Relational Tables + Foreign Keys│   │   (Structured JSON extraction)    │
+│   Row-Level Security (RLS) Policies │   │                                   │
+│   Dual-Mode In-Memory DemoStore     │   │   OpenStreetMap / Leaflet Tiles   │
+│   (Zero-credential instant review)  │   │   (Delhi NCR Geo Routing)         │
+└─────────────────────────────────────┘   └───────────────────────────────────┘
+</code></pre>
+<h3>Key Architectural Decisions</h3>
+<ol>
+<li><strong>FastAPI &amp; Pydantic v2 Backend:</strong> Provides end-to-end type safety, auto-generated OpenAPI documentation (<code>/docs</code>), sub-millisecond serialization speeds, and clean separation between API schemas and domain models.</li>
+<li><strong>Dual-Mode Persistence Adapter:</strong> Employs the Repository Pattern. Production connects to Supabase PostgreSQL with RLS policies, while the platform seamlessly defaults to an in-memory <code>DemoStore</code> pre-seeded with Delhi NCR industrial data — guaranteeing zero setup friction for judges.</li>
+<li><strong>Decoupled Deterministic Logic:</strong> The matching engine, economic calculator, and LCA carbon calculator reside in pure, dependency-free Python modules. They are 100% reproducible and unit-tested without external network dependencies.</li>
+<li><strong>Resilient AI Pipeline:</strong> If the Google Gemini API key is unset or rate-limited, the system transparently falls back to a high-precision regex keyword extractor, flagging the extraction as <code>"rule_based_fallback"</code> in the UI.</li>
+</ol>
+<hr />
+<h2>6. Key Features &amp; Modules</h2>
+<h3>6.1 Waste Listing Wizard</h3>
+<ul>
+<li>Accepts unstructured natural-language input (e.g., <em>"We have 3 tonnes of clean PET cutting scrap available every week from our Noida plant"</em>).</li>
+<li>Uses Gemini 2.0 Flash to extract canonical material candidate, quantity, unit, frequency, quality claim, city, and collection schedule.</li>
+<li>Normalizes all volume metrics to standardized <code>kg/week</code> for uniform matching.</li>
+<li>Requires explicit user verification and field editing before transitioning from <code>draft</code> to <code>published</code>.</li>
+</ul>
+<h3>6.2 100-Point Deterministic Buyer Matching</h3>
+<ul>
+<li>Evaluates listings against active buyer sourcing targets across 5 weighted dimensions.</li>
+<li>Applies hard eligibility gates to filter incompatible materials, exceeded radii, or prohibited contaminants.</li>
+<li>Computes delivered logistics cost using distance-weighted freight models.</li>
+<li>Displays match scores categorized into <code>High Match (80-100)</code>, <code>Moderate Match (60-79)</code>, or <code>Low Match (&lt;60)</code>.</li>
+</ul>
+<h3>6.3 Explainable Match Detail &amp; Decision Support</h3>
+<ul>
+<li><strong>Score Decomposition:</strong> Interactive Recharts visual breakdown displaying exact points earned per dimension.</li>
+<li><strong>"Why This Match?" Section:</strong> Transparent bullet points detailing exact alignment facts.</li>
+<li><strong>Economic Feasibility Calculator:</strong> Computes estimated sales revenue, logistics haulage cost, net recovered value, and total economic improvement versus disposal.</li>
+<li><strong>Avoided Carbon Calculator:</strong> Discloses secondary material recovery, virgin material displacement, and net CO2e reduction.</li>
+<li><strong>Interactive Route Map:</strong> Visualizes transit corridor between supplier and buyer across Delhi-NCR using Leaflet.</li>
+</ul>
+<h3>6.4 Digital Material Passport (ISO 59040:2025)</h3>
+<ul>
+<li>Assigns unique trackable lot identifiers with technical specifications (form, colour, packaging, storage).</li>
+<li>Multi-tier evidence verification repository for supplier declarations, lab test reports, and factory certifications.</li>
+<li>Physical sample availability tracker with compliance triage status.</li>
+</ul>
+<h3>6.5 Buyer Requirements &amp; Acceptance Templates</h3>
+<ul>
+<li>Recyclers define granular sourcing criteria: acceptable material categories, minimum quality grade, maximum contamination tolerance, weekly quantity limits, and maximum transit distance.</li>
+<li>Pre-configured acceptance templates define prohibited contaminants (e.g., PVC in PET streams, moisture &gt; 5%, heavy metals).</li>
+</ul>
+<h3>6.6 Operational Transaction Lifecycle</h3>
+<ul>
+<li>Complete 5-stage procurement workflow:</li>
+<li><strong>Sample Request:</strong> Buyer requests a physical sample (5 kg lot) for laboratory assay.</li>
+<li><strong>Testing &amp; Approval:</strong> Sample received, tested, and approved against acceptance template.</li>
+<li><strong>Commercial Offer:</strong> Buyer issues binding purchase order and agreed pricing.</li>
+<li><strong>Logistics &amp; Dispatch:</strong> Freight scheduled, weighbridge manifest generated, and pickup logged.</li>
+<li><strong>Receipt &amp; Settlement:</strong> Material weighed at receiving dock, quality verified, and payment settled.</li>
+</ul>
+<h3>6.7 Real-Time Dashboard &amp; Analytics</h3>
+<ul>
+<li>Live metrics tracking active waste listings, buyer sourcing requirements, pre-scored matches, total weekly tonnage diverted, and cumulative avoided carbon emissions.</li>
+<li>Persona switcher allowing instant navigation between Waste Generator, Industrial Buyer, and Platform Administrator views.</li>
+</ul>
+<h3>6.8 Delhi-NCR Geospatial Mapping</h3>
+<ul>
+<li>Interactive Leaflet cartography mapping manufacturing hubs (Noida, Greater Noida, Ghaziabad, Faridabad, Gurugram, Manesar, Sonipat, Bhiwadi, Panipat).</li>
+<li>Real-time great-circle Haversine distance computations and delivery route plotting.</li>
+</ul>
+<hr />
+<h2>7. Technology Stack</h2>
+<h3>Core Technologies</h3>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+<th>Version / Specification</th>
+<th>Role in CircularMatch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Frontend Framework</strong></td>
+<td>React</td>
+<td>18.2.0</td>
+<td>Core UI component architecture</td>
+</tr>
+<tr>
+<td><strong>Language (Web)</strong></td>
+<td>TypeScript</td>
+<td>5.3.3</td>
+<td>Full frontend type safety and contract enforcement</td>
+</tr>
+<tr>
+<td><strong>Build Tool</strong></td>
+<td>Vite</td>
+<td>8.0.0</td>
+<td>High-performance bundling and instant HMR</td>
+</tr>
+<tr>
+<td><strong>Styling &amp; Design</strong></td>
+<td>Tailwind CSS</td>
+<td>3.4.1</td>
+<td>Utility-first styling with Minimax Design System</td>
+</tr>
+<tr>
+<td><strong>UI Motion</strong></td>
+<td>Framer Motion</td>
+<td>11.0.0</td>
+<td>Smooth micro-animations, transitions, and state changes</td>
+</tr>
+<tr>
+<td><strong>Data Visualization</strong></td>
+<td>Recharts</td>
+<td>2.12.0</td>
+<td>Score component breakdown and impact charts</td>
+</tr>
+<tr>
+<td><strong>Geospatial Mapping</strong></td>
+<td>Leaflet / React-Leaflet</td>
+<td>1.9.4</td>
+<td>Interactive Delhi NCR maps and transit routes</td>
+</tr>
+<tr>
+<td><strong>Server State</strong></td>
+<td>TanStack Query</td>
+<td>5.20.0</td>
+<td>Asynchronous query caching and data synchronization</td>
+</tr>
+<tr>
+<td><strong>Backend Framework</strong></td>
+<td>FastAPI</td>
+<td>0.110.0</td>
+<td>High-performance asynchronous Python API service</td>
+</tr>
+<tr>
+<td><strong>Data Validation</strong></td>
+<td>Pydantic v2</td>
+<td>2.6.0</td>
+<td>Schema serialization and strict contract validation</td>
+</tr>
+<tr>
+<td><strong>Runtime (API)</strong></td>
+<td>Python</td>
+<td>3.12 / 3.14</td>
+<td>Modern backend execution environment</td>
+</tr>
+<tr>
+<td><strong>Rate Limiting</strong></td>
+<td>SlowAPI</td>
+<td>0.1.9</td>
+<td>IP and token-based API rate limiting and protection</td>
+</tr>
+<tr>
+<td><strong>Database (Prod)</strong></td>
+<td>Supabase PostgreSQL</td>
+<td>15.1</td>
+<td>Managed relational DB with Row-Level Security</td>
+</tr>
+<tr>
+<td><strong>Demo Persistence</strong></td>
+<td>In-Memory DemoStore</td>
+<td>Python Native</td>
+<td>Zero-credential instant evaluation data store</td>
+</tr>
+<tr>
+<td><strong>Generative AI</strong></td>
+<td>Google Gemini</td>
+<td>2.0 Flash (<code>temperature=0</code>)</td>
+<td>Structured JSON extraction from natural text</td>
+</tr>
+<tr>
+<td><strong>Email Service</strong></td>
+<td>Resend API</td>
+<td>2.0.0</td>
+<td>Transactional notifications for sample requests</td>
+</tr>
+<tr>
+<td><strong>Testing (Backend)</strong></td>
+<td>pytest</td>
+<td>8.4.2</td>
+<td>7 automated test suites verifying API and matching</td>
+</tr>
+<tr>
+<td><strong>Testing (Frontend)</strong></td>
+<td>Vitest</td>
+<td>1.3.0</td>
+<td>Component unit tests and render assertions</td>
+</tr>
+<tr>
+<td><strong>Performance Audit</strong></td>
+<td>Lighthouse CI</td>
+<td>0.12.0</td>
+<td>Automated Core Web Vitals and performance budgets</td>
+</tr>
+</tbody>
+</table>
+<h3>Repository Structure</h3>
+<pre><code>circularmatch/
+├── apps/
+│   ├── api/
+│   │   ├── app/
+│   │   │   ├── api/          # FastAPI routers (listings, buyers, matches, passports, admin)
+│   │   │   ├── core/         # Configuration, auth helpers, constants
+│   │   │   ├── schemas/      # Pydantic v2 contract models
+│   │   │   ├── services/     # Matching engine v2, Gemini extraction, LCA calculators
+│   │   │   ├── repositories/ # Abstract repository, DemoStore, and Supabase adapter
+│   │   │   └── seed/         # Curated Delhi NCR industrial seed dataset
+│   │   └── tests/            # 7 pytest test suites (matching v2, API flows, extraction)
+│   └── web/
+│       └── src/
+│           ├── components/   # UI component library (ScoreRing, StatusBadge, Cards, Map)
+│           ├── pages/        # Route pages (Dashboards, ListWaste, Matches, Requirements)
+│           ├── hooks/        # Custom React hooks (useAsync, useAuth)
+│           ├── lib/          # API client, formatting utilities, design tokens
+│           └── types/        # TypeScript interfaces and shared types
+├── supabase/
+│   ├── migrations/           # 0001_initial_schema.sql, 0002_trusted_pilot_core.sql
+│   └── seed.sql              # Controlled industrial material catalog seed
+├── docs/                     # Specifications, blueprints, pitch presentations, and reports
+├── render.yaml               # Infrastructure configuration for Render API deployment
+└── vercel.json               # Frontend build and routing configuration for Vercel
+</code></pre>
+<hr />
+<h2>8. Matching Algorithm — Deep Dive</h2>
+<h3>8.1 100-Point Scoring Formula &amp; Code Implementation</h3>
+<p>The matching engine assigns points across five mathematically bounded dimensions:</p>
+<pre><code class="language-python">def calculate_match(listing: WasteListing, requirement: BuyerRequirement, material: Material | None = None) -&gt; MatchResult:
+    # Dimension 1: Material Category Alignment (35 pts)
+    s_mat = material_score(listing, requirement, material)
+    if s_mat == 0.0:
+        return MatchResult(eligible=False, rejection_reason=&quot;Material category mismatch&quot;)
+
+    # Dimension 2: Quality Grade &amp; Contamination (20 pts)
+    # 15 pts for Grade meeting requirement; 5 pts for Contamination &lt;= maximum
+    s_qual = quality_score(listing, requirement)
+
+    # Dimension 3: Quantity Compatibility (20 pts)
+    # 20 pts inside range; 12 pts within 20% margin; 5 pts outside
+    s_qty = quantity_score(listing, requirement)
+
+    # Dimension 4: Location &amp; Logistics (15 pts)
+    # 15 pts same city; 10 pts same state; 5 pts inter-state transit
+    s_loc = location_score(listing, requirement)
+
+    # Dimension 5: Evidence &amp; Passport Completeness (10 pts)
+    # 10 pts for 5/5 lot attributes verified; 8 pts for 4; 5 pts for 3; 2 pts for &lt;3
+    s_evi = evidence_score(listing.lot, listing.evidence_records)
+
+    total_score = s_mat + s_qual + s_qty + s_loc + s_evi
+    return MatchResult(eligible=True, score=total_score, breakdown={...})
+</code></pre>
+<h4>Detailed Breakdown of Dimensions</h4>
+<ol>
+<li><strong>Material Category Alignment (35 Points):</strong> Exact match between listing canonical material ID and buyer requirement category. Returns 35.0 if compatible; otherwise triggers a hard eligibility rejection.</li>
+<li><strong>Quality Grade &amp; Contamination (20 Points):</strong> Evaluates technical grade using an ordered hierarchy (<code>Grade A / Industrial</code> = 3, <code>Grade B / Standard</code> = 2, <code>Grade C / Mixed</code> = 1). Awarded 15 points if supplier grade ≥ buyer minimum grade, plus 5 points if contamination level is within buyer tolerance.</li>
+<li><strong>Quantity Compatibility (20 Points):</strong> Evaluates normalized weekly volume ($    ext{kg/week}$). If quantity falls within $[ ext{Min},   ext{Max}]$, awards full 20 points. If within a 20% margin ($0.8     imes    ext{Min}$ or $1.2   imes    ext{Max}$), awards 12 points. Partial outside supply receives 5 points.</li>
+<li><strong>Location &amp; Logistics Proximity (15 Points):</strong> Same city dispatch (e.g., Noida to Noida) earns 15 points. Same state transit (e.g., Noida to Ghaziabad in UP) earns 10 points. Inter-state transit (e.g., Noida, UP to Manesar, Haryana) earns 5 points, provided total distance is within the buyer's configured maximum radius.</li>
+<li><strong>Evidence &amp; Passport Completeness (10 Points):</strong> Rewards technical lot transparency across 5 attributes: material form, colour, packaging, storage condition, and uploaded evidence files. Complete 5/5 earns 10 points; 4/5 earns 8 points; 3/5 earns 5 points; below 3 earns 2 points.</li>
+</ol>
+<h3>8.2 Illustrative Economic Feasibility Calculator</h3>
+<p>Logistics costs in the Delhi NCR industrial belt are modelled using standard freight benchmarks:<br />
+$$  ext{Logistics Rate (₹/kg)} = ₹1.20  ext{ (Base handling)} + (0.025  imes    ext{Distance in km})$$</p>
+<p><strong>Example Case Study: Industrial PET Flake (Noida to Manesar — 48 km)</strong><br />
+- <strong>Weekly Volume:</strong> 2,600 kg<br />
+- <strong>Current Disposal Cost (₹8.00/kg):</strong> ₹20,800 liability<br />
+- <strong>Agreed Purchase Price:</strong> ₹14.00/kg<br />
+- <strong>Gross Weekly Sales Revenue:</strong> $2,600    imes ₹14.00 = ₹36,400$<br />
+- <strong>Freight Rate:</strong> $₹1.20 + (48    imes 0.025) = ₹2.40 ext{/kg}$<br />
+- <strong>Total Haulage Cost:</strong> $2,600    imes ₹2.40 = ₹6,240$<br />
+- <strong>Net Recovered Value:</strong> $₹36,400 - ₹6,240 = \mathbf{₹30,160  ext{/week}}$<br />
+- <strong>Total Economic Swing:</strong> $₹30,160 + ₹20,800 = \mathbf{₹50,960    ext{/week (₹26.5 Lakhs/year)}}$</p>
+<h3>8.3 Illustrative Environmental Impact Calculator</h3>
+<p>Carbon abatement is calculated based on life-cycle displacement factors adhering to ISO 59020:2024 and GHG Protocol Scope 3 Category 5 guidelines:</p>
+<p>$$  ext{Avoided }   ext{CO}<em>2   ext{e} = (Q</em>{   ext{waste}}     imes R_{    ext{recovery}}  imes D_{    ext{virgin}}    imes F_{    ext{virgin}}) + (Q_{    ext{waste}}     imes F_{    ext{disposal}}) - E_{   ext{transport}}$$</p>
+<table>
+<thead>
+<tr>
+<th>Material Stream</th>
+<th>Virgin Avoided Factor</th>
+<th>Recovery Factor</th>
+<th>Virgin Displacement</th>
+<th>Landfill Disposal Factor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PET Plastic</strong></td>
+<td>1.80 kg CO2e/kg</td>
+<td>85%</td>
+<td>85%</td>
+<td>0.05 kg CO2e/kg</td>
+</tr>
+<tr>
+<td><strong>Cotton Textiles</strong></td>
+<td>1.30 kg CO2e/kg</td>
+<td>72%</td>
+<td>70%</td>
+<td>0.12 kg CO2e/kg</td>
+</tr>
+<tr>
+<td><strong>Corrugated Cardboard</strong></td>
+<td>0.95 kg CO2e/kg</td>
+<td>82%</td>
+<td>75%</td>
+<td>0.25 kg CO2e/kg</td>
+</tr>
+<tr>
+<td><strong>Mild Steel Scrap</strong></td>
+<td>1.65 kg CO2e/kg</td>
+<td>92%</td>
+<td>90%</td>
+<td>0.02 kg CO2e/kg</td>
+</tr>
+<tr>
+<td><strong>HDPE Industrial</strong></td>
+<td>1.70 kg CO2e/kg</td>
+<td>80%</td>
+<td>80%</td>
+<td>0.05 kg CO2e/kg</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: All values are explicitly labelled in the platform as "Illustrative Demo Scenarios — Not a Certified Third-Party LCA" to maintain compliance integrity.</em></p>
+<hr />
+<h2>9. AI Integration &amp; Guardrails</h2>
+<h3>9.1 What Google Gemini 2.0 Flash Does</h3>
+<p>CircularMatch leverages Google Gemini 2.0 Flash via direct HTTP REST calls (<code>https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent</code>). The integration enforces:<br />
+- <code>response_mime_type: "application/json"</code><br />
+- <code>temperature: 0.0</code> (eliminating creative drift and hallucination)<br />
+- Strict catalog grounding against the 5 canonical material streams.</p>
+<pre><code class="language-json">{
+  &quot;material_candidate&quot;: &quot;mat-pet&quot;,
+  &quot;category_candidate&quot;: &quot;Plastics&quot;,
+  &quot;quantity_value&quot;: 3000,
+  &quot;quantity_unit&quot;: &quot;kg&quot;,
+  &quot;frequency&quot;: &quot;weekly&quot;,
+  &quot;quality_grade&quot;: &quot;industrial&quot;,
+  &quot;quality_verified&quot;: false,
+  &quot;city&quot;: &quot;Noida&quot;,
+  &quot;availability&quot;: &quot;Every Monday morning&quot;,
+  &quot;missing_fields&quot;: []
+}
+</code></pre>
+<h3>9.2 Strict AI Safety Guardrails</h3>
+<table>
+<thead>
+<tr>
+<th>Prohibited Action</th>
+<th>Risk Prevented</th>
+<th>System Enforcement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Autonomous Publishing</strong></td>
+<td>Unverified or inaccurate data entering marketplace.</td>
+<td>Gemini output is strictly formatted as a <code>draft</code>; publication requires user sign-off.</td>
+</tr>
+<tr>
+<td><strong>Assigning Quality Badges</strong></td>
+<td>False claims of chemical purity or regulatory clearance.</td>
+<td><code>quality_verified</code> is hardcoded to <code>false</code> during AI extraction.</td>
+</tr>
+<tr>
+<td><strong>Computing Match Scores</strong></td>
+<td>Black-box, non-reproducible procurement recommendations.</td>
+<td>Scored exclusively by deterministic Python algorithms in <code>matching.py</code>.</td>
+</tr>
+<tr>
+<td><strong>Inventing Price / Freight</strong></td>
+<td>False commercial quotes leading to contract disputes.</td>
+<td>Pricing and logistics are derived solely from user input and deterministic formulas.</td>
+</tr>
+</tbody>
+</table>
+<h3>9.3 Zero-Downtime Rule-Based Fallback</h3>
+<p>If no <code>GEMINI_API_KEY</code> is present in the environment or if external API rate limits are hit, the backend activates an internal rule-based regex parsing engine. The UI transparently presents a subtle badge: <code>"Demo extraction — rule-based fallback"</code>, ensuring 100% functionality during live presentations.</p>
+<hr />
+<h2>10. Impact &amp; Economic Value</h2>
+<h3>10.1 The Macro Business Case</h3>
+<p>India's secondary material recovery sector is estimated at <strong>₹1.8–2.2 Trillion annually</strong>, but over 40% of pre-consumer recyclable industrial waste is degraded due to lack of local matchmaking. By connecting generators directly to primary recyclers within a 100 km radius, CircularMatch captures value lost to intermediate scrap dealers while ensuring traceable feedstock.</p>
+<h3>10.2 Scalability Across Delhi NCR Clusters</h3>
+<ul>
+<li><strong>Phase 1 Pilot (100 Matched Facilities):</strong> Diverts an estimated 25,000 tonnes of industrial secondary material annually, unlocking <strong>₹35–50 Crore in recovered value</strong> and eliminating ~40,000 tonnes of CO2e.</li>
+<li><strong>Sustainable Business Model:</strong> A nominal 1.0–1.5% facilitation fee on completed transactions generates sustainable recurring revenue without burdening participants.</li>
+</ul>
+<h3>10.3 UN Sustainable Development Goals (SDGs)</h3>
+<ul>
+<li><strong>SDG 12 (Responsible Consumption &amp; Production):</strong> Targets 12.5 (substantially reduce waste generation through prevention, reduction, recycling, and reuse).</li>
+<li><strong>SDG 13 (Climate Action):</strong> Mitigates industrial greenhouse gas emissions through virgin resource displacement.</li>
+<li><strong>SDG 9 (Industry, Innovation &amp; Infrastructure):</strong> Fosters eco-industrial symbiosis and smart green infrastructure across Indian industrial estates.</li>
+<li><strong>SDG 17 (Partnerships for the Goals):</strong> Bridges private industrial waste generators, recycling associations, and state pollution control boards.</li>
+</ul>
+<hr />
+<h2>11. Demo Walkthrough</h2>
+<h3>11.1 Fast 3-Minute Judge Evaluation Route</h3>
+<ol>
+<li><strong>Dashboard Overview (<code>/dashboard?demo=seller</code>):</strong><br />
+   Review live platform KPIs: Active Waste Listings (4), Live Buyer Requirements (3), Pre-Scored Matches (3), Weekly Diverted Value (₹1.85L), Avoided CO2e (14.2 Tonnes).</li>
+<li><strong>AI Waste Listing Wizard (<code>/list-waste</code>):</strong><br />
+   Click prefilled sample: <em>"We produce around 3 tonnes of clean PET manufacturing scrap weekly in Noida, available every Monday."</em> Click <strong>Analyze &amp; Structure</strong>. Point out the structured JSON extraction, unit normalization to 2,600 kg/week, and the unverified quality warning.</li>
+<li><strong>Publish &amp; Review Ranked Matches (<code>/matches</code>):</strong><br />
+   Publish listing and view ranked buyer cards. Highlight <strong>ReLoop Polymers</strong> with a <strong>94/100 Match Score</strong> and the <code>Needs Sample</code> badge.</li>
+<li><strong>Deep-Dive Match Details:</strong><br />
+   Inspect the 100-point score decomposition chart, read the data-driven "Why this match?" explanation, review the logistics freight calculation (₹6,240), and view the interactive Noida-to-Manesar Leaflet route map.</li>
+<li><strong>Digital Material Passport (<code>/passport</code>):</strong><br />
+   Inspect Lot <code>LOT-PET-NOI-001</code>, showing baled flake packaging, indoor storage, uploaded evidence files, and the 5-stage transaction timeline.</li>
+<li><strong>Buyer Persona (<code>/dashboard?demo=buyer</code>):</strong><br />
+   Switch to the buyer view to inspect incoming matched offers, manage sourcing criteria, and trigger physical sample requests.</li>
+</ol>
+<hr />
+<h2>12. Market Opportunity</h2>
+<h3>12.1 Target Customer Segments</h3>
+<ol>
+<li><strong>SME Manufacturers (Generators):</strong> Plastic moulders, garment exporters, corrugated box makers, and light engineering units looking to reduce waste disposal costs and comply with ESG norms.</li>
+<li><strong>Industrial Recyclers &amp; Re-processors (Buyers):</strong> Mechanical plastic recyclers, open-end yarn spinners, paper re-pulping mills, and secondary steel re-rollers facing raw material shortages.</li>
+<li><strong>Eco-Industrial Park Authorities:</strong> UPSIDC (Uttar Pradesh State Industrial Development Authority) and HSIIDC (Haryana State Industrial and Infrastructure Development Corporation) seeking cluster-level circularity metrics.</li>
+</ol>
+<h3>12.2 Competitive Moat</h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Classified Scrap Boards</th>
+<th>Enterprise ERPs</th>
+<th>CircularMatch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>AI Structured Extraction</strong></td>
+<td>❌ No</td>
+<td>❌ Manual entry only</td>
+<td>✅ Gemini 2.0 Flash + Rule Fallback</td>
+</tr>
+<tr>
+<td><strong>Deterministic 100-Pt Scoring</strong></td>
+<td>❌ Unsorted</td>
+<td>❌ No external market</td>
+<td>✅ Auditable, explainable points</td>
+</tr>
+<tr>
+<td><strong>Lot Material Passport</strong></td>
+<td>❌ No</td>
+<td>⚠️ Internal only</td>
+<td>✅ ISO 59040 standardized</td>
+</tr>
+<tr>
+<td><strong>Eligibility Gating</strong></td>
+<td>❌ Buyer screens all</td>
+<td>❌ N/A</td>
+<td>✅ Automated pre-screening</td>
+</tr>
+<tr>
+<td><strong>LCA Carbon Calculations</strong></td>
+<td>❌ No</td>
+<td>⚠️ Costly add-on</td>
+<td>✅ Built-in Scope 3 disclosures</td>
+</tr>
+<tr>
+<td><strong>SME Accessibility</strong></td>
+<td>✅ High</td>
+<td>❌ Prohibitive cost</td>
+<td>✅ Zero-friction web platform</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>13. Research Foundation</h2>
+<p>The architecture of CircularMatch is grounded in established international standards and Indian environmental policy:</p>
+<ul>
+<li><strong>UNIDO Eco-Industrial Parks (EIP) Framework:</strong> Informs the platform's multi-stakeholder symbiosis workflow, ensuring transactions move from discovery to physical settlement.</li>
+<li><strong>ISO 59040:2025 (Circular Economy — Digital Product &amp; Material Datasheets):</strong> Provides the data model for the Material Passport, establishing clear separation between declared and verified properties.</li>
+<li><strong>ISO 59020:2024 (Measuring &amp; Assessing Circularity Performance):</strong> Guides the system boundaries and indicators used in the environmental impact calculator.</li>
+<li><strong>GHG Protocol Scope 3 Category 5 Guidance:</strong> Dictates that avoided-emissions scenarios must be presented with full boundary disclosures rather than misconstrued as verified corporate carbon offsets.</li>
+<li><strong>CPCB Plastic Waste Management Rules (EPR Amendments):</strong> Aligns material categorization and traceability with statutory recycling targets for Indian industry.</li>
+<li><strong>Digital Personal Data Protection (DPDP) Act, 2023:</strong> Implements role-based access control (RBAC), preventing premature exposure of sensitive supplier pricing before mutual buyer interest is established.</li>
+</ul>
+<hr />
+<h2>14. Roadmap to Production</h2>
+<h3>Phase 1: Hackathon MVP (Completed &amp; Live)</h3>
+<ul>
+<li>[x] Full-stack FastAPI + React 18 + TypeScript architecture</li>
+<li>[x] Gemini 2.0 Flash structured extraction with rule-based fallback</li>
+<li>[x] 100-point deterministic multi-factor matching engine (<code>test_matching_v2.py</code>)</li>
+<li>[x] Material Passport with 4-tier quality verification hierarchy</li>
+<li>[x] Economic and environmental LCA impact calculators</li>
+<li>[x] Interactive Leaflet geospatial routing across Delhi NCR clusters</li>
+<li>[x] Dual-mode persistence (Supabase PostgreSQL + In-Memory DemoStore)</li>
+<li>[x] 7 passing pytest test suites (20 unit tests) + Vitest scaffolding</li>
+<li>[x] Render backend configuration (<code>render.yaml</code>) + Vercel frontend (<code>vercel.json</code>)</li>
+</ul>
+<h3>Phase 2: Pilot Deployment (Next 3–6 Months)</h3>
+<ul>
+<li>[ ] Connect live Supabase Auth with SMS OTP for factory floor managers</li>
+<li>[ ] Direct integration with private S3/Supabase storage for lab certificate PDF uploads</li>
+<li>[ ] Onboard 25 pilot generators across Greater Noida and Ghaziabad industrial areas</li>
+<li>[ ] Implement Google Maps Distance Matrix API for dynamic freight quotes</li>
+<li>[ ] Formal legal review of non-hazardous secondary material transport documentation</li>
+</ul>
+<h3>Phase 3: Regional Expansion (6–18 Months)</h3>
+<ul>
+<li>[ ] Integration with CPCB EPR centralized portal for statutory certificate generation</li>
+<li>[ ] Expansion into Western India industrial corridors (Ahmedabad–Vadodara, Pune–Pimpri)</li>
+<li>[ ] Automated integration with SME ERP systems (Tally Prime, SAP Business One)</li>
+<li>[ ] Mobile application for on-site QR code scanning and lot manifest generation</li>
+</ul>
+<hr />
+<h2>15. Team &amp; Execution</h2>
+<h3>Team Code Craft</h3>
+<p><strong>Institution:</strong> G.L. Bajaj Institute of Technology &amp; Management (ITM), Greater Noida<br />
+<strong>Department:</strong> Computer Science &amp; Engineering  </p>
+<table>
+<thead>
+<tr>
+<th>Team Member</th>
+<th>Role</th>
+<th>Core Contributions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Shivansh Gupta</strong></td>
+<td>Full-Stack Lead &amp; System Architect</td>
+<td>Architected FastAPI backend, 100-pt matching engine v2, Supabase database schemas &amp; RLS, DemoStore repository pattern, and pytest test suite.</td>
+</tr>
+<tr>
+<td><strong>Shivansh Rai</strong></td>
+<td>Frontend Lead &amp; UI/UX Engineer</td>
+<td>Implemented Minimax Design System, React 18 component architecture, Leaflet geospatial mapping, Recharts analytics, and responsive dashboards.</td>
+</tr>
+<tr>
+<td><strong>Shivharsh Tiwari</strong></td>
+<td>AI &amp; Sustainability Engineer</td>
+<td>Integrated Google Gemini 2.0 Flash API with structured JSON schemas, developed LCA carbon calculators, and authored industrial research models.</td>
+</tr>
+</tbody>
+</table>
+<h3>Technical Verification &amp; Quality Signals</h3>
+<ul>
+<li><strong>Test Suite Pass Rate:</strong> 100% passing across 7 test files (<code>test_api_flow.py</code>, <code>test_demo_accounts.py</code>, <code>test_extraction.py</code>, <code>test_full_suite.py</code>, <code>test_matching.py</code>, <code>test_matching_v2.py</code>, <code>test_trusted_pilot_core.py</code>).</li>
+<li><strong>Strict Typing:</strong> Complete TypeScript type safety on frontend; Pydantic v2 schemas on backend.</li>
+<li><strong>Zero Mock Failures:</strong> Dashboards, buyer targets, and listing wizards operate on live structured data.</li>
+<li><strong>Security &amp; Privacy:</strong> Environment-isolated API keys, SlowAPI rate limiting, and SQL injection prevention via parameterized ORM queries.</li>
+</ul>
+<hr />
+<h2>16. Conclusion &amp; Project Links</h2>
+<p>CircularMatch demonstrates that the transition from a linear "take-make-waste" economy to an industrial circular economy is fundamentally a <strong>data structuring, matching intelligence, and trust problem</strong>. By providing manufacturing facilities with zero-barrier AI onboarding, mathematically transparent 100-point matching, lot-level material passports, and honest impact disclosures, CircularMatch proves that sustainable industrial symbiosis can be both ecologically vital and commercially lucrative.</p>
+<h3>Project Resources</h3>
+<ul>
+<li><strong>GitHub Repository:</strong> <a href="https://github.com/shivanshguptaa070-del/circularmatch">https://github.com/shivanshguptaa070-del/circularmatch</a></li>
+<li><strong>Live Frontend Application (Vercel):</strong> <a href="https://circularmatch.vercel.app">https://circularmatch.vercel.app</a></li>
+<li><strong>Backend API Documentation (Swagger/OpenAPI):</strong> <a href="https://circularmatch-api.onrender.com/docs">https://circularmatch-api.onrender.com/docs</a></li>
+<li><strong>Interactive Pitch Deck (7 Slides):</strong> <code>CircularMatch_Pitch.html</code></li>
+<li><strong>Local Development Environment:</strong> <code>http://localhost:5173</code> (Frontend) · <code>http://localhost:8000</code> (API)</li>
+</ul>
+<hr />
+<p><em>Report prepared by Team Code Craft for HACKDAY 1.0 (DECODEP) and national competition submissions, September 20, 2026.</em></p>
+</div>
+
+</body>
+</html>

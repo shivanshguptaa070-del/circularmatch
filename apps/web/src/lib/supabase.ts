@@ -20,4 +20,6 @@ export interface UserProfile {
   company_name: string
   active_mode: ActiveMode
   avatar_url?: string | null
+  role?: string
 }
+

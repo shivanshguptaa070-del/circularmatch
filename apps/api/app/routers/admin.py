@@ -29,6 +29,7 @@ def purge_demo_data(
     return envelope({"dry_run": dry_run, "deleted_counts": counts, "message": message})
 
 @router.get("/api/admin/scoring")
+@router.get("/api/admin/scoring-config")
 def get_scoring_config(current_user: User = Depends(require_roles("admin")), store: DemoStore = Depends(get_store)) -> dict[str, Any]:
     return envelope({"config": store.scoring_config.model_dump(), "notice": "MVP decision rules — configurable, not scientifically optimal."})
 
@@ -57,3 +58,27 @@ def review_evidence(evidence_id: str, request: ReviewEvidenceRequest, current_us
 @router.get("/api/admin/reports")
 def get_reports(current_user: User = Depends(require_roles("admin"))) -> dict[str, Any]:
     return envelope({"reports": [], "message": "No demo reports in the fictional dataset."})
+
+@router.get("/api/admin/listings")
+def get_admin_listings(
+    current_user: User = Depends(require_roles("admin")),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    listings = [listing_view(store, l) for l in store.list_listings()]
+    return envelope({"listings": listings, "count": len(listings)})
+
+@router.get("/api/admin/matches")
+def get_admin_matches(
+    current_user: User = Depends(require_roles("admin")),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    matches = [match_card_view(store, m) for m in store.matches.values()]
+    return envelope({"matches": matches, "count": len(matches)})
+
+@router.get("/api/admin/audit-events")
+def get_admin_audit_events(
+    current_user: User = Depends(require_roles("admin")),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    events = [e.model_dump() for e in store.audit_events]
+    return envelope({"audit_events": events, "count": len(events)})

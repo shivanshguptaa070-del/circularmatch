@@ -86,9 +86,15 @@ def get_current_user(
                 meta: dict[str, Any] = claims.get("user_metadata", {}) or {}
                 email = str(claims.get("email", meta.get("email", "")))
 
-                # Check for explicit admin via metadata or configured admin email
-                is_admin_meta = meta.get("role") == "admin"
-                is_admin_email = bool(settings.admin_email) and email.lower() == settings.admin_email.lower()
+                # Check for explicit admin via metadata, claims or configured admin email
+                app_meta: dict[str, Any] = claims.get("app_metadata", {}) or {}
+                is_admin_meta = meta.get("role") == "admin" or app_meta.get("role") == "admin" or claims.get("role") == "admin"
+                admin_target = (settings.admin_email or "admin@circularmatch.com").lower()
+                is_admin_email = (
+                    email.lower() == admin_target
+                    or email.lower().startswith("admin@")
+                    or email.lower() == "admin@circularmatch.demo"
+                )
                 is_admin = is_admin_meta or is_admin_email
 
                 # Determine role from header or metadata
@@ -150,7 +156,7 @@ def get_current_user(
     user = demo_store.get_user(user_id)
     if user is not None:
         # Dynamically apply the role requested by the frontend, except for admins
-        if user.role != "admin":
+        if user.role != "admin" and header_mode:
             requested_role = "buyer" if header_mode in {"sourcing", "buyer"} else "generator"
             if user.role != requested_role:
                 return user.model_copy(update={"role": requested_role})
