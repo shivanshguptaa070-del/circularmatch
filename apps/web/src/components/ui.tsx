@@ -113,11 +113,16 @@ export function ScoreRing({ score, label = 'match score', size = 88 }: { score: 
   const stroke = clamped >= 88 ? '#12645b' : clamped >= 70 ? '#c08a37' : '#e98467'
   const displayScore = Math.round(clamped)
   const isTop = clamped >= 85
+  
+  // Optically center the circle by placing the gap perfectly at the top (12 o'clock)
+  const gapPercent = 100 - clamped
+  const startAngle = -90 + (gapPercent * 1.8)
+
   return (
     <div className={`relative flex shrink-0 items-center justify-center rounded-full bg-white/70 shadow-[0_8px_20px_rgba(14,67,55,.08)] transition-transform duration-300 hover:scale-105 ${isTop ? 'ring-2 ring-emerald-300/40' : ''}`} style={{ width: size, height: size }} aria-label={`${displayScore}% ${label}`}>
       {isTop && <span className="absolute -inset-1 rounded-full animate-soft-ping bg-emerald-400/20 pointer-events-none" />}
       <svg width={size - 8} height={size - 8} viewBox="0 0 88 88" className="absolute inset-0 m-auto block drop-shadow-[0_4px_6px_rgba(18,100,91,.15)]">
-        <g transform="rotate(-90 44 44)">
+        <g transform={`rotate(${startAngle} 44 44)`}>
           <circle cx="44" cy="44" r={radius} fill="none" stroke="#e6eee9" strokeWidth="7" />
           <motion.circle
             cx="44"
@@ -135,7 +140,10 @@ export function ScoreRing({ score, label = 'match score', size = 88 }: { score: 
         </g>
       </svg>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className="text-[1.25rem] font-extrabold tracking-tight text-ink leading-none">{displayScore}%</span>
+        <span className="text-[1.25rem] font-extrabold tracking-tight text-ink leading-none translate-x-[2px] flex items-baseline">
+          {displayScore}
+          <span className="text-[0.65em] font-bold text-[#5a736a] ml-[1px]">%</span>
+        </span>
       </div>
     </div>
   )
