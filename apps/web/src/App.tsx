@@ -74,7 +74,9 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
   }, [session.user.id, navigate])
 
   const handleSignOut = useCallback(async () => {
-    await supabase.auth.signOut()
+    localStorage.removeItem('cm_demo')
+    await supabase.auth.signOut().catch(() => null)
+    window.location.href = '/'
   }, [])
 
   const currentProfile = { ...profile, active_mode: activeMode }
@@ -156,6 +158,30 @@ export default function App() {
 
   useEffect(() => {
     // Get initial session
+    const urlParams = new URLSearchParams(window.location.search)
+    const demoParam = urlParams.get('demo') || localStorage.getItem('cm_demo')
+
+    if (demoParam && (demoParam === 'seller' || demoParam === 'buyer')) {
+      localStorage.setItem('cm_demo', demoParam)
+      const mockProfile: UserProfile = {
+        id: `demo-${demoParam}-id`,
+        email: `${demoParam}@circularmatch.com`,
+        full_name: demoParam === 'seller' ? 'test' : 'EcoCraft Procurement',
+        company_name: demoParam === 'seller' ? 'testing' : 'EcoCraft Packaging',
+        active_mode: demoParam === 'seller' ? 'selling' : 'sourcing',
+        avatar_url: null,
+      }
+      setSession({
+        user: { id: `demo-${demoParam}-id`, email: `${demoParam}@circularmatch.com`, app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '' },
+        access_token: 'demo-token',
+        refresh_token: 'demo-refresh',
+        expires_in: 3600,
+        token_type: 'bearer',
+      } as unknown as Session)
+      setProfile(mockProfile)
+      return
+    }
+
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
       if (s) void fetchProfile(s)
