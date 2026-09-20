@@ -22,13 +22,13 @@ const CHART_COLORS = ['#12645b', '#72a98f', '#c08a37', '#86a8b8', '#e98467']
 function ChartCard({ title, subtitle, children, accent = 'spruce' }: { title: string; subtitle: string; children: React.ReactNode; accent?: 'spruce' | 'gold' | 'coral' }) {
   const accentClass = accent === 'gold' ? 'text-[#a47a25] bg-[#fff6df]' : accent === 'coral' ? 'text-coral bg-[#fff0eb]' : 'text-spruce bg-[#e7f5ed]'
   return (
-    <section className="card chart-card p-5 sm:p-6">
+    <section className="card chart-card rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm lift-hover bg-white">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
-          <h2 className="font-semibold tracking-[-0.03em] text-ink">{title}</h2>
-          <p className="mt-1 text-xs leading-5 text-[#748982]">{subtitle}</p>
+          <h2 className="text-[18px] font-bold tracking-tight text-ink">{title}</h2>
+          <p className="mt-1 text-[13px] leading-relaxed text-[#748982]">{subtitle}</p>
         </div>
-        <span className={`grid h-9 w-9 place-items-center rounded-2xl ${accentClass}`}><Network size={17} /></span>
+        <span className={`grid h-10 w-10 place-items-center rounded-2xl ${accentClass}`}><Network size={18} /></span>
       </div>
       {children}
     </section>
@@ -43,7 +43,7 @@ export function AdminDashboard() {
   const data = summary.data
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 animate-fade-in-up">
       <PageHeader
         eyebrow="Admin Workspace"
         title="Platform Overview"
@@ -125,30 +125,30 @@ export function AdminDashboard() {
       </section>
 
       {data.match_success_rate_percent !== undefined && (
-        <section className="card p-5 sm:p-6">
-          <div className="flex items-center gap-3">
-            <span className="grid h-9 w-9 place-items-center rounded-2xl bg-[#e7f5ed] text-spruce"><Activity size={17} /></span>
+        <section className="card rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm lift-hover bg-white">
+          <div className="flex items-center gap-3.5">
+            <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#e7f5ed] text-spruce"><Activity size={18} /></span>
             <div>
-              <h2 className="font-semibold tracking-[-0.03em] text-ink">Platform Match Success Rate</h2>
-              <p className="mt-0.5 text-xs text-[#748982]">Percentage of active matches leading to accepted transactions</p>
+              <h2 className="text-[18px] font-bold tracking-tight text-ink">Platform Match Success Rate</h2>
+              <p className="mt-0.5 text-[13px] text-[#748982]">Percentage of active matches leading to accepted transactions</p>
             </div>
-            <span className="ml-auto text-2xl font-bold text-spruce">{data.match_success_rate_percent}%</span>
+            <span className="ml-auto text-[28px] font-extrabold text-spruce">{data.match_success_rate_percent}%</span>
           </div>
-          <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-[#e6eee8]">
+          <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#e6eee8]">
             <div className="h-full rounded-full bg-gradient-to-r from-[#0c5146] via-spruce to-[#45a482]" style={{ width: `${data.match_success_rate_percent}%` }} />
           </div>
         </section>
       )}
 
       {data.labels && (
-        <section className="rounded-2xl border border-[#d5e5da] bg-[#f6fbf7] p-5">
+        <section className="rounded-2xl border border-[#d5e5da] bg-[#f6fbf7] p-5 sm:p-6 shadow-sm lift-hover">
           <div className="flex items-start gap-2 mb-3">
-            <Leaf className="mt-0.5 shrink-0 text-spruce" size={15} />
-            <h3 className="text-xs font-semibold text-ink">Platform Notices</h3>
+            <Leaf className="mt-0.5 shrink-0 text-spruce" size={16} />
+            <h3 className="text-[14px] font-bold text-ink">Platform Notices</h3>
           </div>
-          <ul className="space-y-1.5">
+          <ul className="space-y-2">
             {Object.values(data.labels).map((label, i) => (
-              <li key={i} className="text-xs leading-5 text-[#5a7269]">• {label}</li>
+              <li key={i} className="text-[13px] leading-relaxed text-[#5a7269]">• {label}</li>
             ))}
           </ul>
         </section>

@@ -3,7 +3,7 @@ import { BarChart3, CheckCircle2, Loader2, RotateCcw, Settings2, ShieldCheck } f
 import { get, patch } from '../lib/api'
 import { useAsync } from '../hooks/useAsync'
 import type { Role, ScoringConfig } from '../types'
-import { StatusBadge, Disclosure, ErrorPanel, PageSkeleton, PageHeader } from '../components/ui'
+import { StatusBadge, ErrorPanel, PageSkeleton, PageHeader } from '../components/ui'
 
 const LABELS: Array<[keyof ScoringConfig['weights'], string, string]> = [
   ['material', 'Material compatibility', 'Exact controlled-catalog material or approved future mapping.'],
@@ -49,13 +49,92 @@ export function AdminPage({ role }: { role: Role }) {
   if (config.error || !config.data) return <ErrorPanel error={config.error || 'Scoring configuration unavailable.'} onRetry={() => void config.reload()} />
 
   return (
-    <div className="space-y-7">
-      <PageHeader eyebrow="Configuration" title="Deterministic scoring rules" description="Configure how the matcher weighs each compatibility signal across material, quality, quantity, distance, price, and impact." actions={<StatusBadge>Active Weights</StatusBadge>} />
-      {message && <div className="flex gap-3 rounded-2xl border border-[#b9ddc7] bg-[#eff9f2] p-4 text-sm text-[#28624e]"><CheckCircle2 className="mt-0.5 shrink-0" size={18} /><span>{message}</span></div>}
-      {error && <div className="rounded-2xl border border-[#f1c6b9] bg-[#fff7f4] p-4 text-sm text-[#994f3a]">{error}</div>}
+    <div className="space-y-7 animate-fade-in-up">
+      <PageHeader
+        eyebrow="Configuration"
+        title="Deterministic scoring rules"
+        description="Configure how the matcher weighs each compatibility signal across material, quality, quantity, distance, price, and impact."
+        actions={<StatusBadge>Active Weights</StatusBadge>}
+      />
+      {message && <div className="flex gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/90 p-4 text-[14px] text-emerald-900 shadow-sm"><CheckCircle2 className="mt-0.5 shrink-0 text-emerald-600" size={18} /><span>{message}</span></div>}
+      {error && <div className="rounded-2xl border border-rose-200 bg-rose-50/90 p-4 text-[14px] text-rose-900 shadow-sm">{error}</div>}
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px] xl:grid-cols-[minmax(0,1fr)_350px]">
-        <article className="card p-5 sm:p-7"><div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#e5ece7] pb-5"><div><div className="flex items-center gap-2"><Settings2 className="text-spruce" size={19} /><h2 className="text-xl font-semibold tracking-[-0.035em] text-ink">Default MVP decision rules</h2></div><p className="mt-2 text-sm leading-6 text-[#657b72]">Version {config.data.config.version} · all six weights must total 100%.</p></div><div className={`rounded-2xl px-4 py-3 text-right ${Math.abs(total - 1) < 0.001 ? 'bg-[#e8f5ed] text-spruce' : 'bg-[#fff1ea] text-[#ae573d]'}`}><p className="text-[10px] font-bold uppercase tracking-[0.1em]">Weight total</p><p className="mt-1 text-2xl font-bold tracking-[-0.05em]">{Math.round(total * 100)}%</p></div></div><div className="mt-5 divide-y divide-[#e5ece7]">{LABELS.map(([key, label, description]) => <div key={key} className="grid gap-4 py-5 sm:grid-cols-[minmax(0,1fr)_105px] sm:items-center"><div><p className="font-semibold text-ink">{label}</p><p className="mt-1 text-xs leading-5 text-[#6e837b]">{description}</p></div><label className="relative"><input type="number" min="0" max="100" step="1" className="field-input pr-8 text-right font-semibold" value={Math.round(weights[key] * 100)} onChange={(event) => setWeight(key, event.target.value)} /><span className="absolute right-3 top-3.5 text-sm font-semibold text-[#759087]">%</span></label></div>)}</div><div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#e5ece7] pt-5"><button className="btn-secondary" onClick={() => setWeights(config.data?.config.weights || null)}><RotateCcw size={16} />Reset edits</button><button className="btn-primary" disabled={saving || Math.abs(total - 1) > 0.001} onClick={() => void save()}>{saving ? <Loader2 className="animate-spin" size={17} /> : <CheckCircle2 size={17} />}{saving ? 'Saving…' : 'Save decision rules'}</button></div></article>
-        <aside className="space-y-5"><article className="card p-5"><div className="flex items-center gap-2"><ShieldCheck className="text-spruce" size={18} /><h2 className="font-semibold text-ink">Explainability guardrail</h2></div><p className="mt-3 text-sm leading-6 text-[#667d74]">The application stores component scores, inputs, flags and rule versions alongside every match. An LLM is never asked to invent the score.</p></article><article className="card p-5"><div className="flex items-center gap-2"><BarChart3 className="text-[#a47a25]" size={18} /><h2 className="font-semibold text-ink">What to calibrate later</h2></div><ul className="mt-4 space-y-3 text-xs leading-5 text-[#657b72]"><li>• Actual buyer acceptance and transaction outcomes</li><li>• Documented quality verification and contamination data</li><li>• Real freight quotes and delivered-cost records</li><li>• Reviewed material-specific lifecycle factors</li></ul></article><article className="rounded-3xl bg-forest p-5 text-white"><p className="text-xs font-bold uppercase tracking-[0.13em] text-mint">Data maturity</p><h2 className="mt-2 text-lg font-semibold tracking-[-0.03em]">Do not confuse a system score with ground truth.</h2><p className="mt-3 text-xs leading-5 text-[#c5dfd0]">The value of this MVP is visible reasoning and a scalable data architecture, not unsupported accuracy claims.</p></article></aside>
+        <article className="card rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-sm lift-hover bg-white">
+          <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[#e5ece7] pb-5">
+            <div>
+              <div className="flex items-center gap-2">
+                <Settings2 className="text-spruce" size={19} />
+                <h2 className="text-[20px] font-bold tracking-tight text-ink">Default MVP decision rules</h2>
+              </div>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-[#657b72]">Version {config.data.config.version} · all six weights must total 100%.</p>
+            </div>
+            <div className={`rounded-2xl px-4 py-3 text-right shadow-sm ${Math.abs(total - 1) < 0.001 ? 'bg-[#e8f5ed] text-spruce border border-emerald-200/60' : 'bg-[#fff1ea] text-[#ae573d] border border-rose-200/60'}`}>
+              <p className="text-[10.5px] font-bold uppercase tracking-[0.1em]">Weight total</p>
+              <p className="mt-1 text-2xl font-extrabold tracking-tight">{Math.round(total * 100)}%</p>
+            </div>
+          </div>
+          <div className="mt-5 divide-y divide-[#e5ece7]">
+            {LABELS.map(([key, label, description]) => (
+              <div key={key} className="grid gap-4 py-4.5 sm:grid-cols-[minmax(0,1fr)_115px] sm:items-center">
+                <div>
+                  <p className="text-[14px] font-bold text-ink">{label}</p>
+                  <p className="mt-1 text-[13px] leading-relaxed text-[#6e837b]">{description}</p>
+                </div>
+                <label className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="1"
+                    className="field-input !rounded-xl !py-2.5 !pr-8 text-right font-bold text-[14px]"
+                    value={Math.round(weights[key] * 100)}
+                    onChange={(event) => setWeight(key, event.target.value)}
+                  />
+                  <span className="absolute right-3.5 top-3 text-[14px] font-bold text-[#759087]">%</span>
+                </label>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#e5ece7] pt-5">
+            <button className="btn-secondary rounded-xl font-medium text-[13px]" onClick={() => setWeights(config.data?.config.weights || null)}>
+              <RotateCcw size={16} />Reset edits
+            </button>
+            <button
+              className="btn-primary rounded-xl font-semibold text-[13px]"
+              disabled={saving || Math.abs(total - 1) > 0.001}
+              onClick={() => void save()}
+            >
+              {saving ? <Loader2 className="animate-spin" size={17} /> : <CheckCircle2 size={17} />}
+              {saving ? 'Saving…' : 'Save decision rules'}
+            </button>
+          </div>
+        </article>
+        <aside className="space-y-5">
+          <article className="card rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm lift-hover bg-white">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="text-spruce" size={18} />
+              <h2 className="text-[17px] font-bold text-ink">Explainability guardrail</h2>
+            </div>
+            <p className="mt-3 text-[13.5px] leading-relaxed text-[#667d74]">The application stores component scores, inputs, flags and rule versions alongside every match. An LLM is never asked to invent the score.</p>
+          </article>
+          <article className="card rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm lift-hover bg-white">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="text-[#a47a25]" size={18} />
+              <h2 className="text-[17px] font-bold text-ink">What to calibrate later</h2>
+            </div>
+            <ul className="mt-4 space-y-2.5 text-[13px] leading-relaxed text-[#657b72]">
+              <li>• Actual buyer acceptance and transaction outcomes</li>
+              <li>• Documented quality verification and contamination data</li>
+              <li>• Real freight quotes and delivered-cost records</li>
+              <li>• Reviewed material-specific lifecycle factors</li>
+            </ul>
+          </article>
+          <article className="rounded-3xl bg-forest p-6 text-white shadow-md lift-hover">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-mint">Data maturity</p>
+            <h2 className="mt-2 text-[18px] font-bold tracking-tight">Do not confuse a system score with ground truth.</h2>
+            <p className="mt-3 text-[13px] leading-relaxed text-[#c5dfd0]">The value of this MVP is visible reasoning and a scalable data architecture, not unsupported accuracy claims.</p>
+          </article>
+        </aside>
       </section>
     </div>
   )

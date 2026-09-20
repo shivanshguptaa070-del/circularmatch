@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react-hooks/exhaustive-deps, react-hooks/use-memo */
 import { useCallback, useEffect, useState } from 'react'
 
 export function useAsync<T>(loader: () => Promise<T>, dependencies: unknown[] = []) {

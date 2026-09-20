@@ -110,56 +110,55 @@ export function MatchDetailPage({ role }: { role: Role }) {
   }
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 animate-fade-in-up">
       <Breadcrumb items={[
-        { label: 'Dashboard', href: '/' },
-        { label: 'Lots', href: '/listings' },
+        { label: 'Dashboard', href: '/dashboard' },
         { label: 'Matches', href: `/listings/${listing.id}/matches` },
-        { label: 'Match detail' }
+        { label: 'Match Explanation' }
       ]} />
       <PageHeader
         eyebrow="Explainable recommendation · trusted pilot core"
         title="Why this match?"
         description="This workspace evaluates compatibility, evidence completeness, quality specs, distance, and circular economics."
-        actions={<><Link className="btn-secondary" to={`/listings/${listing.id}/passport`}><ClipboardCheck size={16} />Material Passport</Link><Link className="btn-secondary" to={`/listings/${listing.id}/matches`}><ArrowRight className="rotate-180" size={16} />Back to buyers</Link></>}
+        actions={<><Link className="btn-secondary rounded-xl" to={`/listings/${listing.id}/passport`}><ClipboardCheck size={16} />Material Passport</Link><Link className="btn-secondary rounded-xl" to={`/listings/${listing.id}/matches`}><ArrowRight className="rotate-180" size={16} />Back to buyers</Link></>}
       />
-      {message && <div className="flex gap-3 rounded-2xl border border-[#b9ddc7] bg-[#eff9f2] p-4 text-sm text-[#28624e]"><CheckCircle2 className="mt-0.5 shrink-0" size={18} /><span>{message}</span></div>}
-      {actionError && <div className="rounded-2xl border border-[#f1c6b9] bg-[#fff7f4] p-4 text-sm text-[#994f3a]">{actionError}</div>}
+      {message && <div className="flex gap-3.5 rounded-2xl border border-[#b9ddc7] bg-[#eff9f2] p-4 text-[14px] text-[#28624e] shadow-sm"><CheckCircle2 className="mt-0.5 shrink-0 text-emerald-600" size={19} /><span>{message}</span></div>}
+      {actionError && <div className="rounded-2xl border border-[#f1c6b9] bg-[#fff7f4] p-4 text-[14px] text-[#994f3a] shadow-sm">{actionError}</div>}
 
-      <section className="relative overflow-hidden rounded-3xl bg-forest p-6 text-white shadow-lift sm:p-8"><div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full border-[34px] border-mint/10" /><div className="relative grid gap-7 lg:grid-cols-[1fr_auto_1fr] lg:items-center"><div className="min-w-0"><p className="text-xs font-bold uppercase tracking-[0.16em] text-mint">Material Passport lot</p><h2 className="mt-3 truncate text-2xl font-semibold tracking-[-0.045em] sm:text-3xl">{listing.material}</h2><p className="mt-2 truncate text-sm text-[#c4dfd0]">{lot ? `${lot.lot_code} · ${lot.material_form}` : 'Lot record pending'} · {formatKg(listing.normalized_kg_per_week)}/week</p><div className="mt-4 flex flex-wrap gap-2"><QualityPill verified={listing.quality_verified} grade={titleCase(listing.quality_grade)} /><span className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-semibold text-[#d1eada]">{Math.round(match.data_completeness_score)}% data completeness</span></div></div><div className="flex items-center justify-center gap-3"><div className="h-px w-10 bg-mint/35" /><Route className="text-mint shrink-0" size={24} /><div className="h-px w-10 bg-mint/35" /></div><div className="min-w-0 lg:text-right"><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#f5d68a]">Buyer route</p><h2 className="mt-3 truncate text-2xl font-semibold tracking-[-0.045em] sm:text-3xl">{buyer.name}</h2><p className="mt-2 truncate text-sm text-[#c4dfd0]">{buyer.city} · {match.distance_km.toFixed(1)} km calculated distance</p><p className="mt-4 inline-flex truncate max-w-full rounded-full bg-white/10 px-3 py-1.5 text-xs font-semibold text-mint">{requirement.minimum_quantity_kg_week.toLocaleString('en-IN')}–{requirement.maximum_quantity_kg_week.toLocaleString('en-IN')} kg/week required</p></div></div><div className="relative mt-7 flex flex-col gap-4 border-t border-white/15 pt-6 lg:flex-row lg:items-center lg:justify-between"><div><p className="max-w-3xl text-sm leading-6 text-[#c7e1d2]">{explanation.headline}</p><p className="mt-2 text-xs font-semibold text-mint">Next action: {match.next_action}</p></div><div className="flex items-center gap-4"><ScoreRing score={match.total_score} size={96} /><button className="btn-primary" style={{ background: '#bfe9d0', color: '#073c33' }} disabled={contacting} onClick={() => setShowContactModal(true)}>{contacting ? <Loader2 className="animate-spin" size={16} /> : <Contact size={16} />}{match.status === 'contacted' ? (role === 'buyer' ? 'Send email to generator' : 'Send email to buyer') : (role === 'buyer' ? 'Contact generator' : 'Contact buyer')}</button></div></div></section>
+      <section className="relative overflow-hidden rounded-3xl bg-forest p-6 text-white shadow-lift sm:p-8 lift-hover shine-wrap"><div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full border-[34px] border-mint/10 animate-blob" /><div className="relative grid gap-7 lg:grid-cols-[1fr_auto_1fr] lg:items-center"><div className="min-w-0"><p className="text-[11px] font-bold uppercase tracking-[0.16em] text-mint">Material Passport lot</p><h2 className="mt-3 truncate text-[26px] font-bold tracking-tight sm:text-[30px]">{listing.material}</h2><p className="mt-2 truncate text-[13.5px] text-[#c4dfd0]">{lot ? `${lot.lot_code} · ${lot.material_form}` : 'Lot record pending'} · {formatKg(listing.normalized_kg_per_week)}/week</p><div className="mt-4 flex flex-wrap gap-2"><QualityPill verified={listing.quality_verified} grade={titleCase(listing.quality_grade)} /><span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-[#d1eada]">{Math.round(match.data_completeness_score)}% data completeness</span></div></div><div className="flex items-center justify-center gap-3"><div className="h-px w-10 bg-mint/35" /><Route className="text-mint shrink-0" size={24} /><div className="h-px w-10 bg-mint/35" /></div><div className="min-w-0 lg:text-right"><p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#f5d68a]">Buyer route</p><h2 className="mt-3 truncate text-[26px] font-bold tracking-tight sm:text-[30px]">{buyer.name}</h2><p className="mt-2 truncate text-[13.5px] text-[#c4dfd0]">{buyer.city} · {match.distance_km.toFixed(1)} km calculated distance</p><p className="mt-4 inline-flex truncate max-w-full rounded-full bg-white/10 px-3.5 py-1.5 text-[12px] font-semibold text-mint">{requirement.minimum_quantity_kg_week.toLocaleString('en-IN')}–{requirement.maximum_quantity_kg_week.toLocaleString('en-IN')} kg/week required</p></div></div><div className="relative mt-7 flex flex-col gap-4 border-t border-white/15 pt-6 lg:flex-row lg:items-center lg:justify-between"><div><p className="max-w-3xl text-[14px] leading-relaxed text-[#c7e1d2]">{explanation.headline}</p><p className="mt-2 text-[12px] font-semibold text-mint">Next action: {match.next_action}</p></div><div className="flex items-center gap-4"><ScoreRing score={match.total_score} size={96} /><button className="btn-primary rounded-xl !py-3 !px-5 text-[13.5px]" style={{ background: '#bfe9d0', color: '#073c33' }} disabled={contacting} onClick={() => setShowContactModal(true)}>{contacting ? <Loader2 className="animate-spin" size={16} /> : <Contact size={16} />}{match.status === 'contacted' ? (role === 'buyer' ? 'Send email to generator' : 'Send email to buyer') : (role === 'buyer' ? 'Contact generator' : 'Contact buyer')}</button></div></div></section>
 
       {/* Contact message modal */}
       {showContactModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => setShowContactModal(false)}>
-          <div className="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl sm:p-8" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm" onClick={() => setShowContactModal(false)}>
+          <div className="animate-scale-in w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl sm:p-8 border border-emerald-100/60" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 border-b border-[#e4eee7] pb-5">
-              <span className="grid h-10 w-10 place-items-center rounded-xl bg-[#e8f5ed] text-[#2d6a4f]"><Send size={18} /></span>
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#e8f5ed] text-[#2d6a4f]"><Send size={19} /></span>
               <div>
-                <h3 className="text-lg font-semibold text-ink">Send contact request</h3>
-                <p className="text-sm text-[#6b8179]">{role === 'buyer' ? 'An email will be sent to the generator' : 'An email will be sent to the buyer'}</p>
+                <h3 className="text-[19px] font-bold text-ink tracking-tight">Send contact request</h3>
+                <p className="text-[13px] text-[#6b8179]">{role === 'buyer' ? 'An email will be sent to the generator' : 'An email will be sent to the buyer'}</p>
               </div>
             </div>
             <div className="mt-5 space-y-4">
               <div>
-                <label className="mb-1.5 block text-sm font-medium text-ink" htmlFor="contact-note">Message (optional)</label>
+                <label className="mb-1.5 block text-[13px] font-semibold text-ink" htmlFor="contact-note">Message (optional)</label>
                 <textarea
                   id="contact-note"
                   rows={4}
-                  className="w-full rounded-xl border border-[#d0e4d7] bg-[#f8fbf8] px-4 py-3 text-sm text-ink placeholder:text-[#9db5ac] focus:border-[#2d6a4f] focus:outline-none focus:ring-2 focus:ring-[#2d6a4f]/20 resize-none"
+                  className="w-full rounded-xl border border-[#d0e4d7] bg-[#f8fbf8] p-3.5 text-[14px] leading-relaxed text-ink placeholder:text-[#9db5ac] focus:border-[#2d6a4f] focus:outline-none focus:ring-4 focus:ring-[#2d6a4f]/20 resize-none transition-all"
                   placeholder={role === 'buyer' ? 'Hi, I am interested in sourcing your waste material. Our facility can process...' : 'Hi, I have a regular supply of this material. Would love to discuss...'}
                   value={contactNote}
                   onChange={(e) => setContactNote(e.target.value)}
                   maxLength={500}
                 />
-                <p className="mt-1 text-right text-xs text-[#9db5ac]">{contactNote.length}/500</p>
+                <p className="mt-1 text-right text-[11.5px] text-[#9db5ac]">{contactNote.length}/500</p>
               </div>
-              <div className="rounded-xl border border-[#ddeee3] bg-[#f2faf5] p-3">
-                <p className="text-xs leading-5 text-[#4a7a63]">Your name and email will be shared with the {role === 'buyer' ? 'generator' : 'buyer'} so they can respond directly. This is not a purchase order or contract.</p>
+              <div className="rounded-xl border border-[#ddeee3] bg-[#f2faf5] p-3.5">
+                <p className="text-[12.5px] leading-relaxed text-[#4a7a63]">Your name and email will be shared with the {role === 'buyer' ? 'generator' : 'buyer'} so they can respond directly. This is not a purchase order or contract.</p>
               </div>
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-              <button className="btn-secondary" onClick={() => { setShowContactModal(false); setContactNote('') }} disabled={contacting}>Cancel</button>
-              <button className="btn-primary" onClick={() => void contact()} disabled={contacting}>
+              <button className="btn-secondary rounded-xl !py-2.5" onClick={() => { setShowContactModal(false); setContactNote('') }} disabled={contacting}>Cancel</button>
+              <button className="btn-primary rounded-xl !py-2.5" onClick={() => void contact()} disabled={contacting}>
                 {contacting ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}
                 {contacting ? 'Sending…' : 'Send email'}
               </button>

@@ -198,20 +198,20 @@ export function AppShell({
             <button
               onClick={() => setShowModeMenu(!showModeMenu)}
               disabled={modeSwitching}
-              className="group flex w-full items-center gap-2.5 rounded-xl border border-emerald-100/80 bg-gradient-to-br from-emerald-50/70 to-teal-50/50 p-2.5 text-left transition hover:border-emerald-200 hover:shadow-md hover:shadow-emerald-500/10"
+              className="group lift-hover flex w-full items-center gap-2.5 rounded-xl border border-emerald-100/80 bg-gradient-to-br from-emerald-50/70 to-teal-50/50 p-2.5 text-left transition hover:border-emerald-200 hover:shadow-md hover:shadow-emerald-500/10"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-emerald-700 shadow-sm ring-1 ring-emerald-100">
                 <ModeIcon className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0 leading-tight">
-                <div className="text-sm font-semibold text-slate-900">{modeInfo.label}</div>
-                <div className="truncate text-[11px] text-slate-500">{modeInfo.description}</div>
+                <div className="text-[13.5px] font-semibold text-slate-900">{modeInfo.label}</div>
+                <div className="truncate text-[11.5px] text-slate-500">{modeInfo.description}</div>
               </div>
               <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition group-hover:text-emerald-700 ${showModeMenu ? 'rotate-180' : ''}`} />
             </button>
 
             {showModeMenu && (
-              <div className="absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-xl border border-emerald-100 bg-white p-1 shadow-xl">
+              <div className="animate-scale-in absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-2xl border border-emerald-100 bg-white p-1.5 shadow-xl">
                 {(Object.entries(MODE_CONFIG) as [ActiveMode, typeof MODE_CONFIG[ActiveMode]][]).map(([mode, info]) => {
                   const Icon = info.icon
                   const isActive = mode === profile.active_mode
@@ -219,16 +219,16 @@ export function AppShell({
                     <button
                       key={mode}
                       onClick={() => void switchMode(mode)}
-                      className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left transition ${
-                        isActive ? 'bg-emerald-50 text-emerald-800' : 'text-slate-700 hover:bg-slate-50'
+                      className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition ${
+                        isActive ? 'bg-emerald-50 text-emerald-800 font-semibold' : 'text-slate-700 hover:bg-slate-50'
                       }`}
                     >
-                      <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-md ${isActive ? 'bg-emerald-200/60 text-emerald-800' : 'bg-slate-100 text-slate-500'}`}>
-                        <Icon size={13} />
+                      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${isActive ? 'bg-emerald-200/60 text-emerald-800' : 'bg-slate-100 text-slate-500'}`}>
+                        <Icon size={14} />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs font-semibold">{info.actionLabel}</p>
-                        <p className="truncate text-[10px] text-slate-500">{info.description}</p>
+                        <p className="text-[13px] font-semibold">{info.actionLabel}</p>
+                        <p className="truncate text-[11px] text-slate-500">{info.description}</p>
                       </div>
                     </button>
                   )
@@ -239,12 +239,12 @@ export function AppShell({
         )}
 
         {/* Workspace Label */}
-        <div className="mt-6 px-2 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700/80">
+        <div className="mt-6 px-2 text-[10.5px] font-bold uppercase tracking-[0.2em] text-emerald-700/80">
           Workspace
         </div>
 
         {/* Nav items */}
-        <nav className="mt-2 flex-1 space-y-1">
+        <nav className="mt-2 flex-1 space-y-1.5">
           {navItems.map(({ label, path, icon: Icon, badge }) => {
             const selected = location.pathname === path || (path === '/listings' && location.pathname.startsWith('/listings'))
             return (
@@ -252,7 +252,7 @@ export function AppShell({
                 key={path}
                 to={path}
                 onClick={() => setMobileOpen(false)}
-                className={`group flex w-full items-center justify-between rounded-lg px-3 py-2 text-[13.5px] font-medium transition-all duration-300 ${
+                className={`group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-[13.5px] font-medium transition-all duration-300 ${
                   selected
                     ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
@@ -270,10 +270,10 @@ export function AppShell({
                 </span>
                 {badge && (
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition ${
+                    className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold transition ${
                       selected
                         ? 'bg-white/25 text-white backdrop-blur'
-                        : 'bg-slate-100 text-slate-500 group-hover:bg-emerald-100 group-hover:text-emerald-700'
+                        : 'bg-slate-100 text-slate-600 group-hover:bg-emerald-100 group-hover:text-emerald-700'
                     }`}
                   >
                     {badge}
@@ -285,7 +285,7 @@ export function AppShell({
         </nav>
 
         {/* Bottom user card */}
-        <div className="mt-auto flex items-center gap-2.5 rounded-xl border border-emerald-100/60 bg-gradient-to-br from-slate-50 to-white p-2.5 shadow-sm transition hover:border-emerald-200 hover:shadow-md">
+        <div className="mt-auto lift-hover flex items-center gap-2.5 rounded-xl border border-emerald-100/60 bg-gradient-to-br from-slate-50 to-white p-3 shadow-sm transition hover:border-emerald-200 hover:shadow-md">
           {profile.avatar_url ? (
             <img src={profile.avatar_url} alt={profile.full_name} className="h-9 w-9 rounded-full object-cover shadow-sm" />
           ) : (
@@ -297,12 +297,12 @@ export function AppShell({
             </div>
           )}
           <div className="flex-1 min-w-0 leading-tight">
-            <div className="truncate text-[13px] font-semibold text-slate-900">{profile.full_name}</div>
-            <div className="truncate text-[10.5px] text-slate-500">{profile.company_name || profile.email}</div>
+            <div className="truncate text-[13.5px] font-semibold text-slate-900">{profile.full_name}</div>
+            <div className="truncate text-[11px] text-slate-500">{profile.company_name || profile.email}</div>
           </div>
           <button
             onClick={() => void onSignOut()}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-700"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-700"
             title="Sign out"
             aria-label="Log out"
           >
@@ -384,11 +384,11 @@ export function AppShell({
           }`}
         >
           {/* TopBar */}
-          <header className="sticky top-0 z-20 flex h-[64px] items-center justify-between border-b border-emerald-100/60 bg-white/70 px-6 backdrop-blur-md md:px-8 lg:px-10 animate-fade-in-up">
+          <header className="sticky top-0 z-20 flex h-[64px] items-center justify-between border-b border-emerald-100/60 bg-white/75 px-6 backdrop-blur-md md:px-8 lg:px-10 animate-fade-in-up">
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                className="grid h-9 w-9 place-items-center rounded-lg border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-emerald-300"
+                className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-emerald-300 lift-hover"
                 onClick={() => {
                   if (window.innerWidth >= 1024) {
                     setSidebarCollapsed((prev) => !prev)
@@ -409,7 +409,7 @@ export function AppShell({
                 )}
               </button>
 
-              <div className="flex items-center gap-2 text-[13px] font-medium text-slate-700">
+              <div className="flex items-center gap-2 text-[13.5px] font-medium text-slate-700">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inset-0 animate-soft-ping rounded-full bg-emerald-400" />
                   <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
@@ -422,13 +422,13 @@ export function AppShell({
 
             <div className="flex items-center gap-2.5">
               {/* Search Bar */}
-              <div className="group hidden h-9 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/60 px-3 transition-all duration-300 hover:border-emerald-300 hover:bg-white focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-100 sm:flex">
-                <Search className="h-3.5 w-3.5 text-slate-400 transition-colors group-focus-within:text-emerald-600" />
+              <div className="group hidden h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 transition-all duration-300 hover:border-emerald-300 hover:bg-white focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-100 sm:flex">
+                <Search className="h-4 w-4 text-slate-400 transition-colors group-focus-within:text-emerald-600" />
                 <input
                   placeholder="Search…"
-                  className="w-32 lg:w-40 bg-transparent text-[13px] text-slate-700 outline-none placeholder:text-slate-400"
+                  className="w-32 lg:w-44 bg-transparent text-[13.5px] text-slate-700 outline-none placeholder:text-slate-400"
                 />
-                <span className="hidden items-center gap-0.5 rounded border border-slate-200 bg-white px-1 text-[9px] font-semibold text-slate-500 lg:flex">
+                <span className="hidden items-center gap-0.5 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[9.5px] font-semibold text-slate-500 lg:flex">
                   <Command className="h-2.5 w-2.5" /> K
                 </span>
               </div>
@@ -437,20 +437,23 @@ export function AppShell({
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="group relative flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-md hover:shadow-emerald-500/20"
+                  className="group lift-hover relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-md hover:shadow-emerald-500/20"
                   aria-label="Notifications"
                 >
                   <Bell className="h-4 w-4 transition-transform group-hover:rotate-[12deg]" />
                   {notifications.some((n) => !n.is_read) && (
-                    <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-white" />
+                    <span className="absolute right-1.5 top-1.5 flex h-2.5 w-2.5">
+                      <span className="absolute inset-0 animate-soft-ping rounded-full bg-rose-400 opacity-75" />
+                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
+                    </span>
                   )}
                 </button>
 
                 {showNotifications && (
-                  <div className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-2xl z-50">
+                  <div className="animate-scale-in absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-2xl z-50">
                     <div className="bg-gradient-to-r from-emerald-600 to-teal-700 px-4 py-3 text-sm font-bold text-white flex justify-between items-center">
                       <span>Notifications</span>
-                      <span className="text-[11px] bg-white/20 px-2 py-0.5 rounded-full">{notifications.length}</span>
+                      <span className="text-[11px] bg-white/20 px-2.5 py-0.5 rounded-full font-bold">{notifications.length}</span>
                     </div>
                     <div className="max-h-96 overflow-y-auto divide-y divide-slate-100">
                       {notifications.length === 0 ? (
@@ -475,8 +478,8 @@ export function AppShell({
                               n.is_read ? 'opacity-60' : 'bg-emerald-50/20'
                             }`}
                           >
-                            <p className="text-xs font-bold text-slate-900">{n.title}</p>
-                            <p className="mt-0.5 text-[11px] text-slate-500 leading-relaxed">{n.message}</p>
+                            <p className="text-[12.5px] font-bold text-slate-900">{n.title}</p>
+                            <p className="mt-0.5 text-[11.5px] text-slate-500 leading-relaxed">{n.message}</p>
                           </div>
                         ))
                       )}
@@ -486,17 +489,17 @@ export function AppShell({
               </div>
 
               {/* User Avatar Pill */}
-              <div className="group flex items-center gap-2 rounded-lg border border-slate-200 bg-white py-1 pl-1 pr-2.5 transition hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-500/20">
+              <div className="group lift-hover flex items-center gap-2 rounded-xl border border-slate-200 bg-white py-1 pl-1 pr-2.5 transition hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-500/20">
                 {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.full_name} className="h-7 w-7 rounded-md object-cover" />
+                  <img src={profile.avatar_url} alt={profile.full_name} className="h-7 w-7 rounded-lg object-cover" />
                 ) : (
-                  <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-amber-400 to-orange-500 text-[11px] font-bold text-white shadow-sm">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 text-[11px] font-bold text-white shadow-sm">
                     {initials}
                   </div>
                 )}
                 <div className="hidden leading-tight sm:block max-w-[120px]">
-                  <div className="truncate text-[12px] font-semibold text-slate-900">{profile.full_name}</div>
-                  <div className="truncate text-[9.5px] text-slate-500">{profile.company_name || profile.email}</div>
+                  <div className="truncate text-[12.5px] font-semibold text-slate-900">{profile.full_name}</div>
+                  <div className="truncate text-[10px] text-slate-500">{profile.company_name || profile.email}</div>
                 </div>
               </div>
             </div>

@@ -67,33 +67,109 @@ export function BuyerAcceptanceSpecPage({ role }: { role: Role }) {
   const { requirement, acceptance_spec: spec } = data.data
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 animate-fade-in-up">
       <PageHeader
         eyebrow="Trusted pilot core · Buyer template"
         title={`Acceptance criteria for ${requirement.material}`}
         description="Turn a vague quality preference into explicit material, evidence, sample, and capacity rules. These are buyer-configurable screening criteria—not a universal standard or legal approval."
-        actions={<Link className="btn-primary" to="/buyer-requirements"><ClipboardList size={16} />Buyer requirements<ArrowRight size={16} /></Link>}
+        actions={<Link className="btn-primary rounded-xl" to="/buyer-requirements"><ClipboardList size={16} />Buyer requirements<ArrowRight size={16} /></Link>}
       />
       <Disclosure>{spec.notice}</Disclosure>
-      {message && <div className="flex gap-3 rounded-2xl border border-[#b9ddc7] bg-[#eff9f2] p-4 text-sm text-[#28624e]"><CheckCircle2 className="mt-0.5 shrink-0" size={18} /><span>{message}</span></div>}
-      {error && <div className="rounded-2xl border border-[#f1c6b9] bg-[#fff7f4] p-4 text-sm text-[#994f3a]">{error}</div>}
+      {message && <div className="flex gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/90 p-4 text-[14px] text-emerald-900 shadow-sm"><CheckCircle2 className="mt-0.5 shrink-0 text-emerald-600" size={18} /><span>{message}</span></div>}
+      {error && <div className="rounded-2xl border border-rose-200 bg-rose-50/90 p-4 text-[14px] text-rose-900 shadow-sm">{error}</div>}
 
       <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_288px] xl:grid-cols-[minmax(0,1fr)_360px]">
-        <article className="card p-5 sm:p-7"><div className="flex items-start justify-between gap-4 border-b border-[#e4ece6] pb-5"><div><div className="flex items-center gap-2"><SlidersHorizontal className="text-spruce" size={19} /><h2 className="text-xl font-semibold tracking-[-.04em] text-ink">Acceptance profile</h2></div><p className="mt-2 text-sm leading-6 text-[#687e75]">Matching evaluates these explicit rules before it recommends a commercial action.</p></div><StatusBadge>buyer controlled</StatusBadge></div>
-          <div className="mt-6 grid gap-5 sm:grid-cols-2">
-            <label><span className="field-label">Accepted forms <span className="font-normal text-[#82968e]">comma separated</span></span><input className="field-input" disabled={role !== 'buyer'} value={form.accepted_forms} onChange={(event) => setForm({ ...form, accepted_forms: event.target.value })} placeholder="Manufacturing trim, Regrind" /></label>
-            <label><span className="field-label">Accepted colours <span className="font-normal text-[#82968e]">optional</span></span><input className="field-input" disabled={role !== 'buyer'} value={form.accepted_colours} onChange={(event) => setForm({ ...form, accepted_colours: event.target.value })} placeholder="Clear, Transparent light blue" /></label>
-            <label className="sm:col-span-2"><span className="field-label">Prohibited material / condition <span className="font-normal text-[#82968e]">comma separated</span></span><input className="field-input" disabled={role !== 'buyer'} value={form.prohibited_materials} onChange={(event) => setForm({ ...form, prohibited_materials: event.target.value })} placeholder="PVC, PETG, Free-flowing liquids" /></label>
-            <label><span className="field-label">Minimum evidence level</span><select className="field-input" disabled={role !== 'buyer'} value={form.required_evidence_status} onChange={(event) => setForm({ ...form, required_evidence_status: event.target.value })}>{evidenceOptions.map((option) => <option key={option} value={option}>{titleCase(option)}</option>)}</select></label>
-            <label><span className="field-label">Published intake capacity <span className="font-normal text-[#82968e]">kg/week</span></span><input type="number" className="field-input" disabled={role !== 'buyer'} value={form.available_capacity_kg_week} onChange={(event) => setForm({ ...form, available_capacity_kg_week: event.target.value })} placeholder={String(requirement.maximum_quantity_kg_week)} /></label>
-            <label className="sm:col-span-2 flex cursor-pointer items-center gap-3 rounded-xl border border-[#d5e4da] bg-[#f8fbf9] px-4 py-3.5"><input type="checkbox" disabled={role !== 'buyer'} checked={form.requires_sample} onChange={(event) => setForm({ ...form, requires_sample: event.target.checked })} className="h-4 w-4 accent-[#12645b]" /><span><span className="block text-sm font-semibold text-ink">Require sample or inspection</span><span className="block text-[11px] text-[#71867e]">A match will show “Needs sample” instead of implying commercial acceptance.</span></span></label>
-            <label className="sm:col-span-2"><span className="field-label">Permitted downstream-route note</span><textarea rows={3} className="field-input resize-y" disabled={role !== 'buyer'} value={form.route_note} onChange={(event) => setForm({ ...form, route_note: event.target.value })} /></label>
-            <label className="sm:col-span-2"><span className="field-label">Internal review note</span><textarea rows={2} className="field-input resize-y" disabled={role !== 'buyer'} value={form.review_note} onChange={(event) => setForm({ ...form, review_note: event.target.value })} /></label>
+        <article className="card rounded-2xl border border-slate-200/80 p-5 sm:p-7 shadow-sm lift-hover">
+          <div className="flex items-start justify-between gap-4 border-b border-[#e4ece6] pb-5">
+            <div>
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="text-spruce" size={19} />
+                <h2 className="text-[20px] font-bold tracking-tight text-ink">Acceptance profile</h2>
+              </div>
+              <p className="mt-1.5 text-[13px] leading-relaxed text-[#687e75]">Matching evaluates these explicit rules before it recommends a commercial action.</p>
+            </div>
+            <StatusBadge>buyer controlled</StatusBadge>
           </div>
-          <div className="mt-6 flex flex-col gap-3 border-t border-[#e4ece6] pt-5 sm:flex-row sm:items-center sm:justify-between"><p className="text-xs leading-5 text-[#6e837a]">Template updated: {new Date(spec.updated_at).toLocaleDateString('en-IN')} · Platform template version</p>{role === 'buyer' && <button className="btn-primary" disabled={saving} onClick={() => void save()}>{saving ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}{saving ? 'Saving…' : 'Save acceptance template'}</button>}</div>
+          <div className="mt-6 grid gap-5 sm:grid-cols-2">
+            <label>
+              <span className="field-label text-[12px] font-bold text-slate-700">Accepted forms <span className="font-normal text-[#82968e]">comma separated</span></span>
+              <input className="field-input !rounded-xl !p-3.5 !text-[14px]" disabled={role !== 'buyer'} value={form.accepted_forms} onChange={(event) => setForm({ ...form, accepted_forms: event.target.value })} placeholder="Manufacturing trim, Regrind" />
+            </label>
+            <label>
+              <span className="field-label text-[12px] font-bold text-slate-700">Accepted colours <span className="font-normal text-[#82968e]">optional</span></span>
+              <input className="field-input !rounded-xl !p-3.5 !text-[14px]" disabled={role !== 'buyer'} value={form.accepted_colours} onChange={(event) => setForm({ ...form, accepted_colours: event.target.value })} placeholder="Clear, Transparent light blue" />
+            </label>
+            <label className="sm:col-span-2">
+              <span className="field-label text-[12px] font-bold text-slate-700">Prohibited material / condition <span className="font-normal text-[#82968e]">comma separated</span></span>
+              <input className="field-input !rounded-xl !p-3.5 !text-[14px]" disabled={role !== 'buyer'} value={form.prohibited_materials} onChange={(event) => setForm({ ...form, prohibited_materials: event.target.value })} placeholder="PVC, PETG, Free-flowing liquids" />
+            </label>
+            <label>
+              <span className="field-label text-[12px] font-bold text-slate-700">Minimum evidence level</span>
+              <select className="field-input !rounded-xl !p-3.5 !text-[14px]" disabled={role !== 'buyer'} value={form.required_evidence_status} onChange={(event) => setForm({ ...form, required_evidence_status: event.target.value })}>
+                {evidenceOptions.map((option) => <option key={option} value={option}>{titleCase(option)}</option>)}
+              </select>
+            </label>
+            <label>
+              <span className="field-label text-[12px] font-bold text-slate-700">Published intake capacity <span className="font-normal text-[#82968e]">kg/week</span></span>
+              <input type="number" className="field-input !rounded-xl !p-3.5 !text-[14px]" disabled={role !== 'buyer'} value={form.available_capacity_kg_week} onChange={(event) => setForm({ ...form, available_capacity_kg_week: event.target.value })} placeholder={String(requirement.maximum_quantity_kg_week)} />
+            </label>
+            <label className="sm:col-span-2 flex cursor-pointer items-center gap-3.5 rounded-xl border border-[#d5e4da] bg-[#f8fbf9] px-4 py-3.5 transition-colors hover:bg-emerald-50/40">
+              <input type="checkbox" disabled={role !== 'buyer'} checked={form.requires_sample} onChange={(event) => setForm({ ...form, requires_sample: event.target.checked })} className="h-4.5 w-4.5 rounded accent-[#12645b]" />
+              <span>
+                <span className="block text-[14px] font-semibold text-ink">Require sample or inspection</span>
+                <span className="block text-[12px] text-[#71867e]">A match will show “Needs sample” instead of implying commercial acceptance.</span>
+              </span>
+            </label>
+            <label className="sm:col-span-2">
+              <span className="field-label text-[12px] font-bold text-slate-700">Permitted downstream-route note</span>
+              <textarea rows={3} className="field-input !rounded-xl !p-3.5 !text-[14px] resize-y" disabled={role !== 'buyer'} value={form.route_note} onChange={(event) => setForm({ ...form, route_note: event.target.value })} />
+            </label>
+            <label className="sm:col-span-2">
+              <span className="field-label text-[12px] font-bold text-slate-700">Internal review note</span>
+              <textarea rows={2} className="field-input !rounded-xl !p-3.5 !text-[14px] resize-y" disabled={role !== 'buyer'} value={form.review_note} onChange={(event) => setForm({ ...form, review_note: event.target.value })} />
+            </label>
+          </div>
+          <div className="mt-6 flex flex-col gap-3 border-t border-[#e4ece6] pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-[12px] leading-relaxed text-[#6e837a]">Template updated: {new Date(spec.updated_at).toLocaleDateString('en-IN')} · Platform template version</p>
+            {role === 'buyer' && (
+              <button className="btn-primary rounded-xl font-semibold" disabled={saving} onClick={() => void save()}>
+                {saving ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />}
+                {saving ? 'Saving…' : 'Save acceptance template'}
+              </button>
+            )}
+          </div>
         </article>
-        <aside className="space-y-5"><article className="card p-5"><div className="flex items-center gap-2"><ShieldCheck className="text-spruce" size={18} /><h2 className="font-semibold text-ink">How gates work</h2></div><div className="mt-4 space-y-3 text-xs leading-5 text-[#647a71]"><p><strong className="text-ink">Blocked:</strong> material form, stated quality, colour, or distance conflicts with a rule.</p><p><strong className="text-ink">Missing evidence:</strong> the lot does not meet your selected evidence threshold.</p><p><strong className="text-ink">Needs sample:</strong> screening fit is present, but inspection/sample is required before commercial acceptance.</p><p><strong className="text-ink">Eligible:</strong> no current screening gate blocks an RFQ; it still is not a contract.</p></div></article><article className="card p-5"><div className="flex items-center gap-2"><TestTube2 className="text-[#a47a25]" size={18} /><h2 className="font-semibold text-ink">Current demand signal</h2></div><div className="mt-4 rounded-2xl bg-[#f6f9f6] p-4 text-sm"><p className="font-semibold text-ink">{formatKg(requirement.minimum_quantity_kg_week)}–{formatKg(requirement.maximum_quantity_kg_week)}/week</p><p className="mt-2 text-xs text-[#6d837a]">{requirement.city} · {requirement.maximum_distance_km} km screening radius · minimum stated quality: {titleCase(requirement.minimum_quality_grade)}</p></div></article><Link className="btn-secondary w-full" to={`/buyer-requirements/${requirement.id}/matches`}><FileCheck2 size={16} />View compatible supply<ArrowRight size={15} /></Link></aside>
+        <aside className="space-y-5">
+          <article className="card rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm lift-hover">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="text-spruce" size={18} />
+              <h2 className="text-[17px] font-bold text-ink">How gates work</h2>
+            </div>
+            <div className="mt-4 space-y-3 text-[13px] leading-relaxed text-[#647a71]">
+              <p><strong className="text-ink">Blocked:</strong> material form, stated quality, colour, or distance conflicts with a rule.</p>
+              <p><strong className="text-ink">Missing evidence:</strong> the lot does not meet your selected evidence threshold.</p>
+              <p><strong className="text-ink">Needs sample:</strong> screening fit is present, but inspection/sample is required before commercial acceptance.</p>
+              <p><strong className="text-ink">Eligible:</strong> no current screening gate blocks an RFQ; it still is not a contract.</p>
+            </div>
+          </article>
+          <article className="card rounded-2xl border border-slate-200/80 p-5 sm:p-6 shadow-sm lift-hover">
+            <div className="flex items-center gap-2">
+              <TestTube2 className="text-[#a47a25]" size={18} />
+              <h2 className="text-[17px] font-bold text-ink">Current demand signal</h2>
+            </div>
+            <div className="mt-4 rounded-2xl bg-[#f6f9f6] p-4 text-[13.5px] border border-slate-100">
+              <p className="font-bold text-ink">{formatKg(requirement.minimum_quantity_kg_week)}–{formatKg(requirement.maximum_quantity_kg_week)}/week</p>
+              <p className="mt-2 text-[12.5px] text-[#6d837a] leading-relaxed">
+                {requirement.city} · {requirement.maximum_distance_km} km screening radius · minimum stated quality: {titleCase(requirement.minimum_quality_grade)}
+              </p>
+            </div>
+          </article>
+          <Link className="btn-secondary rounded-xl w-full justify-center text-[13.5px] font-medium" to={`/buyer-requirements/${requirement.id}/matches`}>
+            <FileCheck2 size={16} />View compatible supply<ArrowRight size={15} />
+          </Link>
+        </aside>
       </section>
     </div>
   )
 }
+

@@ -300,7 +300,11 @@ print(f"PASSED: {passed_tests} / {total_tests} ({passed_tests/total_tests*100:.1
 print(f"FAILED: {failed_tests}")
 print("=" * 80)
 
-if failed_tests > 0:
-    sys.exit(1)
-else:
-    sys.exit(0)
+def test_full_suite_results():
+    assert failed_tests == 0, f"{failed_tests} tests failed in suite"
+
+if __name__ == "__main__":
+    if failed_tests > 0:
+        sys.exit(1)
+    else:
+        sys.exit(0)

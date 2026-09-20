@@ -179,19 +179,19 @@ function DashboardHeader() {
         <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-600 bg-clip-text text-[32px] font-extrabold leading-tight tracking-tight text-transparent">
           Buy Dashboard
         </h1>
-        <p className="mt-1.5 max-w-2xl text-[13.5px] leading-relaxed text-slate-500">
+        <p className="mt-1.5 max-w-2xl text-[14px] leading-relaxed text-slate-500">
           Track your secondary material requirements, active supplier matches, and cost savings pipeline across{' '}
           <span className="font-semibold text-slate-700">all your procurement targets</span>.
         </p>
       </div>
 
       <div className="flex items-center gap-2.5">
-        <button className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3.5 text-[13px] font-medium text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 shadow-sm">
+        <button className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 shadow-sm lift-hover">
           Last 30 days
         </button>
         <Link
           to="/buyer-requirements"
-          className="group inline-flex h-9 items-center gap-1.5 rounded-lg bg-gradient-to-r from-slate-900 to-slate-800 px-4 text-[13px] font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:shadow-emerald-500/20 hover:shadow-xl"
+          className="group inline-flex h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 px-4 text-[13px] font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:shadow-emerald-500/20 hover:shadow-xl"
         >
           <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
           Set a sourcing target
@@ -498,7 +498,6 @@ function DonutChart({ categoryData }: { categoryData?: { name: string; value: nu
 
   const r = 50;
   const c = 2 * Math.PI * r;
-  let offset = 0;
 
   return (
     <div className="relative">
@@ -514,10 +513,10 @@ function DonutChart({ categoryData }: { categoryData?: { name: string; value: nu
         </defs>
         <circle cx="70" cy="70" r={r} stroke="#f1f5f9" strokeWidth="14" fill="none" />
         {segments.map((s, i) => {
+          const priorLen = segments.slice(0, i).reduce((sum, seg) => sum + (seg.pct / 100) * c, 0);
           const len = (s.pct / 100) * c;
           const dasharray = `${len} ${c - len}`;
-          const dashoffset = -offset;
-          offset += len;
+          const dashoffset = -priorLen;
           if (s.pct === 0) return null;
           return (
             <circle
