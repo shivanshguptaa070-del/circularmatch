@@ -10,14 +10,12 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { Activity, ArrowRight, CircleDollarSign, Leaf, Network, PackageCheck, Recycle, Settings2, SlidersHorizontal, UsersRound } from 'lucide-react'
-import { useSearchParams } from 'react-router-dom'
+import { Activity, CircleDollarSign, Leaf, Network, PackageCheck, Recycle, UsersRound } from 'lucide-react'
 import { get } from '../lib/api'
 import { formatCurrency, formatKg, formatNumber } from '../lib/format'
 import { useAsync } from '../hooks/useAsync'
 import type { AdminDashboardSummary } from '../types'
 import { ErrorPanel, PageSkeleton, MetricCard, PageHeader } from '../components/ui'
-import { AdminPage } from './AdminPage'
 
 const CHART_COLORS = ['#12645b', '#72a98f', '#c08a37', '#86a8b8', '#e98467']
 
@@ -38,39 +36,7 @@ function ChartCard({ title, subtitle, children, accent = 'spruce' }: { title: st
 }
 
 export function AdminDashboard() {
-  const [searchParams, setSearchParams] = useSearchParams()
-  const activeTab = searchParams.get('tab') === 'scoring' ? 'scoring' : 'overview'
-
   const summary = useAsync(() => get<AdminDashboardSummary>('/api/dashboard/summary').then((r) => r.data), [])
-
-  if (activeTab === 'scoring') {
-    return (
-      <div className="space-y-6 animate-fade-in-up">
-        <div className="flex items-center justify-between gap-4 border-b border-emerald-100/80 pb-4">
-          <div className="flex items-center gap-2">
-            <button
-              id="admin-back-to-overview-tab"
-              onClick={() => setSearchParams({})}
-              className="rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-[12.5px] font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
-            >
-              ← Platform Overview
-            </button>
-            <span className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 px-3.5 py-1.5 text-[12.5px] font-semibold text-white shadow-sm flex items-center gap-1.5">
-              <Settings2 size={14} />
-              <span>Scoring Rules</span>
-            </span>
-          </div>
-          <button
-            onClick={() => setSearchParams({})}
-            className="text-[12px] font-medium text-slate-500 hover:text-emerald-700 transition"
-          >
-            Exit to Overview
-          </button>
-        </div>
-        <AdminPage role="admin" />
-      </div>
-    )
-  }
 
   if (summary.loading) return <PageSkeleton />
   if (summary.error || !summary.data) return <ErrorPanel error={summary.error || 'Unavailable'} onRetry={() => void summary.reload()} />
@@ -82,67 +48,8 @@ export function AdminDashboard() {
         eyebrow="Admin Workspace"
         title="Platform Overview"
         description="Full platform visibility — all listings, requirements, matches, and environmental impact across all companies."
-        actions={
-          <div className="flex items-center gap-2.5">
-            <button
-              id="admin-dashboard-scoring-rules-btn"
-              onClick={() => setSearchParams({ tab: 'scoring' })}
-              className="btn-primary inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-semibold shadow-sm transition hover:shadow-md"
-            >
-              <Settings2 size={16} />
-              <span>Scoring Rules</span>
-            </button>
-          </div>
-        }
+        actions={undefined}
       />
-
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-emerald-100/70 pb-3">
-        <button
-          id="tab-btn-overview"
-          onClick={() => setSearchParams({})}
-          className="rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 px-4 py-2 text-[13px] font-semibold text-white shadow-md shadow-emerald-600/20"
-        >
-          Platform Overview
-        </button>
-        <button
-          id="tab-btn-scoring"
-          onClick={() => setSearchParams({ tab: 'scoring' })}
-          className="flex items-center gap-2 rounded-xl border border-slate-200/80 bg-white px-4 py-2 text-[13px] font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900"
-        >
-          <Settings2 size={15} />
-          <span>Scoring Rules</span>
-        </button>
-      </div>
-
-      {/* Scoring Rules Quick Action Card */}
-      <section className="card rounded-2xl border border-emerald-200/80 bg-gradient-to-br from-emerald-50/70 via-teal-50/40 to-white p-5 sm:p-6 shadow-sm lift-hover">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-start gap-3.5">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-600/25">
-              <Settings2 size={20} />
-            </span>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-[17px] font-bold text-slate-900">Deterministic Scoring Rules</h3>
-                <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-800">Active</span>
-              </div>
-              <p className="mt-1 text-[13px] text-slate-600 max-w-2xl">
-                Calibrate how the matcher calculates compatibility: Material (35%), Quality (20%), Quantity (20%), Distance (15%), Price (0%), and Environment (10%).
-              </p>
-            </div>
-          </div>
-          <button
-            id="btn-admin-configure-rules"
-            onClick={() => setSearchParams({ tab: 'scoring' })}
-            className="btn-primary flex items-center gap-2 rounded-xl px-4 py-2.5 text-[13px] font-semibold shrink-0 shadow-sm transition hover:shadow-md"
-          >
-            <SlidersHorizontal size={15} />
-            <span>Configure Scoring Rules</span>
-            <ArrowRight size={15} />
-          </button>
-        </div>
-      </section>
       <section className="grid gap-5 lg:grid-cols-3 xl:grid-cols-4">
         <MetricCard label="Total Waste Listed" value={`${formatKg(data.kpis?.total_waste_listed_kg_week || 0)} / wk`} detail="Across all active listings" icon={Recycle} />
         <MetricCard label="Waste Diverted" value={formatKg(data.kpis?.waste_diverted_kg || 0)} detail="Via confirmed transactions" icon={PackageCheck} />
