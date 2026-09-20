@@ -48,67 +48,149 @@ def _normalize(value: str) -> str:
     return " ".join(value.lower().strip().split())
 
 
-def material_score(listing: WasteListing, requirement: BuyerRequirement) -> float | None:
-    # Controlled MVP catalog: exact canonical material is required. Future catalog
-    # mappings can introduce explicitly approved compatible grades here.
-    return 100.0 if listing.material_id == requirement.material_id else None
+GRADE_MAP = {
+    "a": 3,
+    "b": 2,
+    "c": 1,
+    "premium": 3,
+    "industrial": 3,
+    "standard": 2,
+    "mixed": 1,
+    "unknown": 1,
+}
+
+CONTAMINATION_MAP = {
+    "low": 1,
+    "med": 2,
+    "medium": 2,
+    "high": 3,
+}
+
+CITY_TO_STATE = {
+    "new delhi": "Delhi",
+    "delhi": "Delhi",
+    "noida": "Uttar Pradesh",
+    "ghaziabad": "Uttar Pradesh",
+    "gurugram": "Haryana",
+    "gurgaon": "Haryana",
+    "faridabad": "Haryana",
+    "manesar": "Haryana",
+    "sonipat": "Haryana",
+    "bhiwadi": "Rajasthan",
+}
+
+
+def _normalize_category(cat: str) -> str:
+    c = cat.strip().lower()
+    if c.endswith("s") and not c.endswith("ss"):
+        c = c[:-1]
+    return c.replace("&", "/").replace(" ", "")
+
+
+def material_score(listing: WasteListing, requirement: BuyerRequirement, material: Material | None = None) -> float:
+    """material_score (35 pts): Exact category match = 35, No match = 0."""
+    req_category = (getattr(requirement, "material_category", None) or "").strip().lower()
+    mat_category = (material.category if material else "").strip().lower()
+    if req_category and mat_category:
+        norm_req = _normalize_category(req_category)
+        norm_mat = _normalize_category(mat_category)
+        if norm_req == norm_mat or norm_req in norm_mat or norm_mat in norm_req:
+            return 35.0
+        return 0.0
+    if requirement.material_id and listing.material_id:
+        return 35.0 if listing.material_id == requirement.material_id else 0.0
+    return 0.0
 
 
 def quality_score(listing: WasteListing, requirement: BuyerRequirement) -> float:
-    listing_rank = QUALITY_RANK[listing.quality_grade]
-    requirement_rank = QUALITY_RANK[requirement.minimum_quality_grade]
-    if listing_rank < requirement_rank:
-        return 0.0
-    # A declared grade that meets the buyer rule remains usable for a lead, but it
-    # cannot score as fully verified or be described as certified.
-    return 100.0 if listing.quality_verified else 85.0
+    """quality_score (20 pts): Grade A meets Grade A requirement = 15, Contamination within limit = 5."""
+    req_grade_str = getattr(requirement, "minimum_grade", None) or getattr(requirement, "minimum_quality_grade", "standard")
+    req_grade_val = GRADE_MAP.get(str(req_grade_str).lower(), 2)
+    listing_grade_val = GRADE_MAP.get(str(listing.quality_grade).lower(), 1)
+    grade_score = 15.0 if listing_grade_val >= req_grade_val else 0.0
+
+    req_contam_str = getattr(requirement, "maximum_contamination", "high") or "high"
+    req_contam_val = CONTAMINATION_MAP.get(str(req_contam_str).lower(), 3)
+    listing_contam_str = getattr(listing, "contamination_level", "low") or "low"
+    listing_contam_val = CONTAMINATION_MAP.get(str(listing_contam_str).lower(), 1)
+    contam_score = 5.0 if listing_contam_val <= req_contam_val else 0.0
+
+    return grade_score + contam_score
 
 
 def quantity_score(listing: WasteListing, requirement: BuyerRequirement) -> float:
+    """quantity_score (20 pts): Supplier qty within buyer range = 20, Within 20% of range = 12, Outside range = 5."""
     available = listing.normalized_kg_per_week
     minimum = requirement.minimum_quantity_kg_week
     maximum = requirement.maximum_quantity_kg_week
     if minimum <= available <= maximum:
-        return 100.0
-    if available < minimum:
-        return _clamp(100 * (available / minimum))
-    if not requirement.allow_partial_quantity:
-        return 0.0
-    oversupply_ratio = (available - maximum) / maximum
-    return _clamp(100 - 85 * oversupply_ratio, lower=15)
+        return 20.0
+    lower_bound = 0.8 * minimum
+    upper_bound = 1.2 * maximum
+    if lower_bound <= available <= upper_bound:
+        return 12.0
+    return 5.0
 
 
-def distance_score(distance_km: float, maximum_distance_km: float) -> float:
+def location_score(listing: WasteListing, requirement: BuyerRequirement) -> float:
+    """location_score (15 pts): Same city = 15, Same state = 10, Different state = 5."""
+    listing_city = listing.city.strip().lower()
+    buyer_city = (getattr(requirement, "preferred_location", None) or requirement.city).strip().lower()
+    if listing_city == buyer_city or buyer_city in listing_city or listing_city in buyer_city:
+        return 15.0
+
+    listing_state = CITY_TO_STATE.get(listing_city, "Delhi")
+    buyer_state = CITY_TO_STATE.get(buyer_city)
+    if buyer_state and buyer_state.lower() == listing_state.lower():
+        return 10.0
+    if buyer_city in listing_state.lower() or listing_state.lower() in buyer_city:
+        return 10.0
+    return 5.0
+
+
+def distance_score(distance_km: float, maximum_distance_km: float, listing: WasteListing | None = None, requirement: BuyerRequirement | None = None) -> float:
+    if listing is not None and requirement is not None:
+        return location_score(listing, requirement)
     if distance_km > maximum_distance_km:
-        return 0.0
+        return 5.0
     nearby_threshold = min(25.0, maximum_distance_km * 0.25)
     if distance_km <= nearby_threshold:
-        return 100.0
-    return _clamp(
-        100 - ((distance_km - nearby_threshold) / (maximum_distance_km - nearby_threshold)) * 60,
-        lower=40,
-    )
+        return 15.0
+    return 10.0
+
+
+def evidence_score(lot: MaterialLot | None, evidence: list[QualityEvidence] | None) -> float:
+    """evidence_score (10 pts): 5 items complete = 10, 4 items = 8, 3 items = 5, Below 3 = 2."""
+    completed = 0
+    if lot:
+        if lot.material_form and _normalize(lot.material_form) != "not specified":
+            completed += 1
+        if lot.colour and _normalize(lot.colour) != "not specified":
+            completed += 1
+        if lot.packaging and _normalize(lot.packaging) != "not specified":
+            completed += 1
+        if lot.storage_condition and _normalize(lot.storage_condition) != "not specified":
+            completed += 1
+    if evidence and len(evidence) > 0:
+        completed += 1
+
+    if completed >= 5:
+        return 10.0
+    if completed == 4:
+        return 8.0
+    if completed == 3:
+        return 5.0
+    return 2.0
+
+
+def environment_score(material: Material, listing: WasteListing, requirement: BuyerRequirement, distance_km: float, lot: MaterialLot | None = None, evidence: list[QualityEvidence] | None = None) -> float:
+    return evidence_score(lot, evidence)
 
 
 def price_score(listing: WasteListing, requirement: BuyerRequirement, logistics_per_kg: float) -> tuple[float, list[str], float | None]:
     flags: list[str] = []
-    if listing.asking_price_per_kg is None or requirement.target_price_per_kg is None:
-        flags.append("Price comparison is neutral because an illustrative listing price or buyer target is missing.")
-        delivered_cost = round(listing.asking_price_per_kg + logistics_per_kg, 2) if listing.asking_price_per_kg is not None else None
-        return 50.0, flags, delivered_cost
-
-    delivered_cost = round(listing.asking_price_per_kg + logistics_per_kg, 2)
-    score = _clamp((requirement.target_price_per_kg / delivered_cost) * 100)
-    if delivered_cost > requirement.target_price_per_kg:
-        flags.append("Illustrative delivered cost is above the buyer's demo target; price discussion may be needed.")
-    return score, flags, delivered_cost
-
-
-def environment_score(material: Material, listing: WasteListing, requirement: BuyerRequirement, distance_km: float) -> float:
-    material_use = selected_material_use(material, listing.selected_use_id)
-    distance_penalty = (distance_km / requirement.maximum_distance_km) * 15
-    # A documented decision signal—not a scientific optimisation or LCA.
-    return round(_clamp(material_use.recovery_factor * 100 - distance_penalty), 1)
+    delivered_cost = round(listing.asking_price_per_kg + logistics_per_kg, 2) if listing.asking_price_per_kg is not None else None
+    return 0.0, flags, delivered_cost
 
 
 def _best_evidence_status(evidence: list[QualityEvidence]) -> str:
@@ -213,8 +295,8 @@ def calculate_match(
     if listing.status != "active" or requirement.status != "active":
         return None
 
-    calculated_material_score = material_score(listing, requirement)
-    if calculated_material_score is None:
+    calculated_material_score = material_score(listing, requirement, material)
+    if calculated_material_score == 0.0:
         return None
 
     evidence = evidence or []
@@ -233,9 +315,9 @@ def calculate_match(
         flags.append("Verification required: quality is supplier-declared and not verified.")
 
     distance_km = haversine_km(listing.latitude, listing.longitude, requirement.latitude, requirement.longitude)
-    calculated_distance_score = distance_score(distance_km, requirement.maximum_distance_km)
-    distance_blocked = calculated_distance_score == 0
-    if distance_blocked:
+    calculated_distance_score = location_score(listing, requirement)
+    distance_blocked = calculated_distance_score <= 5.0
+    if distance_km > requirement.maximum_distance_km:
         checks.append(EligibilityCheck(key="distance", label="Serviceable distance", status="warning", detail=f"{distance_km:.1f} km exceeds the buyer's {requirement.maximum_distance_km:.0f} km screening radius. Freight negotiations needed."))
     else:
         checks.append(EligibilityCheck(key="distance", label="Serviceable distance", status="pass", detail=f"{distance_km:.1f} km is within the buyer's {requirement.maximum_distance_km:.0f} km screening radius."))
@@ -254,7 +336,7 @@ def calculate_match(
     logistics_per_kg = estimate_logistics_per_kg(distance_km)
     calculated_price_score, price_flags, delivered_cost = price_score(listing, requirement, logistics_per_kg)
     flags.extend(price_flags)
-    calculated_environment_score = environment_score(material, listing, requirement, distance_km)
+    calculated_evidence_score = evidence_score(lot, evidence)
 
     accepted_sample = any(item.status == "accepted" for item in sample_requests)
     if accepted_sample:
@@ -295,9 +377,16 @@ def calculate_match(
         "quantity": calculated_quantity_score,
         "distance": calculated_distance_score,
         "price": calculated_price_score,
-        "environment": calculated_environment_score,
+        "environment": calculated_evidence_score,
     }
-    total_score = round(sum(scores[key] * scoring_config.weights[key] for key in scores), 1)
+    total_score = round(
+        calculated_material_score
+        + calculated_quality_score
+        + calculated_quantity_score
+        + calculated_distance_score
+        + calculated_evidence_score,
+        1,
+    )
     material_use = selected_material_use(material, listing.selected_use_id)
     economic = economic_value(listing, requirement, distance_km)
     impact = environmental_impact(listing, material, material_use, requirement, distance_km)
@@ -306,6 +395,7 @@ def calculate_match(
         id=f"match-{listing.id}-{requirement.id}",
         listing_id=listing.id,
         buyer_requirement_id=requirement.id,
+        material_id=listing.material_id,
         scoring_config_id=scoring_config.id,
         total_score=total_score,
         material_score=round(calculated_material_score, 1),
@@ -313,7 +403,7 @@ def calculate_match(
         quantity_score=round(calculated_quantity_score, 1),
         distance_score=round(calculated_distance_score, 1),
         price_score=round(calculated_price_score, 1),
-        environment_score=round(calculated_environment_score, 1),
+        environment_score=round(calculated_evidence_score, 1),
         distance_km=distance_km,
         estimated_logistics_per_kg=logistics_per_kg,
         delivered_cost_per_kg=delivered_cost,
@@ -346,6 +436,7 @@ def calculate_match(
             "decision_rule_label": "MVP decision rules — configurable, not scientifically optimal.",
         },
         created_at=datetime.now(timezone.utc).isoformat(),
+        is_demo=bool(getattr(listing, "is_demo", False) and getattr(requirement, "is_demo", False)),
     )
 
 

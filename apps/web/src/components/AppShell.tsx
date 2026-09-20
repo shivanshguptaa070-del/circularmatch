@@ -62,12 +62,16 @@ export function AppShell({
   onSwitchMode,
   onSignOut,
   isAdmin = false,
+  isDemo = false,
+  demoRole,
 }: {
   profile: UserProfile
   children: ReactNode
   onSwitchMode: (mode: ActiveMode) => Promise<void>
   onSignOut: () => Promise<void>
   isAdmin?: boolean
+  isDemo?: boolean
+  demoRole?: 'seller' | 'buyer' | 'admin'
 }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
@@ -501,9 +505,58 @@ export function AppShell({
                   <div className="truncate text-[12.5px] font-semibold text-slate-900">{profile.full_name}</div>
                   <div className="truncate text-[10px] text-slate-500">{profile.company_name || profile.email}</div>
                 </div>
+                {isDemo && (
+                  <span className="ml-1 hidden sm:inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200">
+                    DEMO
+                  </span>
+                )}
               </div>
             </div>
           </header>
+
+          {/* Demo Environment Banner */}
+          {isDemo && (
+            <div
+              role="banner"
+              aria-label="Demo environment banner"
+              className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 px-6 py-2.5 sm:px-8 lg:px-10"
+            >
+              <div className="flex items-center gap-2 text-[12.5px] font-semibold text-amber-800">
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold text-white">⚡</span>
+                <span className="hidden sm:inline">DEMO ENVIRONMENT</span>
+                <span className="text-amber-500">·</span>
+                <span className="capitalize">{demoRole ?? 'demo'} Workspace</span>
+                <span className="hidden text-amber-400 sm:inline">·</span>
+                <span className="hidden text-[11.5px] font-normal text-amber-600 sm:inline">Data is isolated from production</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {(['seller', 'buyer', 'admin'] as const).filter((r) => r !== demoRole).map((role) => (
+                  <button
+                    key={role}
+                    id={`demo-switch-${role}`}
+                    onClick={() => {
+                      localStorage.setItem('cm_demo', role)
+                      window.location.href = `/dashboard?demo=${role}`
+                    }}
+                    className="rounded-full border border-amber-300 bg-white px-3 py-1 text-[11.5px] font-semibold text-amber-800 transition hover:bg-amber-100 hover:border-amber-400 capitalize"
+                  >
+                    → {role.charAt(0).toUpperCase() + role.slice(1)}
+                  </button>
+                ))}
+                <button
+                  id="demo-exit"
+                  onClick={() => {
+                    localStorage.removeItem('cm_demo')
+                    localStorage.removeItem('cm_demo_session')
+                    window.location.href = '/'
+                  }}
+                  className="rounded-full border border-red-200 bg-white px-3 py-1 text-[11.5px] font-semibold text-red-600 transition hover:bg-red-50 hover:border-red-300"
+                >
+                  ✕ Exit Demo
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Main Body */}
           <main className="flex-1 overflow-x-hidden px-6 py-7 sm:px-8 sm:py-8 lg:px-10 lg:py-10">

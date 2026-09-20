@@ -674,10 +674,10 @@ class DemoStore:
                 "users": [k for k, v in self.users.items() if v.is_demo],
                 "listings": [k for k, v in self.listings.items() if v.is_demo],
                 "requirements": [k for k, v in self.requirements.items() if v.is_demo],
-                "lots": [k for k, v in self.lots.items()],  # lots have no is_demo field yet
+                "lots": [k for k, v in self.lots.items() if v.is_demo],
                 "evidence": [k for k, v in self.evidence.items() if v.is_demo],
                 "acceptance_specs": [k for k, v in self.acceptance_specs.items() if v.is_demo],
-                "matches": [k for k, v in self.matches.items()],  # matches have no is_demo field yet
+                "matches": [k for k, v in self.matches.items() if v.is_demo],
                 "transactions": len([t for t in self.transactions if t.get("is_demo", True)]),
             }
             counts = {

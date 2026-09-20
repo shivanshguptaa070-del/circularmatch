@@ -55,8 +55,12 @@ export function BuyerRequirementsPage({ role: _role }: { role?: Role }) {
 
   const [form, setForm] = useState({
     material_id: '',
+    material_category: '',
     minimum_quantity_kg_week: '',
     maximum_quantity_kg_week: '',
+    minimum_grade: 'B',
+    maximum_contamination: 'low',
+    preferred_location: '',
     minimum_quality_grade: 'standard',
     maximum_distance_km: '200',
     target_price_per_kg: '',
@@ -92,8 +96,12 @@ export function BuyerRequirementsPage({ role: _role }: { role?: Role }) {
     setEditingId(req.id)
     setForm({
       material_id: req.material_id || '',
+      material_category: req.material_category || req.category || '',
       minimum_quantity_kg_week: String(req.minimum_quantity_kg_week),
       maximum_quantity_kg_week: String(req.maximum_quantity_kg_week),
+      minimum_grade: req.minimum_grade || 'B',
+      maximum_contamination: (req.maximum_contamination?.toLowerCase() as any) || 'low',
+      preferred_location: req.preferred_location || req.city || '',
       minimum_quality_grade: req.minimum_quality_grade,
       maximum_distance_km: String(req.maximum_distance_km),
       target_price_per_kg: req.target_price_per_kg ? String(req.target_price_per_kg) : '',
@@ -105,12 +113,8 @@ export function BuyerRequirementsPage({ role: _role }: { role?: Role }) {
 
   const submitRequirement = async () => {
     setError(null)
-    if (!form.material_id) {
-      setError('Please select a required material.')
-      return
-    }
-    if (!form.city) {
-      setError('Please select your buyer location.')
+    if (!form.material_category && !form.material_id) {
+      setError('Please select a material category.')
       return
     }
     if (!form.minimum_quantity_kg_week || !form.maximum_quantity_kg_week) {
@@ -123,14 +127,25 @@ export function BuyerRequirementsPage({ role: _role }: { role?: Role }) {
     }
     setSaving(true)
     try {
+      const matchedMaterial = materials.data?.find(
+        (m) => m.category.toLowerCase() === (form.material_category || '').toLowerCase(),
+      )
+      const materialId = form.material_id || matchedMaterial?.id || 'mat-pet'
+      const loc = form.preferred_location || form.city || 'Noida'
+
       const payload = {
+        material_id: materialId,
+        material_category: form.material_category || matchedMaterial?.category || 'Plastics',
         minimum_quantity_kg_week: Number(form.minimum_quantity_kg_week),
         maximum_quantity_kg_week: Number(form.maximum_quantity_kg_week),
-        minimum_quality_grade: form.minimum_quality_grade,
-        maximum_distance_km: Number(form.maximum_distance_km),
+        minimum_grade: form.minimum_grade || 'B',
+        maximum_contamination: form.maximum_contamination || 'low',
+        preferred_location: loc,
+        minimum_quality_grade: form.minimum_quality_grade || 'standard',
+        maximum_distance_km: Number(form.maximum_distance_km || '200'),
         target_price_per_kg: form.target_price_per_kg ? Number(form.target_price_per_kg) : null,
         allow_partial_quantity: form.allow_partial_quantity,
-        city: form.city,
+        city: loc,
       }
 
       let reqId = editingId
@@ -138,16 +153,18 @@ export function BuyerRequirementsPage({ role: _role }: { role?: Role }) {
         await put(`/api/buyer-requirements/${editingId}`, payload)
         toast.success('Requirement updated')
       } else {
-        const response = await post<{ requirement: BuyerRequirement }>('/api/buyer-requirements', {
-          ...payload,
-          material_id: form.material_id,
-        })
+        const response = await post<{ requirement: BuyerRequirement }>('/api/buyer-requirements', payload)
         reqId = response.data.requirement.id
         toast.success('Requirement created')
       }
 
       await requirements.reload()
-      if (reqId) setSelectedRequirementId(reqId)
+      if (reqId) {
+        setSelectedRequirementId(reqId)
+        setTimeout(() => {
+          document.getElementById('supply-analysis')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 150)
+      }
       setEditingId(null)
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Could not save the buyer requirement.')
@@ -202,8 +219,12 @@ export function BuyerRequirementsPage({ role: _role }: { role?: Role }) {
                 setEditingId(null)
                 setForm({
                   material_id: '',
+                  material_category: '',
                   minimum_quantity_kg_week: '',
                   maximum_quantity_kg_week: '',
+                  minimum_grade: 'B',
+                  maximum_contamination: 'low',
+                  preferred_location: '',
                   minimum_quality_grade: 'standard',
                   maximum_distance_km: '200',
                   target_price_per_kg: '',
@@ -335,8 +356,6 @@ export function BuyerRequirementsPage({ role: _role }: { role?: Role }) {
         description="Are you sure you want to archive this requirement? Active matches will be disconnected."
         confirmLabel="Yes, archive"
         cancelLabel="Cancel"
-        isDestructive={true}
-        isLoading={deleting}
         onConfirm={() => void handleDelete()}
         onCancel={() => setConfirmDeleteId(null)}
       />
@@ -438,8 +457,12 @@ function NewRequirementForm({
 }: {
   form: {
     material_id: string
+    material_category: string
     minimum_quantity_kg_week: string
     maximum_quantity_kg_week: string
+    minimum_grade: string
+    maximum_contamination: string
+    preferred_location: string
     minimum_quality_grade: string
     maximum_distance_km: string
     target_price_per_kg: string
@@ -453,6 +476,19 @@ function NewRequirementForm({
   onCancelEdit: () => void
   onSubmit: () => Promise<void>
 }) {
+  const categories = Array.from(
+    new Set(
+      [
+        ...materials.map((m) => m.category),
+        'Plastics',
+        'Textiles',
+        'Paper & Cardboard',
+        'Metals',
+        'Glass',
+      ].filter(Boolean),
+    ),
+  )
+
   return (
     <div
       className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white shadow-sm animate-fade-in-up"
@@ -471,7 +507,7 @@ function NewRequirementForm({
               {editingId ? 'Edit buyer requirement' : 'New buyer requirement'}
             </h2>
             <p className="mt-1 text-[13px] text-slate-500">
-              One material per requirement keeps matching clear and explainable.
+              Set material criteria, volume bounds, and grade requirements for matching.
             </p>
           </div>
           <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-200/60 bg-emerald-50/60 text-emerald-700">
@@ -483,36 +519,18 @@ function NewRequirementForm({
 
         {/* Form grid 2 cols */}
         <div className="mt-5 grid grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2">
-          <Field label="Required material">
+          {/* 1. Material Category (dropdown) */}
+          <Field label="Material Category">
             <div className="relative">
               <select
-                value={form.material_id}
-                onChange={(e) => update('material_id', e.target.value)}
-                disabled={!!editingId}
-                className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-[13.5px] font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
-              >
-                <option value="">Select a material…</option>
-                {materials.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.canonical_name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
-            </div>
-          </Field>
-
-          <Field label="Buyer location">
-            <div className="relative">
-              <select
-                value={form.city}
-                onChange={(e) => update('city', e.target.value)}
+                value={form.material_category}
+                onChange={(e) => update('material_category', e.target.value)}
                 className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-[13.5px] font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
               >
-                <option value="">Select city…</option>
-                {DELHI_NCR_CITIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
+                <option value="">Select a category…</option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
                   </option>
                 ))}
               </select>
@@ -520,18 +538,31 @@ function NewRequirementForm({
             </div>
           </Field>
 
-          <Field label="Minimum quantity" unit="kg/week">
+          {/* 6. Preferred Location (text) */}
+          <Field label="Preferred Location">
+            <input
+              type="text"
+              value={form.preferred_location}
+              onChange={(e) => update('preferred_location', e.target.value)}
+              placeholder="e.g. Noida, Delhi, Gurugram"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[14px] font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 placeholder:font-normal placeholder:text-slate-400"
+            />
+          </Field>
+
+          {/* 2. Min Quantity (number) */}
+          <Field label="Min Quantity" unit="kg/week">
             <input
               type="number"
               min="1"
               value={form.minimum_quantity_kg_week}
               onChange={(e) => update('minimum_quantity_kg_week', e.target.value)}
-              placeholder="e.g. 2000"
+              placeholder="e.g. 1000"
               className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[14px] font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 placeholder:font-normal placeholder:text-slate-400"
             />
           </Field>
 
-          <Field label="Maximum quantity" unit="kg/week">
+          {/* 3. Max Quantity (number) */}
+          <Field label="Max Quantity" unit="kg/week">
             <input
               type="number"
               min="1"
@@ -542,44 +573,36 @@ function NewRequirementForm({
             />
           </Field>
 
-          <Field label="Minimum stated quality">
+          {/* 4. Maximum Contamination (dropdown: Low/Med/High) */}
+          <Field label="Maximum Contamination">
             <div className="relative">
               <select
-                value={form.minimum_quality_grade}
-                onChange={(e) => update('minimum_quality_grade', e.target.value)}
+                value={form.maximum_contamination}
+                onChange={(e) => update('maximum_contamination', e.target.value)}
                 className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-[13.5px] font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
               >
-                {QUALITY_OPTIONS.map((q) => (
-                  <option key={q} value={q}>
-                    {titleCase(q)}
-                  </option>
-                ))}
+                <option value="low">Low</option>
+                <option value="med">Med</option>
+                <option value="high">High</option>
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             </div>
           </Field>
 
-          <Field label="Maximum distance" unit="km">
-            <input
-              type="number"
-              min="1"
-              value={form.maximum_distance_km}
-              onChange={(e) => update('maximum_distance_km', e.target.value)}
-              placeholder="e.g. 150"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[14px] font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 placeholder:font-normal placeholder:text-slate-400"
-            />
-          </Field>
-
-          <Field label="Target price" unit="₹/kg">
-            <input
-              type="number"
-              min="0"
-              step="0.1"
-              value={form.target_price_per_kg}
-              onChange={(e) => update('target_price_per_kg', e.target.value)}
-              placeholder="e.g. 17.5"
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-[14px] font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200 placeholder:font-normal placeholder:text-slate-400"
-            />
+          {/* 5. Minimum Grade (dropdown: A/B/C) */}
+          <Field label="Minimum Grade">
+            <div className="relative">
+              <select
+                value={form.minimum_grade}
+                onChange={(e) => update('minimum_grade', e.target.value)}
+                className="w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 pr-9 text-[13.5px] font-semibold text-slate-800 outline-none transition focus:border-emerald-400 focus:ring-2 focus:ring-emerald-200"
+              >
+                <option value="A">Grade A (Premium / Industrial)</option>
+                <option value="B">Grade B (Standard)</option>
+                <option value="C">Grade C (Mixed / Secondary)</option>
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+            </div>
           </Field>
         </div>
 
@@ -594,7 +617,7 @@ function NewRequirementForm({
             />
             <div>
               <div className="text-[13px] font-bold text-slate-900">Allow partial quantity</div>
-              <div className="text-[11.5px] text-slate-600">Permit a supply volume outside range for review</div>
+              <div className="text-[11.5px] text-slate-600">Permit supply batches outside range for evaluation</div>
             </div>
           </label>
         </div>
@@ -603,7 +626,7 @@ function NewRequirementForm({
         <div className="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-1.5 text-[11.5px] text-slate-500">
             <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-            <span>Distance uses Haversine calculations between regional coordinates.</span>
+            <span>Scores matches dynamically: Material (35), Qty (20), Quality (20), Location (15), Evidence (10).</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -616,6 +639,7 @@ function NewRequirementForm({
                 Cancel
               </button>
             )}
+            {/* 7. "Find Matches" button */}
             <button
               type="button"
               disabled={saving}
@@ -627,7 +651,7 @@ function NewRequirementForm({
               ) : (
                 <Sparkles className="h-3.5 w-3.5 transition-transform group-hover:rotate-12" />
               )}
-              {saving ? 'Saving…' : editingId ? 'Save changes' : 'Publish & find supply'}
+              {saving ? 'Searching…' : 'Find Matches'}
               <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </button>
           </div>

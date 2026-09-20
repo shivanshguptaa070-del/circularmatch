@@ -167,6 +167,10 @@ export interface BuyerRequirement {
   id: string
   company_id: string
   material_id: string
+  material_category?: string | null
+  maximum_contamination?: 'low' | 'med' | 'high' | 'Low' | 'Med' | 'High' | null
+  minimum_grade?: 'A' | 'B' | 'C' | null
+  preferred_location?: string | null
   minimum_quantity_kg_week: number
   maximum_quantity_kg_week: number
   minimum_quality_grade: string

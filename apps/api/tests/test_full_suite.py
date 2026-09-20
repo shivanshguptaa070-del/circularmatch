@@ -152,19 +152,19 @@ material = store.get_material(pet_listing.material_id)
 
 # 4.1 Incompatible material filter
 m_score_steel = material_score(pet_listing, steel_req)
-record(len(results) + 1, "Matching Engine", "Incompatible material rejected", m_score_steel is None, "PET vs Steel returns None")
+record(len(results) + 1, "Matching Engine", "Incompatible material rejected", m_score_steel == 0.0, "PET vs Steel returns 0.0")
 
 # 4.2 Quality grade score
 q_score = quality_score(pet_listing, top_req)
-record(len(results) + 1, "Matching Engine", "Quality scoring (Declared vs Verified)", q_score == 85.0, "Declared industrial scores 85; 100 when verified")
+record(len(results) + 1, "Matching Engine", "Quality scoring", q_score == 20.0, "Perfect grade and contamination gets 20.0")
 
 # 4.3 Quantity bounds score
 qty_score_fit = quantity_score(pet_listing, top_req)
-record(len(results) + 1, "Matching Engine", "Quantity fit within [1500, 6000] kg/wk", qty_score_fit == 100.0, "3000 kg fits perfectly -> 100.0")
+record(len(results) + 1, "Matching Engine", "Quantity fit within [1500, 6000] kg/wk", qty_score_fit == 20.0, "3000 kg fits perfectly -> 20.0")
 
 # 4.4 Distance score decay
 dist_score = distance_score(d_noida_manesar, top_req.maximum_distance_km)
-record(len(results) + 1, "Matching Engine", "Distance score decay function", 60.0 <= dist_score <= 90.0, f"Score: {dist_score:.1f}/100 for {d_noida_manesar:.1f}km / max {top_req.maximum_distance_km}km")
+record(len(results) + 1, "Matching Engine", "Distance score decay function", dist_score == 10.0, f"Score: {dist_score:.1f}/15 for {d_noida_manesar:.1f}km / max {top_req.maximum_distance_km}km")
 
 # 4.5 Full match calculation
 match_top = calculate_match(

@@ -84,6 +84,7 @@ class WasteListing(BaseModel):
     disposal_cost_per_kg: float | None = Field(default=None, ge=0)
     status: ListingStatus = "active"
     selected_use_id: str | None = None
+    contamination_level: Literal["low", "med", "high", "Low", "Med", "High"] = "low"
     is_demo: bool = True
     created_at: str
 
@@ -144,6 +145,10 @@ class BuyerRequirement(BaseModel):
     city: str
     latitude: float
     longitude: float
+    material_category: str | None = None
+    maximum_contamination: Literal["low", "med", "high", "Low", "Med", "High"] = "high"
+    minimum_grade: Literal["A", "B", "C"] = "B"
+    preferred_location: str | None = None
     status: RequirementStatus = "active"
     is_demo: bool = True
     created_at: str
@@ -181,6 +186,7 @@ class MatchRecord(BaseModel):
     id: str
     listing_id: str
     buyer_requirement_id: str
+    material_id: str | None = None
     scoring_config_id: str
     total_score: float = Field(ge=0, le=100)
     material_score: float = Field(ge=0, le=100)
@@ -201,6 +207,7 @@ class MatchRecord(BaseModel):
     flags: list[str] = Field(default_factory=list)
     explanation_inputs: dict[str, Any] = Field(default_factory=dict)
     created_at: str
+    is_demo: bool = True
 
 
 class SampleRequest(BaseModel):
@@ -286,10 +293,10 @@ class ScoringConfig(BaseModel):
         default_factory=lambda: {
             "material": 0.35,
             "quality": 0.20,
-            "quantity": 0.15,
+            "quantity": 0.20,
             "distance": 0.15,
-            "price": 0.10,
-            "environment": 0.05,
+            "price": 0.00,
+            "environment": 0.10,
         }
     )
     version: int = 1
@@ -384,14 +391,18 @@ class ReviewEvidenceRequest(BaseModel):
 
 
 class CreateRequirementRequest(BaseModel):
-    material_id: str
+    material_id: str | None = None
+    material_category: str | None = None
     minimum_quantity_kg_week: float = Field(ge=0, le=10_000_000)
     maximum_quantity_kg_week: float = Field(gt=0, le=10_000_000)
     minimum_quality_grade: QualityGrade = "standard"
-    maximum_distance_km: float = Field(gt=0, le=2500)
+    minimum_grade: Literal["A", "B", "C"] = "B"
+    maximum_contamination: Literal["low", "med", "high", "Low", "Med", "High"] = "high"
+    maximum_distance_km: float = Field(default=100.0, gt=0, le=2500)
     target_price_per_kg: float | None = Field(default=None, ge=0, le=1_000_000)
     allow_partial_quantity: bool = True
-    city: str = Field(min_length=2, max_length=100)
+    city: str = Field(default="New Delhi", min_length=2, max_length=100)
+    preferred_location: str | None = None
 
     @model_validator(mode="after")
     def valid_range(self) -> "CreateRequirementRequest":
@@ -401,12 +412,16 @@ class CreateRequirementRequest(BaseModel):
 
 
 class UpdateRequirementRequest(BaseModel):
+    material_category: str | None = None
     minimum_quantity_kg_week: float | None = Field(default=None, ge=0, le=10_000_000)
     maximum_quantity_kg_week: float | None = Field(default=None, gt=0, le=10_000_000)
     minimum_quality_grade: QualityGrade | None = None
+    minimum_grade: Literal["A", "B", "C"] | None = None
+    maximum_contamination: Literal["low", "med", "high", "Low", "Med", "High"] | None = None
     maximum_distance_km: float | None = Field(default=None, gt=0, le=2500)
     target_price_per_kg: float | None = Field(default=None, ge=0, le=1_000_000)
     allow_partial_quantity: bool | None = None
+    preferred_location: str | None = None
     status: Literal["active", "archived"] | None = None
 
 

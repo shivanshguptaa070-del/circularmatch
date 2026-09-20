@@ -222,6 +222,59 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
           </div>
         </div>
 
+        {/* ===== Hackathon Judge Access Card ===== */}
+        <div
+          className="relative w-full max-w-[420px] animate-fade-in-up mb-4 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 shadow-lg shadow-amber-900/10"
+          style={{ animationDelay: '0.05s' }}
+        >
+          {/* Amber accent line */}
+          <div className="absolute -top-px left-10 right-10 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent" />
+          <div className="flex items-center gap-2 mb-3">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-[11px] font-bold text-white">🏆</span>
+            <div>
+              <p className="text-[13px] font-bold text-amber-900">Hackathon Demo Access</p>
+              <p className="text-[10.5px] text-amber-700">1-click judge login — isolated demo data</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            {([
+              { role: 'seller', name: 'Aarav Sharma', company: 'Noida PackForm Industries — Seller', color: 'emerald' },
+              { role: 'buyer', name: 'Kiran Mehta', company: 'ReLoop Polymers — Buyer', color: 'teal' },
+              { role: 'admin', name: 'Rhea Kapoor', company: 'CircularMatch — Admin', color: 'violet' },
+            ] as const).map(({ role, name, company, color }) => (
+              <button
+                key={role}
+                id={`demo-login-${role}`}
+                onClick={() => {
+                  localStorage.setItem('cm_demo', role)
+                  window.location.href = `/dashboard?demo=${role}`
+                }}
+                className={`group flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-left transition-all duration-200 hover:scale-[1.015] hover:shadow-md ${
+                  color === 'emerald'
+                    ? 'border-emerald-200 bg-white hover:border-emerald-400 hover:bg-emerald-50'
+                    : color === 'teal'
+                    ? 'border-teal-200 bg-white hover:border-teal-400 hover:bg-teal-50'
+                    : 'border-violet-200 bg-white hover:border-violet-400 hover:bg-violet-50'
+                }`}
+              >
+                <div>
+                  <p className="text-[12.5px] font-bold text-slate-900">{name}</p>
+                  <p className="text-[10.5px] text-slate-500">{company}</p>
+                </div>
+                <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
+                  color === 'emerald'
+                    ? 'bg-emerald-100 text-emerald-700'
+                    : color === 'teal'
+                    ? 'bg-teal-100 text-teal-700'
+                    : 'bg-violet-100 text-violet-700'
+                }`}>
+                  {role}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* ===== Auth card (light theme matching landing) ===== */}
         <div
           className="relative w-full max-w-[420px] animate-fade-in-up rounded-3xl border border-emerald-100/60 bg-white/80 p-7 shadow-2xl shadow-emerald-900/10 backdrop-blur-xl sm:p-8"

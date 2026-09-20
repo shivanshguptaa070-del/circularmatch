@@ -58,7 +58,10 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
   const [activeMode, setActiveMode] = useState<ActiveMode>(storedMode || profile.active_mode || 'selling')
   const navigate = useNavigate()
   const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL as string | undefined
-  const isAdmin = !!(ADMIN_EMAIL && profile.email === ADMIN_EMAIL)
+  const isDemoAdmin = localStorage.getItem('cm_demo') === 'admin'
+  const isAdmin = isDemoAdmin || !!(ADMIN_EMAIL && profile.email === ADMIN_EMAIL)
+  const demoModeVal = localStorage.getItem('cm_demo') as 'seller' | 'buyer' | 'admin' | null
+  const isDemo = demoModeVal === 'seller' || demoModeVal === 'buyer' || demoModeVal === 'admin'
 
   useEffect(() => {
     localStorage.setItem('cm_active_mode', activeMode)
@@ -85,7 +88,7 @@ function RoutedApp({ session, profile }: { session: Session; profile: UserProfil
   const legacyRole: 'generator' | 'buyer' | 'admin' = isAdmin ? 'admin' : activeMode === 'sourcing' ? 'buyer' : 'generator'
 
   return (
-    <AppShell profile={currentProfile} onSwitchMode={switchMode} onSignOut={handleSignOut} isAdmin={isAdmin}>
+    <AppShell profile={currentProfile} onSwitchMode={switchMode} onSignOut={handleSignOut} isAdmin={isAdmin} isDemo={isDemo} demoRole={demoModeVal ?? undefined}>
       <Suspense fallback={<div className="p-20 grid place-items-center"><Loader2 className="animate-spin text-spruce" size={24} /></div>}>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -161,18 +164,20 @@ export default function App() {
     const urlParams = new URLSearchParams(window.location.search)
     const demoParam = urlParams.get('demo') || localStorage.getItem('cm_demo')
 
-    if (demoParam && (demoParam === 'seller' || demoParam === 'buyer')) {
+    if (demoParam && (demoParam === 'seller' || demoParam === 'buyer' || demoParam === 'admin')) {
       localStorage.setItem('cm_demo', demoParam)
+      const fullName = demoParam === 'seller' ? 'Aarav Sharma' : demoParam === 'buyer' ? 'Kiran Mehta' : 'Rhea Kapoor'
+      const companyName = demoParam === 'seller' ? 'Noida PackForm Industries' : demoParam === 'buyer' ? 'ReLoop Polymers' : 'CircularMatch Admin'
       const mockProfile: UserProfile = {
         id: `demo-${demoParam}-id`,
-        email: `${demoParam}@circularmatch.com`,
-        full_name: demoParam === 'seller' ? 'test' : 'EcoCraft Procurement',
-        company_name: demoParam === 'seller' ? 'testing' : 'EcoCraft Packaging',
-        active_mode: demoParam === 'seller' ? 'selling' : 'sourcing',
+        email: `${demoParam}@circularmatch.demo`,
+        full_name: fullName,
+        company_name: companyName,
+        active_mode: demoParam === 'buyer' ? 'sourcing' : 'selling',
         avatar_url: null,
       }
       setSession({
-        user: { id: `demo-${demoParam}-id`, email: `${demoParam}@circularmatch.com`, app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '' },
+        user: { id: `demo-${demoParam}-id`, email: `${demoParam}@circularmatch.demo`, app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '' },
         access_token: 'demo-token',
         refresh_token: 'demo-refresh',
         expires_in: 3600,

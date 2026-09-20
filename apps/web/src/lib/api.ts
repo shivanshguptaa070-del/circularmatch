@@ -12,13 +12,23 @@ async function getAuthHeader(): Promise<Record<string, string>> {
   const mode = localStorage.getItem('cm_active_mode') || (session?.user?.user_metadata?.active_mode as string) || 'selling'
   headers['X-Active-Mode'] = mode
   if (!session) {
-    let demoSession = localStorage.getItem('cm_demo_session')
-    if (!demoSession) {
-      demoSession = Math.random().toString(36).substring(2, 8)
-      localStorage.setItem('cm_demo_session', demoSession)
+    const demoMode = localStorage.getItem('cm_demo')
+    if (demoMode === 'admin') {
+      headers['X-Demo-User-Id'] = 'user-admin'
+    } else if (demoMode === 'seller') {
+      headers['X-Demo-User-Id'] = 'user-generator'
+    } else if (demoMode === 'buyer') {
+      headers['X-Demo-User-Id'] = 'user-buyer'
+    } else {
+      // Unauthenticated random visitor — ephemeral session
+      let demoSession = localStorage.getItem('cm_demo_session')
+      if (!demoSession) {
+        demoSession = Math.random().toString(36).substring(2, 8)
+        localStorage.setItem('cm_demo_session', demoSession)
+      }
+      const rolePrefix = mode === 'sourcing' || mode === 'buyer' ? 'user-buyer' : 'user-generator'
+      headers['X-Demo-User-Id'] = `${rolePrefix}-${demoSession}`
     }
-    const rolePrefix = mode === 'sourcing' || mode === 'buyer' ? 'user-buyer' : 'user-generator'
-    headers['X-Demo-User-Id'] = `${rolePrefix}-${demoSession}`
   }
   return headers
 }

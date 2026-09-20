@@ -70,3 +70,54 @@ def test_buyer_can_rank_compatible_supply() -> None:
     assert data["requirement"]["material"] == "PET industrial scrap"
     assert data["matches"]
     assert data["matches"][0]["waste_listing"]["material"] == "PET industrial scrap"
+
+
+def test_demo_data_isolation_and_purge() -> None:
+    store.reset()
+    admin_headers = {"X-Demo-User-Id": "user-admin"}
+
+    # 1. Preview with dry_run=True
+    dry_run_res = client.post("/api/admin/purge?dry_run=true", headers=admin_headers)
+    assert dry_run_res.status_code == 200
+    dry_counts = dry_run_res.json()["data"]["deleted_counts"]
+    assert dry_counts["listings"] >= 4
+    assert dry_counts["requirements"] >= 3
+    assert dry_counts["lots"] >= 4
+
+    # Verify listings still exist after dry_run
+    assert len(store.listings) >= 4
+
+    # 2. Insert a simulated real (non-demo) user listing
+    from app.schemas.models import WasteListing
+    real_listing = WasteListing(
+        id="listing-real-user-001",
+        company_id="comp-real",
+        material_id="mat-pet",
+        raw_description="Real user industrial scrap",
+        source="manual",
+        quantity_kg=5000,
+        frequency="weekly",
+        normalized_kg_per_week=5000,
+        quality_grade="industrial",
+        quality_verified=True,
+        availability="Immediate",
+        city="Noida",
+        latitude=28.5355,
+        longitude=77.3910,
+        asking_price_per_kg=15.0,
+        disposal_cost_per_kg=5.0,
+        selected_use_id="use-pet-recycling",
+        is_demo=False,
+        created_at="2026-09-20T10:00:00+05:30",
+    )
+    store.listings[real_listing.id] = real_listing
+
+    # 3. Execute purge
+    execute_res = client.post("/api/admin/purge?dry_run=false", headers=admin_headers)
+    assert execute_res.status_code == 200
+
+    # 4. Verify demo listings deleted, real listing preserved
+    assert "listing-pet-demo" not in store.listings
+    assert "listing-cotton-demo" not in store.listings
+    assert "listing-real-user-001" in store.listings
+    assert store.listings["listing-real-user-001"].is_demo is False

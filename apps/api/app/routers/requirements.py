@@ -89,22 +89,36 @@ def create_requirement(
 ) -> dict[str, Any]:
     if current_user.company_id is None:
         raise HTTPException(status_code=400, detail="Please configure your company profile before adding a requirement.")
-    if store.get_material(request.material_id) is None:
-        raise HTTPException(status_code=422, detail="Choose a supported controlled-catalog material.")
-    coordinates = city_coordinates(request.city)
+    
+    material_id = request.material_id
+    if not material_id and request.material_category:
+        for m in store.list_materials():
+            if m.category.strip().lower() == request.material_category.strip().lower():
+                material_id = m.id
+                break
+    if not material_id:
+        material_id = "mat-pet"
+
+    req_city = request.preferred_location or request.city or "New Delhi"
+    coordinates = city_coordinates(req_city)
     if coordinates is None:
-        raise HTTPException(status_code=422, detail="Choose a Delhi NCR demo city.")
+        coordinates = (28.6139, 77.2090)
+
     requirement = BuyerRequirement(
         id=store.new_id("requirement"),
         company_id=current_user.company_id,
-        material_id=request.material_id,
+        material_id=material_id,
+        material_category=request.material_category,
         minimum_quantity_kg_week=request.minimum_quantity_kg_week,
         maximum_quantity_kg_week=request.maximum_quantity_kg_week,
         minimum_quality_grade=request.minimum_quality_grade,
+        minimum_grade=request.minimum_grade,
+        maximum_contamination=request.maximum_contamination,
         maximum_distance_km=request.maximum_distance_km,
         target_price_per_kg=request.target_price_per_kg,
         allow_partial_quantity=request.allow_partial_quantity,
-        city=request.city,
+        city=req_city,
+        preferred_location=request.preferred_location or req_city,
         latitude=coordinates[0],
         longitude=coordinates[1],
         is_demo=current_user.is_demo,  # Real users get is_demo=False; demo personas get True
@@ -135,6 +149,14 @@ def update_requirement(
         requirement.maximum_quantity_kg_week = request.maximum_quantity_kg_week
     if request.minimum_quality_grade is not None:
         requirement.minimum_quality_grade = request.minimum_quality_grade
+    if request.minimum_grade is not None:
+        requirement.minimum_grade = request.minimum_grade
+    if request.maximum_contamination is not None:
+        requirement.maximum_contamination = request.maximum_contamination
+    if request.material_category is not None:
+        requirement.material_category = request.material_category
+    if request.preferred_location is not None:
+        requirement.preferred_location = request.preferred_location
     if request.maximum_distance_km is not None:
         requirement.maximum_distance_km = request.maximum_distance_km
     if request.target_price_per_kg is not None:

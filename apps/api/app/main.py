@@ -316,7 +316,7 @@ def requirement_view(store: DemoStore, requirement: BuyerRequirement) -> dict[st
     material = store.get_material(requirement.material_id)
     company = store.get_company(requirement.company_id)
     payload["material"] = material.canonical_name if material else "Unknown material"
-    payload["category"] = material.category if material else "Uncategorized"
+    payload["category"] = requirement.material_category or (material.category if material else "Uncategorized")
     payload["company"] = company.name if company else "Unknown company"
     spec = store.get_acceptance_spec(requirement.id)
     payload["acceptance_spec_summary"] = {
