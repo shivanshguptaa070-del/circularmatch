@@ -102,9 +102,9 @@ export function BuyerDashboard() {
     refetchInterval: 60_000,
   })
 
-  const { data: realRequirementsData } = useQuery({
+  const { data: realRequirementsData, isLoading: reqLoading } = useQuery({
     queryKey: ['buyer_requirements', 'mine'],
-    queryFn: () => get<BuyerRequirement[]>('/api/buyer-requirements').then((r) => r.data).catch(() => null),
+    queryFn: () => get<BuyerRequirement[]>('/api/buyer-requirements').then((r) => r.data).catch(() => []),
     refetchInterval: 60_000,
   })
 
@@ -122,19 +122,18 @@ export function BuyerDashboard() {
     ? formatCurrency(data.kpis.estimated_cost_savings_inr)
     : '₹142,000'
 
-  const baseTargets: SourcingTargetItem[] = (realRequirementsData && realRequirementsData.length > 0)
-    ? realRequirementsData.map((r, idx) => ({
-        id: r.id || String(idx),
-        title: r.material || 'Procurement Target',
-        spec: `${r.category || 'Secondary Material'} · Min grade ${r.minimum_quality_grade || 'Standard'}`,
-        qty: `${formatKg(r.maximum_quantity_kg_week || r.minimum_quantity_kg_week || 0)} / wk`,
-        loc: r.city || 'Regional (NCR)',
-        maxPrice: r.target_price_per_kg ? `Max ₹${r.target_price_per_kg}/kg` : 'Negotiable',
-        status: (r.status === 'fulfilled' ? 'Sourced' : r.status === 'matched' ? 'Matching' : 'Active') as 'Matching' | 'Sourced' | 'Active',
-        matchesCount: 2,
-        img: getMaterialImage(r.material, r.category),
-      }))
-    : DEFAULT_TARGETS
+  // Only ever show the logged-in user's own requirements — never demo / default data
+  const baseTargets: SourcingTargetItem[] = (realRequirementsData ?? []).map((r, idx) => ({
+    id: r.id || String(idx),
+    title: r.material || 'Procurement Target',
+    spec: `${r.category || 'Secondary Material'} · Min grade ${r.minimum_quality_grade || 'Standard'}`,
+    qty: `${formatKg(r.maximum_quantity_kg_week || r.minimum_quantity_kg_week || 0)} / wk`,
+    loc: r.city || 'Regional (NCR)',
+    maxPrice: r.target_price_per_kg ? `Max ₹${r.target_price_per_kg}/kg` : 'Negotiable',
+    status: (r.status === 'fulfilled' ? 'Sourced' : r.status === 'matched' ? 'Matching' : 'Active') as 'Matching' | 'Sourced' | 'Active',
+    matchesCount: 2,
+    img: getMaterialImage(r.material, r.category),
+  }))
 
   const filteredTargets = baseTargets.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -161,6 +160,8 @@ export function BuyerDashboard() {
       />
       <ActivityRow
         targets={filteredTargets}
+        totalTargets={baseTargets.length}
+        isLoading={reqLoading}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         statusFilter={statusFilter}
@@ -641,6 +642,8 @@ function BarChart() {
 /* ============================================================ */
 interface ActivityRowProps {
   targets: SourcingTargetItem[]
+  totalTargets: number
+  isLoading: boolean
   searchQuery: string
   setSearchQuery: (q: string) => void
   statusFilter: string
@@ -649,6 +652,8 @@ interface ActivityRowProps {
 
 function ActivityRow({
   targets,
+  totalTargets,
+  isLoading,
   searchQuery,
   setSearchQuery,
   statusFilter,
@@ -724,7 +729,45 @@ function ActivityRow({
       </div>
 
       {/* Rows */}
-      {targets.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col gap-3 p-6">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="flex items-center gap-3 animate-pulse">
+              <div className="h-10 w-10 rounded-lg bg-slate-100" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-1/3 rounded bg-slate-100" />
+                <div className="h-2.5 w-1/2 rounded bg-slate-100" />
+              </div>
+              <div className="h-6 w-16 rounded-full bg-slate-100" />
+            </div>
+          ))}
+        </div>
+      ) : targets.length === 0 && totalTargets === 0 ? (
+        /* True empty state — user has no requirements at all */
+        <div className="flex flex-col items-center gap-4 px-8 py-14 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 blur-xl" />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 shadow-sm">
+              <PackageSearch className="h-8 w-8 text-emerald-600" />
+            </div>
+          </div>
+          <div>
+            <h4 className="text-[15px] font-semibold text-slate-800">No sourcing targets yet</h4>
+            <p className="mt-1 max-w-xs text-[13px] leading-relaxed text-slate-500">
+              Tell us what secondary materials you need — we'll match you with verified sellers in real time.
+            </p>
+          </div>
+          <Link
+            to="/buyer-requirements"
+            className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-[13px] font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:-translate-y-0.5 hover:shadow-emerald-500/40 hover:shadow-xl"
+          >
+            <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+            Set your first sourcing target
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        </div>
+      ) : targets.length === 0 ? (
+        /* Search / filter returned nothing */
         <div className="p-8 text-center text-sm text-slate-400">
           No sourcing targets match your search criteria.
         </div>
@@ -788,7 +831,7 @@ function ActivityRow({
       <div className="flex items-center justify-between border-t border-slate-100 bg-gradient-to-r from-slate-50/50 to-transparent px-5 py-3 text-[12px]">
         <span className="text-slate-500">
           Showing <span className="font-semibold text-slate-700">{targets.length}</span> of{' '}
-          <span className="font-semibold text-slate-700">3</span> targets
+          <span className="font-semibold text-slate-700">{totalTargets}</span> {totalTargets === 1 ? 'target' : 'targets'}
         </span>
         <Link
           to="/buyer-requirements"
