@@ -116,24 +116,26 @@ export function ScoreRing({ score, label = 'match score', size = 88 }: { score: 
   return (
     <div className={`relative flex shrink-0 items-center justify-center rounded-full bg-white/70 shadow-[0_8px_20px_rgba(14,67,55,.08)] transition-transform duration-300 hover:scale-105 ${isTop ? 'ring-2 ring-emerald-300/40' : ''}`} style={{ width: size, height: size }} aria-label={`${displayScore}% ${label}`}>
       {isTop && <span className="absolute -inset-1 rounded-full animate-soft-ping bg-emerald-400/20 pointer-events-none" />}
-      <svg width={size - 8} height={size - 8} viewBox="0 0 88 88" className="block origin-center -rotate-90 drop-shadow-[0_4px_6px_rgba(18,100,91,.15)]">
-        <circle cx="44" cy="44" r={radius} fill="none" stroke="#e6eee9" strokeWidth="7" />
-        <motion.circle
-          cx="44"
-          cy="44"
-          r={radius}
-          fill="none"
-          stroke={stroke}
-          strokeWidth="7"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          initial={{ strokeDashoffset: circumference }}
-          animate={{ strokeDashoffset: dashOffset }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-        />
+      <svg width={size - 8} height={size - 8} viewBox="0 0 88 88" className="absolute inset-0 m-auto block drop-shadow-[0_4px_6px_rgba(18,100,91,.15)]">
+        <g transform="rotate(-90 44 44)">
+          <circle cx="44" cy="44" r={radius} fill="none" stroke="#e6eee9" strokeWidth="7" />
+          <motion.circle
+            cx="44"
+            cy="44"
+            r={radius}
+            fill="none"
+            stroke={stroke}
+            strokeWidth="7"
+            strokeLinecap="round"
+            strokeDasharray={circumference}
+            initial={{ strokeDashoffset: circumference }}
+            animate={{ strokeDashoffset: dashOffset }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+          />
+        </g>
       </svg>
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <span className="text-[1.25rem] font-extrabold tracking-tight text-ink">{displayScore}%</span>
+        <span className="text-[1.25rem] font-extrabold tracking-tight text-ink leading-none">{displayScore}%</span>
       </div>
     </div>
   )
