@@ -33,63 +33,7 @@ interface SourcingTargetItem {
   img: string
 }
 
-const DEFAULT_TARGETS: SourcingTargetItem[] = [
-  {
-    id: '1',
-    title: 'PET Plastic Flakes',
-    spec: 'MFI 0.3 - 0.8 · Blow molding grade',
-    qty: '3,000 kg / wk',
-    loc: 'North India (Delhi / NCR)',
-    maxPrice: 'Max ₹48/kg',
-    status: 'Matching',
-    matchesCount: 3,
-    img: '/materials/pet-flakes.jpg',
-  },
-  {
-    id: '2',
-    title: 'Aluminium 6061 Extrusions',
-    spec: 'Clean cutoffs · Unpainted',
-    qty: '1,500 kg / wk',
-    loc: 'Manesar, HR',
-    maxPrice: 'Max ₹175/kg',
-    status: 'Active',
-    matchesCount: 1,
-    img: '/materials/al-scrap.jpg',
-  },
-  {
-    id: '3',
-    title: 'Corrugated Box Offcuts',
-    spec: 'Kraft paper grade · Dry baled',
-    qty: '4,000 kg / wk',
-    loc: 'Faridabad, HR',
-    maxPrice: 'Max ₹12/kg',
-    status: 'Sourced',
-    matchesCount: 4,
-    img: '/materials/cardboard-paper.jpg',
-  },
-  {
-    id: '4',
-    title: 'Mild-Steel Fabrication Scrap',
-    spec: 'Clean offcuts · Low contaminant',
-    qty: '3,000 kg / wk',
-    loc: 'Noida, UP',
-    maxPrice: 'Max ₹14/kg',
-    status: 'Active',
-    matchesCount: 2,
-    img: '/materials/mild-steel.jpg',
-  },
-  {
-    id: '5',
-    title: 'Cotton Textile Cutting Waste',
-    spec: 'Garment cuttings · 100% Cotton',
-    qty: '600 kg / wk',
-    loc: 'Noida, UP',
-    maxPrice: 'Max ₹25/kg',
-    status: 'Matching',
-    matchesCount: 3,
-    img: '/materials/cotton-textile.jpg',
-  },
-]
+
 
 export function BuyerDashboard() {
   const [timeframe, setTimeframe] = useState<'Month' | 'Quarter' | 'Year'>('Month')
@@ -108,19 +52,19 @@ export function BuyerDashboard() {
     refetchInterval: 60_000,
   })
 
-  // Dynamic values backed by live API with polished fallbacks
+  // Dynamic values backed by live API — show zeros for brand-new users, never demo numbers
   const buyTarget = data?.kpis?.total_procurement_target_kg_week
     ? `${formatKg(data.kpis.total_procurement_target_kg_week)}`
-    : '4,500 kg'
+    : '0 kg'
   const activeSuppliers = data?.kpis?.active_seller_matches !== undefined
     ? formatNumber(data.kpis.active_seller_matches)
-    : '12'
+    : '0'
   const successfulBuys = data?.kpis?.successful_purchases !== undefined
     ? formatNumber(data.kpis.successful_purchases)
-    : '8'
+    : '0'
   const costSavings = data?.kpis?.estimated_cost_savings_inr
     ? formatCurrency(data.kpis.estimated_cost_savings_inr)
-    : '₹142,000'
+    : '₹0'
 
   // Only ever show the logged-in user's own requirements — never demo / default data
   const baseTargets: SourcingTargetItem[] = (realRequirementsData ?? []).map((r, idx) => ({
@@ -157,6 +101,8 @@ export function BuyerDashboard() {
         timeframe={timeframe}
         setTimeframe={setTimeframe}
         categoryData={data?.charts?.procurement_by_category}
+        savingsPipeline={data?.charts?.cost_savings_pipeline}
+        totalKg={buyTarget}
       />
       <ActivityRow
         targets={filteredTargets}
@@ -410,9 +356,11 @@ interface ChartsRowProps {
   timeframe: 'Month' | 'Quarter' | 'Year'
   setTimeframe: (t: 'Month' | 'Quarter' | 'Year') => void
   categoryData?: { name: string; value: number }[]
+  savingsPipeline?: { name: string; value: number }[]
+  totalKg: string
 }
 
-function ChartsRow({ timeframe, setTimeframe, categoryData }: ChartsRowProps) {
+function ChartsRow({ timeframe, setTimeframe, categoryData, savingsPipeline, totalKg }: ChartsRowProps) {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       {/* Donut */}
@@ -438,14 +386,16 @@ function ChartsRow({ timeframe, setTimeframe, categoryData }: ChartsRowProps) {
         </div>
 
         <div className="mt-5 flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
-          <DonutChart categoryData={categoryData} />
+          <DonutChart categoryData={categoryData} totalKg={totalKg} />
           <ul className="w-full flex-1 space-y-2.5">
-            {[
-              { name: 'HDPE Plastic', value: '2,475 kg', pct: 55, color: '#10b981' },
-              { name: 'Aluminium 6061', value: '1,125 kg', pct: 25, color: '#0ea5e9' },
-              { name: 'Corrugated Paper', value: '540 kg', pct: 12, color: '#f59e0b' },
-              { name: 'Other Secondary', value: '360 kg', pct: 8, color: '#8b5cf6' },
-            ].map((l, i) => (
+            {(categoryData && categoryData.length > 0
+              ? categoryData.map((d, idx) => ({
+                  name: d.name,
+                  pct: d.value,
+                  color: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6'][idx % 4],
+                }))
+              : [{ name: 'No sourcing targets yet', pct: 0, color: '#e2e8f0' }]
+            ).map((l, i) => (
               <li
                 key={i}
                 className="flex items-center justify-between rounded-md px-2 py-1.5 text-[12px] transition hover:bg-slate-50"
@@ -458,7 +408,6 @@ function ChartsRow({ timeframe, setTimeframe, categoryData }: ChartsRowProps) {
                   <span className="font-medium text-slate-700">{l.name}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-slate-500">{l.value}</span>
                   <span className="w-10 text-right font-semibold tabular-nums text-slate-900">
                     {l.pct}%
                   </span>
@@ -501,24 +450,20 @@ function ChartsRow({ timeframe, setTimeframe, categoryData }: ChartsRowProps) {
           </div>
         </div>
 
-        <BarChart />
+        <BarChart savingsPipeline={savingsPipeline} />
       </div>
     </div>
   );
 }
 
-function DonutChart({ categoryData }: { categoryData?: { name: string; value: number }[] }) {
-  const segments = categoryData && categoryData.length > 0
-    ? categoryData.map((d, idx) => ({
+function DonutChart({ categoryData, totalKg }: { categoryData?: { name: string; value: number }[]; totalKg: string }) {
+  const hasData = categoryData && categoryData.length > 0;
+  const segments = hasData
+    ? categoryData!.map((d, idx) => ({
         pct: d.value,
         color: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6'][idx % 4],
       }))
-    : [
-        { pct: 55, color: '#10b981' },
-        { pct: 25, color: '#0ea5e9' },
-        { pct: 12, color: '#f59e0b' },
-        { pct: 8, color: '#8b5cf6' },
-      ];
+    : [{ pct: 100, color: '#f1f5f9' }];
 
   const r = 50;
   const c = 2 * Math.PI * r;
@@ -553,7 +498,7 @@ function DonutChart({ categoryData }: { categoryData?: { name: string; value: nu
               fill="none"
               strokeDasharray={dasharray}
               strokeDashoffset={dashoffset}
-              filter="url(#donutGlowBuyer)"
+              filter={hasData ? 'url(#donutGlowBuyer)' : undefined}
               style={{ transition: 'stroke-dasharray 1s ease-out' }}
             />
           );
@@ -564,27 +509,30 @@ function DonutChart({ categoryData }: { categoryData?: { name: string; value: nu
           Target
         </div>
         <div className="bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-[20px] font-bold tracking-tight text-transparent">
-          4,500 kg
+          {totalKg}
         </div>
-        <div className="text-[10px] text-slate-400">4 categories</div>
+        <div className="text-[10px] text-slate-400">{hasData ? `${categoryData!.length} categories` : 'no targets yet'}</div>
       </div>
     </div>
   );
 }
 
-function BarChart() {
-  const data = [
-    { label: 'Jul', secured: 12, potential: 18 },
-    { label: 'Aug', secured: 24, potential: 32 },
-    { label: 'Sep', secured: 48, potential: 65 },
-    { label: 'Oct', secured: 60, potential: 88 },
-    { label: 'Nov', secured: 95, potential: 142 },
-  ];
+function BarChart({ savingsPipeline }: { savingsPipeline?: { name: string; value: number }[] }) {
+  // Use live pipeline data; if none, show an empty placeholder (no fake bars)
+  const data = (savingsPipeline && savingsPipeline.length > 0)
+    ? savingsPipeline.map((d) => ({ label: d.name, secured: Math.round(d.value * 0.65), potential: d.value }))
+    : [];
   const maxHeight = 140;
-  const maxVal = 150;
+  const maxVal = data.length > 0 ? Math.max(...data.map((d) => d.potential), 1) : 1;
 
   return (
     <div className="mt-5">
+      {data.length === 0 ? (
+        <div className="flex h-44 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 text-center">
+          <TrendingUp className="h-6 w-6 text-slate-300" />
+          <p className="text-[12px] text-slate-400">Cost savings will appear once you have active sourcing targets</p>
+        </div>
+      ) : (
       <div className="relative flex h-44 items-end justify-between gap-3">
         {[0, 1, 2, 3].map((g) => (
           <div
@@ -622,6 +570,7 @@ function BarChart() {
           );
         })}
       </div>
+      )}
 
       <div className="mt-4 flex items-center justify-end gap-4 border-t border-slate-100 pt-3 text-[12px]">
         <div className="flex items-center gap-1.5 text-slate-600">

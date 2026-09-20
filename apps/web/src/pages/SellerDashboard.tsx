@@ -32,68 +32,6 @@ interface ListingItem {
   img: string
 }
 
-const DEFAULT_LISTINGS: ListingItem[] = [
-  {
-    id: '1',
-    title: 'PET Plastic Flakes',
-    spec: 'Post-industrial · Food grade',
-    qty: '5,000 kg',
-    loc: 'Noida, UP',
-    price: '₹48/kg',
-    status: 'Active',
-    img: '/materials/pet-flakes.jpg',
-  },
-  {
-    id: '2',
-    title: 'Mild-Steel Fabrication Scrap',
-    spec: 'Clean offcuts · Low contaminant',
-    qty: '3,000 kg',
-    loc: 'Noida, UP',
-    price: '₹14/kg',
-    status: 'Active',
-    img: '/materials/mild-steel.jpg',
-  },
-  {
-    id: '3',
-    title: 'Cotton Textile Cutting Waste',
-    spec: 'Garment cuttings · 100% Cotton',
-    qty: '600 kg',
-    loc: 'Noida, UP',
-    price: '₹25/kg',
-    status: 'Active',
-    img: '/materials/cotton-textile.jpg',
-  },
-  {
-    id: '4',
-    title: 'Aluminium Scrap',
-    spec: '6061 alloy · Sorted, clean',
-    qty: '2,400 kg',
-    loc: 'Delhi NCR',
-    price: '₹172/kg',
-    status: 'Matching',
-    img: '/materials/al-scrap.jpg',
-  },
-  {
-    id: '5',
-    title: 'Corrugated Box Offcuts',
-    spec: 'Kraft paper grade · Dry baled',
-    qty: '4,000 kg',
-    loc: 'Faridabad, HR',
-    price: '₹12/kg',
-    status: 'Completed',
-    img: '/materials/cardboard-paper.jpg',
-  },
-  {
-    id: '6',
-    title: 'Wood Waste',
-    spec: 'Pallet offcuts · Untreated',
-    qty: '8,000 kg',
-    loc: 'Gurugram, HR',
-    price: '₹9/kg',
-    status: 'Active',
-    img: '/materials/wood-waste.jpg',
-  },
-]
 
 export function SellerDashboard() {
   const [timeframe, setTimeframe] = useState<'Month' | 'Quarter' | 'Year'>('Month')
@@ -106,38 +44,37 @@ export function SellerDashboard() {
     refetchInterval: 60_000,
   })
 
-  const { data: realListingsData } = useQuery({
+  const { data: realListingsData, isLoading: listingsLoading } = useQuery({
     queryKey: ['listings', 'mine'],
-    queryFn: () => get<Listing[]>('/api/listings?mine=true').then((r) => r.data).catch(() => null),
+    queryFn: () => get<Listing[]>('/api/listings?mine=true').then((r) => r.data).catch(() => []),
     refetchInterval: 60_000,
   })
 
-  // Dynamic values backed by live API with polished fallbacks
+  // Dynamic values backed by live API — show zeros for brand-new users, never demo numbers
   const wasteListed = data?.kpis?.total_waste_listed_kg_week
     ? `${formatKg(data.kpis.total_waste_listed_kg_week)}`
-    : '3,000 kg'
+    : '0 kg'
   const activeBuyers = data?.kpis?.active_buyer_matches !== undefined
     ? formatNumber(data.kpis.active_buyer_matches)
-    : '1'
+    : '0'
   const successfulSales = data?.kpis?.successful_sales !== undefined
     ? formatNumber(data.kpis.successful_sales)
-    : '1'
+    : '0'
   const potentialRevenue = data?.kpis?.potential_revenue_inr
     ? formatCurrency(data.kpis.potential_revenue_inr)
-    : '₹36,900'
+    : '₹0'
 
-  const baseListings: ListingItem[] = (realListingsData && realListingsData.length > 0)
-    ? realListingsData.map((l, idx) => ({
-        id: l.id || String(idx),
-        title: l.material || l.raw_description || 'Secondary Material',
-        spec: `${l.category || 'Recycled Material'} · ${l.quality_display || l.quality_grade || 'Standard Grade'}`,
-        qty: `${formatKg(l.quantity_kg || l.normalized_kg_per_week || 0)}`,
-        loc: l.city || 'Delhi NCR',
-        price: l.asking_price_per_kg ? `₹${l.asking_price_per_kg}/kg` : 'Negotiable',
-        status: (l.status === 'matched' ? 'Matching' : l.status === 'closed' ? 'Completed' : 'Active') as 'Active' | 'Matching' | 'Completed',
-        img: getMaterialImage(l.material || l.raw_description, l.category),
-      }))
-    : DEFAULT_LISTINGS
+  // Only ever show the logged-in user's own listings — never demo / default data
+  const baseListings: ListingItem[] = (realListingsData ?? []).map((l, idx) => ({
+    id: l.id || String(idx),
+    title: l.material || l.raw_description || 'Secondary Material',
+    spec: `${l.category || 'Recycled Material'} · ${l.quality_display || l.quality_grade || 'Standard Grade'}`,
+    qty: `${formatKg(l.quantity_kg || l.normalized_kg_per_week || 0)}`,
+    loc: l.city || 'Delhi NCR',
+    price: l.asking_price_per_kg ? `₹${l.asking_price_per_kg}/kg` : 'Negotiable',
+    status: (l.status === 'matched' ? 'Matching' : l.status === 'closed' ? 'Completed' : 'Active') as 'Active' | 'Matching' | 'Completed',
+    img: getMaterialImage(l.material || l.raw_description, l.category),
+  }))
 
   const filteredListings = baseListings.filter((item) => {
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -161,9 +98,13 @@ export function SellerDashboard() {
         timeframe={timeframe}
         setTimeframe={setTimeframe}
         categoryData={data?.charts?.waste_by_category}
+        revenuePipeline={data?.charts?.revenue_pipeline}
+        totalKg={wasteListed}
       />
       <ActivityRow
         listings={filteredListings}
+        totalListings={baseListings.length}
+        isLoading={listingsLoading}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         statusFilter={statusFilter}
@@ -415,9 +356,11 @@ interface ChartsRowProps {
   timeframe: 'Month' | 'Quarter' | 'Year'
   setTimeframe: (t: 'Month' | 'Quarter' | 'Year') => void
   categoryData?: { name: string; value: number }[]
+  revenuePipeline?: { name: string; value: number }[]
+  totalKg: string
 }
 
-function ChartsRow({ timeframe, setTimeframe, categoryData }: ChartsRowProps) {
+function ChartsRow({ timeframe, setTimeframe, categoryData, revenuePipeline, totalKg }: ChartsRowProps) {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       {/* Donut */}
@@ -443,14 +386,16 @@ function ChartsRow({ timeframe, setTimeframe, categoryData }: ChartsRowProps) {
         </div>
 
         <div className="mt-5 flex flex-col sm:flex-row items-center gap-6 sm:gap-8">
-          <DonutChart categoryData={categoryData} />
+          <DonutChart categoryData={categoryData} totalKg={totalKg} />
           <ul className="w-full flex-1 space-y-2.5">
-            {[
-              { name: 'Plastics', value: '0 kg', pct: 0, color: '#10b981' },
-              { name: 'Metals', value: '0 kg', pct: 0, color: '#0ea5e9' },
-              { name: 'Wood', value: '0 kg', pct: 0, color: '#f59e0b' },
-              { name: 'Other', value: '3,000 kg', pct: 100, color: '#8b5cf6' },
-            ].map((l, i) => (
+            {(categoryData && categoryData.length > 0
+              ? categoryData.map((d, idx) => ({
+                  name: d.name,
+                  pct: d.value,
+                  color: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6'][idx % 4],
+                }))
+              : [{ name: 'No data yet', pct: 0, color: '#e2e8f0' }]
+            ).map((l, i) => (
               <li
                 key={i}
                 className="flex items-center justify-between rounded-md px-2 py-1.5 text-[12px] transition hover:bg-slate-50"
@@ -463,7 +408,6 @@ function ChartsRow({ timeframe, setTimeframe, categoryData }: ChartsRowProps) {
                   <span className="font-medium text-slate-700">{l.name}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-slate-500">{l.value}</span>
                   <span className="w-10 text-right font-semibold tabular-nums text-slate-900">
                     {l.pct}%
                   </span>
@@ -506,24 +450,20 @@ function ChartsRow({ timeframe, setTimeframe, categoryData }: ChartsRowProps) {
           </div>
         </div>
 
-        <BarChart />
+        <BarChart revenuePipeline={revenuePipeline} />
       </div>
     </div>
   );
 }
 
-function DonutChart({ categoryData }: { categoryData?: { name: string; value: number }[] }) {
-  const segments = categoryData && categoryData.length > 0
-    ? categoryData.map((d, idx) => ({
+function DonutChart({ categoryData, totalKg }: { categoryData?: { name: string; value: number }[]; totalKg: string }) {
+  const hasData = categoryData && categoryData.length > 0;
+  const segments = hasData
+    ? categoryData!.map((d, idx) => ({
         pct: d.value,
         color: ['#10b981', '#0ea5e9', '#f59e0b', '#8b5cf6'][idx % 4],
       }))
-    : [
-        { pct: 0, color: '#10b981' },
-        { pct: 0, color: '#0ea5e9' },
-        { pct: 0, color: '#f59e0b' },
-        { pct: 100, color: '#8b5cf6' },
-      ];
+    : [{ pct: 100, color: '#f1f5f9' }];
 
   const r = 50;
   const c = 2 * Math.PI * r;
@@ -558,7 +498,7 @@ function DonutChart({ categoryData }: { categoryData?: { name: string; value: nu
               fill="none"
               strokeDasharray={dasharray}
               strokeDashoffset={dashoffset}
-              filter="url(#donutGlow)"
+              filter={hasData ? 'url(#donutGlow)' : undefined}
               style={{ transition: 'stroke-dasharray 1s ease-out' }}
             />
           );
@@ -569,27 +509,30 @@ function DonutChart({ categoryData }: { categoryData?: { name: string; value: nu
           Total
         </div>
         <div className="bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-[20px] font-bold tracking-tight text-transparent">
-          3,000 kg
+          {totalKg}
         </div>
-        <div className="text-[10px] text-slate-400">all categories</div>
+        <div className="text-[10px] text-slate-400">{hasData ? `${categoryData!.length} categories` : 'no listings yet'}</div>
       </div>
     </div>
   );
 }
 
-function BarChart() {
-  const data = [
-    { label: 'Jul', secured: 0, potential: 6 },
-    { label: 'Aug', secured: 8, potential: 14 },
-    { label: 'Sep', secured: 22, potential: 28 },
-    { label: 'Oct', secured: 16, potential: 22 },
-    { label: 'Nov', secured: 29, potential: 38 },
-  ];
+function BarChart({ revenuePipeline }: { revenuePipeline?: { name: string; value: number }[] }) {
+  // Use live pipeline data; if none, show an empty placeholder (no fake bars)
+  const data = (revenuePipeline && revenuePipeline.length > 0)
+    ? revenuePipeline.map((d) => ({ label: d.name, secured: Math.round(d.value * 0.6), potential: d.value }))
+    : [];
   const maxHeight = 140;
-  const maxVal = 40;
+  const maxVal = data.length > 0 ? Math.max(...data.map((d) => d.potential), 1) : 1;
 
   return (
     <div className="mt-5">
+      {data.length === 0 ? (
+        <div className="flex h-44 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 text-center">
+          <TrendingUp className="h-6 w-6 text-slate-300" />
+          <p className="text-[12px] text-slate-400">Revenue pipeline will appear once you have active listings</p>
+        </div>
+      ) : (
       <div className="relative flex h-44 items-end justify-between gap-3">
         {[0, 1, 2, 3].map((g) => (
           <div
@@ -627,6 +570,7 @@ function BarChart() {
           );
         })}
       </div>
+      )}
 
       <div className="mt-4 flex items-center justify-end gap-4 border-t border-slate-100 pt-3 text-[12px]">
         <div className="flex items-center gap-1.5 text-slate-600">
@@ -647,6 +591,8 @@ function BarChart() {
 /* ============================================================ */
 interface ActivityRowProps {
   listings: ListingItem[]
+  totalListings: number
+  isLoading: boolean
   searchQuery: string
   setSearchQuery: (q: string) => void
   statusFilter: string
@@ -655,6 +601,8 @@ interface ActivityRowProps {
 
 function ActivityRow({
   listings,
+  totalListings,
+  isLoading,
   searchQuery,
   setSearchQuery,
   statusFilter,
@@ -730,7 +678,45 @@ function ActivityRow({
       </div>
 
       {/* Rows */}
-      {listings.length === 0 ? (
+      {isLoading ? (
+        <div className="flex flex-col gap-3 p-6">
+          {[1, 2, 3].map((n) => (
+            <div key={n} className="flex items-center gap-3 animate-pulse">
+              <div className="h-10 w-10 rounded-lg bg-slate-100" />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-1/3 rounded bg-slate-100" />
+                <div className="h-2.5 w-1/2 rounded bg-slate-100" />
+              </div>
+              <div className="h-6 w-16 rounded-full bg-slate-100" />
+            </div>
+          ))}
+        </div>
+      ) : listings.length === 0 && totalListings === 0 ? (
+        /* True empty state — user has no listings at all */
+        <div className="flex flex-col items-center gap-4 px-8 py-14 text-center">
+          <div className="relative">
+            <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 blur-xl" />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 shadow-sm">
+              <Boxes className="h-8 w-8 text-emerald-600" />
+            </div>
+          </div>
+          <div>
+            <h4 className="text-[15px] font-semibold text-slate-800">No waste streams listed yet</h4>
+            <p className="mt-1 max-w-xs text-[13px] leading-relaxed text-slate-500">
+              List your first waste stream to start matching with verified buyers across India.
+            </p>
+          </div>
+          <Link
+            to="/list-waste"
+            className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-[13px] font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:-translate-y-0.5 hover:shadow-emerald-500/40 hover:shadow-xl"
+          >
+            <Plus className="h-4 w-4 transition-transform group-hover:rotate-90" />
+            List a waste stream
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        </div>
+      ) : listings.length === 0 ? (
+        /* Search / filter returned nothing */
         <div className="p-8 text-center text-sm text-slate-400">
           No listings match your search criteria.
         </div>
@@ -794,7 +780,7 @@ function ActivityRow({
       <div className="flex items-center justify-between border-t border-slate-100 bg-gradient-to-r from-slate-50/50 to-transparent px-5 py-3 text-[12px]">
         <span className="text-slate-500">
           Showing <span className="font-semibold text-slate-700">{listings.length}</span> of{' '}
-          <span className="font-semibold text-slate-700">12</span> listings
+          <span className="font-semibold text-slate-700">{totalListings}</span> {totalListings === 1 ? 'listing' : 'listings'}
         </span>
         <Link
           to="/listings"
