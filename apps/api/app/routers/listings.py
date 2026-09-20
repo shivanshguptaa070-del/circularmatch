@@ -9,9 +9,21 @@ from app.services.calculators import *
 from app.services.extraction import extract_waste
 from app.services.matching import *
 from app.services.email_service import send_contact_notification
+from app.core.config import settings
 from app.seed.demo_data import city_coordinates
 
 router = APIRouter()
+
+
+@router.post("/api/ai/extract-waste")
+async def ai_extract_waste(
+    request: ExtractWasteRequest,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    result = await extract_waste(request.description, store.list_materials(), settings.gemini_api_key)
+    return envelope(result)
+
 
 @router.get("/api/listings")
 def get_listings(
@@ -164,6 +176,7 @@ def create_material_lot(
     return envelope({"lot": lot_view(store, lot), "readiness": passport_readiness(store, listing.id), "message": "Material lot added. Recompute matches to use the newest available lot."})
 
 @router.post("/api/listings/lots/{lot_id}/evidence", status_code=201)
+@router.post("/api/lots/{lot_id}/evidence", status_code=201)
 def create_quality_evidence(
     lot_id: str,
     request: CreateEvidenceRequest,

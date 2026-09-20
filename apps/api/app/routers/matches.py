@@ -14,6 +14,7 @@ from app.seed.demo_data import city_coordinates
 router = APIRouter()
 
 @router.post("/api/listings/{listing_id}/recompute-matches")
+@router.post("/api/listings/{listing_id}/matches/recompute")
 def recompute_matches(
     listing_id: str,
     current_user: User = Depends(get_current_user),
@@ -326,4 +327,125 @@ def create_shipment(
     store.create_shipment(shipment)
     store.add_audit_event(entity_type="match", entity_id=match_id, action="pickup_planned", actor_id=current_user.id, summary=f"Demo pickup planned for {shipment.planned_quantity_kg:,.0f} kg on {shipment.pickup_date}.", is_demo=current_user.is_demo)
     return envelope({"shipment": shipment.model_dump(), "timeline": timeline_for_match(store, match_id), "message": "Demo pickup plan recorded. It is not live fleet dispatch or a transport contract."})
+
+
+@router.patch("/api/sample-requests/{sample_id}")
+def update_sample_request(
+    sample_id: str,
+    request: UpdateSampleRequest,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    sample = store.sample_requests.get(sample_id)
+    if sample is None:
+        raise not_found("Sample request")
+    match = store.get_match(sample.match_id)
+    if match is None:
+        raise HTTPException(status_code=409, detail="Sample match is unavailable.")
+    listing = store.get_listing(match.listing_id)
+    requirement = store.get_requirement(match.buyer_requirement_id)
+    if listing is None or requirement is None or not can_participate_in_match(current_user, listing, requirement):
+        raise HTTPException(status_code=403, detail="You are not a participant in this sample request.")
+    updated = store.update_sample_request(sample_id, {"status": request.status, "note": request.note or sample.note})
+    assert updated is not None
+    store.clear_matches_for_listing(listing.id)
+    recompute_listing_matches(store, listing)
+    store.add_audit_event(
+        entity_type="match",
+        entity_id=match.id,
+        action="sample_updated",
+        actor_id=current_user.id,
+        summary=f"Demo sample request updated to {updated.status}.",
+        is_demo=current_user.is_demo,
+    )
+    return envelope({
+        "sample_request": updated.model_dump(),
+        "timeline": timeline_for_match(store, match.id),
+        "message": "Sample status updated in Demo Mode. Recomputed eligibility will use the new sample status.",
+    })
+
+
+@router.patch("/api/offers/{offer_id}")
+def update_offer(
+    offer_id: str,
+    request: UpdateOfferRequest,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    offer = store.offers.get(offer_id)
+    if offer is None:
+        raise not_found("Offer")
+    match = store.get_match(offer.match_id)
+    if match is None:
+        raise HTTPException(status_code=409, detail="Offer match is unavailable.")
+    listing = store.get_listing(match.listing_id)
+    requirement = store.get_requirement(match.buyer_requirement_id)
+    if listing is None or requirement is None or not can_participate_in_match(current_user, listing, requirement):
+        raise HTTPException(status_code=403, detail="You are not a participant in this offer.")
+    updated = store.update_offer(offer_id, {"status": request.status, "note": request.note or offer.note})
+    assert updated is not None
+    store.add_audit_event(
+        entity_type="match",
+        entity_id=match.id,
+        action="offer_updated",
+        actor_id=current_user.id,
+        summary=f"Demo offer updated to {updated.status}.",
+        is_demo=current_user.is_demo,
+    )
+    return envelope({
+        "offer": updated.model_dump(),
+        "timeline": timeline_for_match(store, match.id),
+        "message": "Offer status updated in Demo Mode. It remains non-binding.",
+    })
+
+
+@router.patch("/api/shipments/{shipment_id}")
+def update_shipment(
+    shipment_id: str,
+    request: UpdateShipmentRequest,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    shipment = store.shipments.get(shipment_id)
+    if shipment is None:
+        raise not_found("Shipment")
+    match = store.get_match(shipment.match_id)
+    if match is None:
+        raise HTTPException(status_code=409, detail="Shipment match is unavailable.")
+    listing = store.get_listing(match.listing_id)
+    requirement = store.get_requirement(match.buyer_requirement_id)
+    if listing is None or requirement is None or not can_participate_in_match(current_user, listing, requirement):
+        raise HTTPException(status_code=403, detail="You are not a participant in this shipment.")
+    updated = store.update_shipment(shipment_id, request.model_dump(exclude_unset=True))
+    assert updated is not None
+    if updated.status == "received":
+        store.update_match(match.id, {"status": "accepted"})
+        received_quantity = updated.received_weight_kg or updated.dispatched_weight_kg or updated.planned_quantity_kg
+        store.transactions.append({
+            "id": store.new_id("txn"),
+            "match_id": match.id,
+            "listing_id": listing.id,
+            "initiated_by": current_user.id,
+            "status": "accepted",
+            "agreed_quantity_kg": received_quantity,
+            "note": "Demo receipt record created from shipment update.",
+            "created_at": store.timestamp(),
+            "is_demo": True,
+        })
+        audit_summary = f"Demo shipment received; {received_quantity:,.0f} kg recorded as accepted for dashboard demonstration."
+    else:
+        audit_summary = f"Demo shipment updated to {updated.status}."
+    store.add_audit_event(
+        entity_type="match",
+        entity_id=match.id,
+        action="shipment_updated",
+        actor_id=current_user.id,
+        summary=audit_summary,
+        is_demo=current_user.is_demo,
+    )
+    return envelope({
+        "shipment": updated.model_dump(),
+        "timeline": timeline_for_match(store, match.id),
+        "message": "Shipment status updated in Demo Mode. It remains illustrative.",
+    })
 

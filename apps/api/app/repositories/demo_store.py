@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from datetime import datetime, timezone
 from threading import RLock
 from typing import Any
@@ -39,37 +40,41 @@ class DemoStore:
 
     def __init__(self) -> None:
         self._lock = RLock()
-        self.reset()
+        is_testing = bool(os.getenv("PYTEST_CURRENT_TEST"))
+        self.reset(preserve_real=not is_testing)
         # Restore real user data from Supabase Storage (survives redeploys)
-        self._load_persistent_data()
+        if not is_testing:
+            self._load_persistent_data()
 
     @staticmethod
     def timestamp() -> str:
         return datetime.now(timezone.utc).isoformat()
 
-    def reset(self, include_sample_entities: bool = True) -> None:
+    def reset(self, include_sample_entities: bool = True, preserve_real: bool | None = None) -> None:
+        if preserve_real is None:
+            preserve_real = not bool(os.getenv("PYTEST_CURRENT_TEST"))
         with self._lock:
-            # SAFETY: Preserve real user records from memory before wiping.
+            # SAFETY: Preserve real user records from memory before wiping if preserve_real is True.
             # This means reset() is safe even if Supabase is temporarily unreachable —
             # real user data is never lost because we never depend on the network here.
-            real_companies = {k: v for k, v in self.companies.items() if not v.is_demo} if hasattr(self, "companies") else {}
-            real_users = {k: v for k, v in self.users.items() if not v.is_demo} if hasattr(self, "users") else {}
-            real_listings = {k: v for k, v in self.listings.items() if not v.is_demo} if hasattr(self, "listings") else {}
-            real_requirements = {k: v for k, v in self.requirements.items() if not v.is_demo} if hasattr(self, "requirements") else {}
-            real_lots = {k: v for k, v in self.lots.items() if not v.is_demo} if hasattr(self, "lots") else {}
-            real_evidence = {k: v for k, v in self.evidence.items() if not v.is_demo} if hasattr(self, "evidence") else {}
-            real_specs = {k: v for k, v in self.acceptance_specs.items() if not v.is_demo} if hasattr(self, "acceptance_specs") else {}
+            real_companies = {k: v for k, v in self.companies.items() if not v.is_demo} if (preserve_real and hasattr(self, "companies")) else {}
+            real_users = {k: v for k, v in self.users.items() if not v.is_demo} if (preserve_real and hasattr(self, "users")) else {}
+            real_listings = {k: v for k, v in self.listings.items() if not v.is_demo} if (preserve_real and hasattr(self, "listings")) else {}
+            real_requirements = {k: v for k, v in self.requirements.items() if not v.is_demo} if (preserve_real and hasattr(self, "requirements")) else {}
+            real_lots = {k: v for k, v in self.lots.items() if not v.is_demo} if (preserve_real and hasattr(self, "lots")) else {}
+            real_evidence = {k: v for k, v in self.evidence.items() if not v.is_demo} if (preserve_real and hasattr(self, "evidence")) else {}
+            real_specs = {k: v for k, v in self.acceptance_specs.items() if not v.is_demo} if (preserve_real and hasattr(self, "acceptance_specs")) else {}
             
             real_listing_ids = set(real_listings.keys())
             real_req_ids = set(real_requirements.keys())
 
-            real_matches = {k: v for k, v in self.matches.items() if v.listing_id in real_listing_ids or v.buyer_requirement_id in real_req_ids} if hasattr(self, "matches") else {}
-            real_samples = {k: v for k, v in self.sample_requests.items() if not v.is_demo} if hasattr(self, "sample_requests") else {}
-            real_offers = {k: v for k, v in self.offers.items() if not v.is_demo} if hasattr(self, "offers") else {}
-            real_shipments = {k: v for k, v in self.shipments.items() if not v.is_demo} if hasattr(self, "shipments") else {}
-            real_audits = [a for a in self.audit_events if getattr(a, "is_demo", True) is False] if hasattr(self, "audit_events") else []
-            real_txns = [t for t in self.transactions if not t.get("is_demo", True)] if hasattr(self, "transactions") else []
-            real_notifications = {k: v for k, v in self.notifications.items() if not v.is_demo} if hasattr(self, "notifications") else {}
+            real_matches = {k: v for k, v in self.matches.items() if v.listing_id in real_listing_ids or v.buyer_requirement_id in real_req_ids} if (preserve_real and hasattr(self, "matches")) else {}
+            real_samples = {k: v for k, v in self.sample_requests.items() if not v.is_demo} if (preserve_real and hasattr(self, "sample_requests")) else {}
+            real_offers = {k: v for k, v in self.offers.items() if not v.is_demo} if (preserve_real and hasattr(self, "offers")) else {}
+            real_shipments = {k: v for k, v in self.shipments.items() if not v.is_demo} if (preserve_real and hasattr(self, "shipments")) else {}
+            real_audits = [a for a in self.audit_events if getattr(a, "is_demo", True) is False] if (preserve_real and hasattr(self, "audit_events")) else []
+            real_txns = [t for t in self.transactions if not t.get("is_demo", True)] if (preserve_real and hasattr(self, "transactions")) else []
+            real_notifications = {k: v for k, v in self.notifications.items() if not v.is_demo} if (preserve_real and hasattr(self, "notifications")) else {}
 
             seed = fresh_seed_data(include_sample_entities=include_sample_entities)
             self.materials: dict[str, Material] = {item.id: item for item in seed["materials"]}
@@ -112,25 +117,26 @@ class DemoStore:
             self.scoring_config: ScoringConfig = seed["scoring_config"]
 
             # RESTORE: Merge real user records back on top of seed data
-            self.companies.update(real_companies)
-            self.users.update(real_users)
-            self.listings.update(real_listings)
-            self.requirements.update(real_requirements)
-            self.lots.update(real_lots)
-            self.evidence.update(real_evidence)
-            self.acceptance_specs.update(real_specs)
-            self.matches.update(real_matches)
-            self.sample_requests.update(real_samples)
-            self.offers.update(real_offers)
-            self.shipments.update(real_shipments)
-            self.audit_events.extend(real_audits)
-            self.transactions.extend(real_txns)
-            self.notifications.update(real_notifications)
-            if real_users:
-                logger.info(
-                    "DemoStore.reset(): preserved %d real companies, %d real users, %d real listings.",
-                    len(real_companies), len(real_users), len(real_listings),
-                )
+            if preserve_real:
+                self.companies.update(real_companies)
+                self.users.update(real_users)
+                self.listings.update(real_listings)
+                self.requirements.update(real_requirements)
+                self.lots.update(real_lots)
+                self.evidence.update(real_evidence)
+                self.acceptance_specs.update(real_specs)
+                self.matches.update(real_matches)
+                self.sample_requests.update(real_samples)
+                self.offers.update(real_offers)
+                self.shipments.update(real_shipments)
+                self.audit_events.extend(real_audits)
+                self.transactions.extend(real_txns)
+                self.notifications.update(real_notifications)
+                if real_users:
+                    logger.info(
+                        "DemoStore.reset(): preserved %d real companies, %d real users, %d real listings.",
+                        len(real_companies), len(real_users), len(real_listings),
+                    )
 
     def _load_persistent_data(self) -> None:
         """Restore non-demo user records from Supabase Storage snapshot on startup.

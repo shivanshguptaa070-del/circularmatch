@@ -37,6 +37,50 @@ def get_acceptance_spec(
         raise HTTPException(status_code=403, detail="You cannot view this buyer acceptance template.")
     return envelope({"requirement": requirement_view(store, requirement), "acceptance_spec": acceptance_spec_view(store, requirement)})
 
+
+@router.patch("/api/buyer-requirements/{requirement_id}/acceptance-spec")
+def update_acceptance_spec(
+    requirement_id: str,
+    request: UpdateBuyerAcceptanceSpecRequest,
+    current_user: User = Depends(get_current_user),
+    store: DemoStore = Depends(get_store),
+) -> dict[str, Any]:
+    requirement = store.get_requirement(requirement_id)
+    if requirement is None:
+        raise not_found("Buyer requirement")
+    if not can_access_requirement(current_user, requirement):
+        raise HTTPException(status_code=403, detail="You cannot edit this buyer acceptance template.")
+    previous = store.get_acceptance_spec(requirement.id) or default_acceptance_spec(store, requirement)
+    spec = BuyerAcceptanceSpec(
+        id=previous.id,
+        buyer_requirement_id=requirement.id,
+        accepted_forms=[item.strip() for item in request.accepted_forms if item.strip()],
+        accepted_colours=[item.strip() for item in request.accepted_colours if item.strip()],
+        prohibited_materials=[item.strip() for item in request.prohibited_materials if item.strip()],
+        required_evidence_status=request.required_evidence_status,
+        requires_sample=request.requires_sample,
+        available_capacity_kg_week=request.available_capacity_kg_week,
+        route_note=request.route_note,
+        review_note=request.review_note,
+        updated_at=store.timestamp(),
+        is_demo=requirement.is_demo,
+    )
+    store.save_acceptance_spec(spec)
+    store.clear_matches_for_requirement(requirement.id)
+    store.add_audit_event(
+        entity_type="buyer_requirement",
+        entity_id=requirement.id,
+        action="acceptance_spec_updated",
+        actor_id=current_user.id,
+        summary="Buyer acceptance template was updated; matching will recompute using the new gates.",
+        is_demo=current_user.is_demo,
+    )
+    return envelope({
+        "acceptance_spec": acceptance_spec_view(store, requirement),
+        "message": "Buyer acceptance template updated. Existing match suggestions will refresh on next analysis.",
+    })
+
+
 @router.post("/api/buyer-requirements")
 def create_requirement(
     request: CreateRequirementRequest,
