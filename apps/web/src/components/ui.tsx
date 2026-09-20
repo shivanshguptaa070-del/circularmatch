@@ -114,9 +114,9 @@ export function ScoreRing({ score, label = 'match score', size = 88 }: { score: 
   const displayScore = Math.round(clamped)
   const isTop = clamped >= 85
   return (
-    <div className={`relative grid shrink-0 place-items-center rounded-full bg-white/70 p-1.5 shadow-[0_8px_20px_rgba(14,67,55,.08)] transition-transform duration-300 hover:scale-105 ${isTop ? 'ring-2 ring-emerald-300/40' : ''}`} style={{ width: size, height: size }} aria-label={`${displayScore}% ${label}`}>
+    <div className={`relative flex shrink-0 items-center justify-center rounded-full bg-white/70 shadow-[0_8px_20px_rgba(14,67,55,.08)] transition-transform duration-300 hover:scale-105 ${isTop ? 'ring-2 ring-emerald-300/40' : ''}`} style={{ width: size, height: size }} aria-label={`${displayScore}% ${label}`}>
       {isTop && <span className="absolute -inset-1 rounded-full animate-soft-ping bg-emerald-400/20 pointer-events-none" />}
-      <svg width={size - 8} height={size - 8} viewBox="0 0 88 88" className="-rotate-90 drop-shadow-[0_4px_6px_rgba(18,100,91,.15)]">
+      <svg width={size - 8} height={size - 8} viewBox="0 0 88 88" className="block origin-center -rotate-90 drop-shadow-[0_4px_6px_rgba(18,100,91,.15)]">
         <circle cx="44" cy="44" r={radius} fill="none" stroke="#e6eee9" strokeWidth="7" />
         <motion.circle
           cx="44"
@@ -132,7 +132,7 @@ export function ScoreRing({ score, label = 'match score', size = 88 }: { score: 
           transition={{ duration: 1.5, ease: "easeOut" }}
         />
       </svg>
-      <div className="absolute inset-0 grid place-items-center">
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <span className="text-[1.25rem] font-extrabold tracking-tight text-ink">{displayScore}%</span>
       </div>
     </div>
