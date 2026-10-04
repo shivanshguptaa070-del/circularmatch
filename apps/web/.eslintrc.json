@@ -21,6 +21,7 @@
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "@typescript-eslint/no-explicit-any": "warn",
     "security/detect-object-injection": "off",
-    "react-hooks/set-state-in-effect": "off"
+    "react-hooks/set-state-in-effect": "off",
+    "no-empty": ["error", { "allowEmptyCatch": true }]
   }
 }
