@@ -25,12 +25,12 @@ function Sparkle({ className, style }: { className?: string; style?: React.CSSPr
 
 function BrowserWindow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="lift-hover shine-wrap relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-2xl shadow-emerald-900/10 ring-1 ring-white/60">
-      <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/80 px-4 py-3">
+    <div className="lift-hover shine-wrap relative overflow-hidden rounded-2xl border border-slate-200/70 dark:border-[#1e332a] bg-white dark:bg-[#111d19] shadow-2xl shadow-emerald-900/10 dark:shadow-black/50 ring-1 ring-white/60 dark:ring-[#1e332a]">
+      <div className="flex items-center gap-2 border-b border-slate-100 dark:border-[#1e332a] bg-slate-50/80 dark:bg-[#0e1714]/90 px-4 py-3">
         <span className="h-3 w-3 rounded-full bg-rose-400 transition hover:scale-125" />
         <span className="h-3 w-3 rounded-full bg-amber-400 transition hover:scale-125" />
         <span className="h-3 w-3 rounded-full bg-emerald-400 transition hover:scale-125" />
-        <div className="mx-auto flex h-7 w-2/3 max-w-md items-center justify-center gap-2 rounded-md bg-white px-3 text-[11px] text-slate-500 ring-1 ring-slate-200 transition hover:ring-emerald-200">
+        <div className="mx-auto flex h-7 w-2/3 max-w-md items-center justify-center gap-2 rounded-md bg-white dark:bg-[#162520] px-3 text-[11px] text-slate-500 dark:text-slate-300 ring-1 ring-slate-200 dark:ring-[#1e332a] transition hover:ring-emerald-200">
           <span className="flex h-3.5 w-3.5 items-center justify-center rounded-sm bg-emerald-600 text-white">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="h-2 w-2">
               <rect x="5" y="11" width="14" height="10" rx="1.5" />
@@ -68,7 +68,7 @@ export default function HeroVisual() {
 
         {/* Notification */}
         <div className="absolute -right-3 top-2 z-20 hidden w-[300px] rotate-[2deg] animate-fade-in-up md:block" style={{ animationDelay: '0.4s' }}>
-          <div className="lift-hover rounded-2xl bg-white p-3.5 shadow-xl shadow-slate-900/15 ring-1 ring-slate-100">
+          <div className="lift-hover rounded-2xl bg-white dark:bg-[#111d19] p-3.5 shadow-xl shadow-slate-900/15 dark:shadow-black/50 ring-1 ring-slate-100 dark:ring-[#1e332a]">
             <svg aria-hidden className="absolute -right-3 -top-3 h-10 w-10 text-amber-400" viewBox="0 0 100 100" fill="none">
               <g stroke="currentColor" strokeWidth="3" strokeLinecap="round">
                 <line x1="50" y1="10" x2="50" y2="0" />
@@ -82,24 +82,24 @@ export default function HeroVisual() {
             <div className="flex items-start gap-3">
               <div className="relative">
                 <div className="absolute inset-0 animate-soft-ping rounded-xl bg-emerald-400/60" />
-                <div className="relative flex h-10 w-10 animate-pop items-center justify-center rounded-xl bg-emerald-50 ring-1 ring-emerald-100">
-                  <Sparkles className="h-4 w-4 text-emerald-700" />
+                <div className="relative flex h-10 w-10 animate-pop items-center justify-center rounded-xl bg-emerald-50 dark:bg-[#162520] ring-1 ring-emerald-100 dark:ring-emerald-500/30">
+                  <Sparkles className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
                 </div>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between">
-                  <div className="text-sm font-bold text-slate-900">New Match Found</div>
-                  <div className="text-[10px] uppercase tracking-wide text-slate-400">now</div>
+                  <div className="text-sm font-bold text-slate-900 dark:text-slate-100">New Match Found</div>
+                  <div className="text-[10px] uppercase tracking-wide text-slate-400 dark:text-slate-500">now</div>
                 </div>
-                <p className="mt-0.5 text-[12px] leading-snug text-slate-600">
+                <p className="mt-0.5 text-[12px] leading-snug text-slate-600 dark:text-slate-300">
                   A manufacturer is interested in your{' '}
-                  <span className="font-semibold text-slate-900">PET Plastic Flakes</span>.
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">PET Plastic Flakes</span>.
                 </p>
                 <div className="mt-2.5 flex items-center gap-3 text-[11px] font-semibold">
-                  <a href="#" className="inline-flex items-center gap-1 text-emerald-700 hover:underline">
+                  <a href="#" className="inline-flex items-center gap-1 text-emerald-700 dark:text-emerald-400 hover:underline">
                     View match <ArrowRight className="h-3 w-3" />
                   </a>
-                  <a href="#" className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-600">
+                  <a href="#" className="inline-flex items-center gap-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
                     <X className="h-3 w-3" /> Dismiss
                   </a>
                 </div>
@@ -110,27 +110,27 @@ export default function HeroVisual() {
 
         {/* Impact */}
         <div className="absolute -left-6 bottom-32 z-20 hidden w-[270px] -rotate-[3deg] animate-fade-in-up sm:block" style={{ animationDelay: '0.6s' }}>
-          <div className="lift-hover rounded-2xl bg-emerald-900 p-4 text-white shadow-2xl shadow-emerald-900/30 ring-1 ring-emerald-800">
-            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-emerald-200/80">
+          <div className="lift-hover rounded-2xl bg-emerald-900 dark:bg-[#0c1612] dark:border dark:border-[#1e332a] dark:shadow-[0_14px_36px_rgba(0,0,0,0.65)] p-4 text-white shadow-2xl shadow-emerald-900/30 ring-1 ring-emerald-800 dark:ring-[#1e332a]">
+            <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-emerald-200/80 dark:text-[#94a3b8]">
               <div className="flex items-center gap-2">
-                <Leaf className="h-3.5 w-3.5" />
+                <Leaf className="h-3.5 w-3.5 text-emerald-400" />
                 <span>Impact</span>
                 <span className="text-emerald-300/60">·</span>
                 <span>This month</span>
               </div>
-              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-700/50 px-2 py-0.5 text-[10px] font-bold ring-1 ring-emerald-600">
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-700/50 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold ring-1 ring-emerald-600 dark:ring-emerald-800/60 dark:text-emerald-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
                 18%
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="animate-count-pulse text-4xl font-extrabold tracking-tight">2.4</span>
-              <span className="text-base font-semibold text-emerald-100">tonnes</span>
+              <span className="animate-count-pulse text-4xl font-extrabold tracking-tight text-white dark:text-[#f8fafc]">2.4</span>
+              <span className="text-base font-semibold text-emerald-100 dark:text-[#cbd5e1]">tonnes</span>
             </div>
-            <div className="mt-0.5 text-xs text-emerald-200/80">Material diverted from disposal</div>
-            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-emerald-800/60">
+            <div className="mt-0.5 text-xs text-emerald-200/80 dark:text-[#94a3b8]">Material diverted from disposal</div>
+            <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-emerald-800/60 dark:bg-[#162520]">
               <div className="relative h-full w-2/3 overflow-hidden rounded-full">
-                <div className="absolute inset-0 animate-shimmer rounded-full bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400" />
+                <div className="absolute inset-0 animate-shimmer rounded-full bg-gradient-to-r from-emerald-400 via-green-300 to-emerald-400 dark:from-[#10b981] dark:via-[#34d399] dark:to-[#10b981]" />
               </div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function HeroVisual() {
 
         {/* Trusted by */}
         <div className="absolute -bottom-4 right-2 z-20 hidden w-[230px] rotate-[2deg] animate-fade-in-up md:block" style={{ animationDelay: '0.8s' }}>
-          <div className="lift-hover rounded-2xl bg-white p-3.5 shadow-xl shadow-slate-900/15 ring-1 ring-slate-100">
+          <div className="lift-hover rounded-2xl bg-white dark:bg-[#111d19] p-3.5 shadow-xl shadow-slate-900/15 dark:shadow-black/50 ring-1 ring-slate-100 dark:ring-[#1e332a]">
             <div className="flex items-center gap-3">
               <div className="flex -space-x-2.5 transition-transform duration-300 hover:scale-105">
                 <Avatar bg="bg-amber-200" />
@@ -146,26 +146,26 @@ export default function HeroVisual() {
                 <Avatar bg="bg-yellow-200" icon={<Building2 className="h-3.5 w-3.5 text-slate-500" />} />
               </div>
               <div className="leading-tight">
-                <div className="text-[12px] font-bold text-slate-900">Trusted by 500+ businesses</div>
-                <div className="text-[11px] text-slate-500">across Delhi NCR</div>
+                <div className="text-[12px] font-bold text-slate-900 dark:text-slate-100">Trusted by 500+ businesses</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">across Delhi NCR</div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Annotations */}
-        <div className="pointer-events-none absolute -right-2 top-44 hidden -rotate-6 font-serif text-base italic text-slate-700 lg:block">
+        <div className="pointer-events-none absolute -right-2 top-44 hidden -rotate-6 font-serif text-base italic text-slate-700 dark:text-slate-300 lg:block">
           Real connections.
           <br />
           Real impact.
-          <svg aria-hidden className="absolute -bottom-12 left-4 h-12 w-20 text-slate-700" viewBox="0 0 80 50" fill="none">
+          <svg aria-hidden className="absolute -bottom-12 left-4 h-12 w-20 text-slate-700 dark:text-slate-300" viewBox="0 0 80 50" fill="none">
             <path d="M5 5 C 25 30, 40 35, 65 45" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" />
             <path d="M58 38 L 65 45 L 60 50" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
-        <div className="pointer-events-none absolute -bottom-2 right-4 hidden -rotate-6 font-serif text-base italic text-slate-700 lg:block">
+        <div className="pointer-events-none absolute -bottom-2 right-4 hidden -rotate-6 font-serif text-base italic text-slate-700 dark:text-slate-300 lg:block">
           <span className="block">Waste today.</span>
-          <span className="block text-emerald-700 underline decoration-emerald-400 decoration-2 underline-offset-4">
+          <span className="block text-emerald-700 dark:text-emerald-400 underline decoration-emerald-400 decoration-2 underline-offset-4">
             Value tomorrow.
           </span>
         </div>

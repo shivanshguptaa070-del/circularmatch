@@ -50,17 +50,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               initial={{ opacity: 0, y: 20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-              className="pointer-events-auto flex w-full max-w-sm items-center justify-between gap-3 rounded-lg bg-white p-4 shadow-xl ring-1 ring-black/5"
+              className="pointer-events-auto flex w-full max-w-sm items-center justify-between gap-3 rounded-lg bg-white p-4 shadow-xl ring-1 ring-black/5 dark:bg-[#111d19] dark:ring-[#1e332a] dark:shadow-black/50"
             >
               <div className="flex items-center gap-3">
-                {t.type === 'success' && <CheckCircle2 className="text-[#12645b]" size={20} />}
-                {t.type === 'error' && <XCircle className="text-coral" size={20} />}
-                {t.type === 'info' && <Info className="text-spruce" size={20} />}
-                <p className="text-sm font-medium text-ink">{t.message}</p>
+                {t.type === 'success' && <CheckCircle2 className="text-[#12645b] dark:text-emerald-400" size={20} />}
+                {t.type === 'error' && <XCircle className="text-coral dark:text-rose-400" size={20} />}
+                {t.type === 'info' && <Info className="text-spruce dark:text-emerald-300" size={20} />}
+                <p className="text-sm font-medium text-ink dark:text-slate-100">{t.message}</p>
               </div>
               <button
                 onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
-                className="text-gray-400 transition hover:text-gray-600"
+                className="text-gray-400 transition hover:text-gray-600 dark:text-slate-400 dark:hover:text-slate-200"
               >
                 <X size={16} />
               </button>

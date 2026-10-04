@@ -40,12 +40,12 @@ export function NetworkMap({
 }) {
   return (
     <div className={`card overflow-hidden ${className}`}>
-      <div className="flex items-center justify-between gap-4 border-b border-[#dce9e0] bg-gradient-to-r from-[#fbfefb] via-white to-[#edf8f1] px-5 py-4">
+      <div className="flex items-center justify-between gap-4 border-b border-[#dce9e0] bg-gradient-to-r from-[#fbfefb] via-white to-[#edf8f1] px-5 py-4 dark:border-[#1e332a] dark:from-[#111d19] dark:via-[#162520] dark:to-[#111d19]">
         <div className="flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#e2f5e9] text-spruce shadow-sm"><MapPinned size={18} /></span>
+          <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#e2f5e9] text-spruce shadow-sm dark:bg-white/10 dark:text-emerald-300"><MapPinned size={18} /></span>
           <div>
-            <p className="text-sm font-semibold text-ink">Delhi NCR material network</p>
-            <p className="mt-0.5 text-[11px] text-[#70857d]">Sample locations only — not live GPS or dispatch routing.</p>
+            <p className="text-sm font-semibold text-ink dark:text-slate-100">Delhi NCR material network</p>
+            <p className="mt-0.5 text-[11px] text-[#70857d] dark:text-slate-400">Sample locations only — not live GPS or dispatch routing.</p>
           </div>
         </div>
         {!compact && <StatusBadge>network map</StatusBadge>}
@@ -69,12 +69,12 @@ export function NetworkMap({
                 pathOptions={{ color: '#ffffff', weight: 2.5, fillColor: color, fillOpacity: 0.97 }}
               >
                 <Popup>
-                  <div className="min-w-[180px] p-1 font-sans text-[#12312d]">
+                  <div className="min-w-[180px] p-1 font-sans text-[#12312d] dark:text-slate-100">
                     <p className="font-semibold">{point.name}</p>
-                    <p className="mt-0.5 text-xs text-[#6b8179]">{point.company_type === 'generator' ? 'Waste generator' : 'Buyer / processor'} · {point.city}</p>
-                    <div className="mt-3 rounded-lg bg-[#f3f7f4] p-2 text-xs">
+                    <p className="mt-0.5 text-xs text-[#6b8179] dark:text-slate-400">{point.company_type === 'generator' ? 'Waste generator' : 'Buyer / processor'} · {point.city}</p>
+                    <div className="mt-3 rounded-lg bg-[#f3f7f4] p-2 text-xs dark:bg-[#162520]">
                       <p className="font-medium">{material}</p>
-                      {quantity ? <p className="mt-1 text-[#5c726a]">{formatKg(quantity)}/week</p> : <p className="mt-1 text-[#5c726a]">Active requirement</p>}
+                      {quantity ? <p className="mt-1 text-[#5c726a] dark:text-slate-300">{formatKg(quantity)}/week</p> : <p className="mt-1 text-[#5c726a] dark:text-slate-300">Active requirement</p>}
                     </div>
                   </div>
                 </Popup>
@@ -93,14 +93,14 @@ export function NetworkMap({
             </>
           )}
         </MapContainer>
-        <div className="pointer-events-none absolute bottom-4 left-4 z-[500] hidden rounded-xl border border-white/70 bg-white/90 px-3 py-2 shadow-lg backdrop-blur sm:block">
-          <div className="flex items-center gap-3 text-[10px] font-semibold text-[#58736a]"><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-spruce shadow-sm" />Generators</span><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#c08a37] shadow-sm" />Buyers</span></div>
+        <div className="pointer-events-none absolute bottom-4 left-4 z-[500] hidden rounded-xl border border-white/70 bg-white/90 px-3 py-2 shadow-lg backdrop-blur sm:block dark:border-[#1e332a] dark:bg-[#111d19]/90">
+          <div className="flex items-center gap-3 text-[10px] font-semibold text-[#58736a] dark:text-slate-300"><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-spruce shadow-sm" />Generators</span><span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-[#c08a37] shadow-sm" />Buyers</span></div>
         </div>
       </div>
       {route && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#dbe8df] bg-[#fbfefb] px-5 py-3.5 text-xs">
-          <span className="inline-flex items-center gap-2 font-semibold text-ink"><RouteIcon size={15} className="text-spruce" />Selected potential route · {route.from.city} → {route.to.city}</span>
-          <span className="rounded-full border border-[#cbe7d7] bg-[#ebf8f0] px-2.5 py-1 font-semibold text-spruce">{route.distance_km.toFixed(1)} km · calculated distance</span>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[#dbe8df] bg-[#fbfefb] px-5 py-3.5 text-xs dark:border-[#1e332a] dark:bg-[#111d19]">
+          <span className="inline-flex items-center gap-2 font-semibold text-ink dark:text-slate-100"><RouteIcon size={15} className="text-spruce dark:text-emerald-400" />Selected potential route · {route.from.city} → {route.to.city}</span>
+          <span className="rounded-full border border-[#cbe7d7] bg-[#ebf8f0] px-2.5 py-1 font-semibold text-spruce dark:border-emerald-800/40 dark:bg-emerald-950/60 dark:text-emerald-300">{route.distance_km.toFixed(1)} km · calculated distance</span>
         </div>
       )}
     </div>

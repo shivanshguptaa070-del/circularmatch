@@ -103,8 +103,8 @@ export default function DashboardVisual() {
   ];
 
   return (
-    <div className="flex bg-white h-full">
-      <aside className="hidden w-14 shrink-0 flex-col items-center gap-1 border-r border-slate-100 bg-white py-4 sm:flex">
+    <div className="flex bg-white dark:bg-[#111d19] h-full">
+      <aside className="hidden w-14 shrink-0 flex-col items-center gap-1 border-r border-slate-100 dark:border-[#1e332a] bg-white dark:bg-[#0e1714] py-4 sm:flex">
         <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-700 text-white">
           <Leaf className="h-4 w-4" />
         </div>
@@ -121,8 +121,8 @@ export default function DashboardVisual() {
             className={cn(
               "group mt-1 flex h-9 w-9 animate-fade-in-right items-center justify-center rounded-lg transition-all duration-300 hover:scale-110 hover:shadow-md",
               it.active
-                ? 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100'
-                : 'text-slate-400 hover:bg-slate-50 hover:text-emerald-600'
+                ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-100 dark:ring-emerald-500/20'
+                : 'text-slate-400 hover:bg-slate-50 dark:hover:bg-[#162520] hover:text-emerald-600 dark:hover:text-emerald-400'
             )}
             style={{ animationDelay: `${0.4 + i * 0.05}s` }}
           >
@@ -133,10 +133,10 @@ export default function DashboardVisual() {
 
       <div className="min-w-0 flex-1 px-5 py-5 sm:px-7 sm:py-6">
         <div className="flex items-center justify-between">
-          <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-bold tracking-widest text-emerald-700 transition-colors hover:bg-emerald-700 hover:text-white">
+          <span className="rounded-md bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold tracking-widest text-emerald-700 dark:text-emerald-400 transition-colors hover:bg-emerald-700 hover:text-white">
             MARKETPLACE
           </span>
-          <div className="hidden items-center gap-1.5 text-xs text-slate-500 sm:flex">
+          <div className="hidden items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 sm:flex">
             <span className="relative flex h-2 w-2">
               <span className="absolute inset-0 animate-soft-ping rounded-full bg-emerald-500/70" />
               <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
@@ -145,23 +145,23 @@ export default function DashboardVisual() {
           </div>
         </div>
 
-        <h3 className="mt-2 text-xl font-bold text-slate-900 transition-colors hover:text-emerald-700">
+        <h3 className="mt-2 text-xl font-bold text-slate-900 dark:text-slate-100 transition-colors hover:text-emerald-700 dark:hover:text-emerald-400">
           Available materials
         </h3>
-        <p className="text-xs text-slate-500">Discover, connect and trade with verified recyclers</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Discover, connect and trade with verified recyclers</p>
 
         <div className="mt-4 flex items-center gap-2">
-          <div className="group flex h-10 flex-1 items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 ring-1 ring-slate-100 transition-all duration-300 focus-within:border-emerald-300 focus-within:ring-2 focus-within:ring-emerald-200">
-            <Search className="h-4 w-4 text-slate-400 transition-colors group-focus-within:text-emerald-600" />
+          <div className="group flex h-10 flex-1 items-center gap-2 rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 ring-1 ring-slate-100 dark:ring-white/5 transition-all duration-300 focus-within:border-emerald-300 focus-within:ring-2 focus-within:ring-emerald-200">
+            <Search className="h-4 w-4 text-slate-400 dark:text-slate-500 transition-colors group-focus-within:text-emerald-600 dark:group-focus-within:text-emerald-400" />
             <input
               placeholder="Search materials, grades or locations…"
-              className="w-full bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-sm text-slate-700 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
-            <span className="hidden items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 sm:flex">
+            <span className="hidden items-center gap-1 rounded-md border border-slate-200 dark:border-[#1e332a] bg-slate-50 dark:bg-[#111d19] px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 dark:text-slate-400 sm:flex">
               <Command className="h-3 w-3" /> K
             </span>
           </div>
-          <button className="group flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-700 transition-all duration-300 hover:scale-105 hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-md">
+          <button className="group flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-all duration-300 hover:scale-105 hover:border-emerald-300 hover:bg-emerald-50 dark:hover:bg-[#1a382b] hover:shadow-md">
             <SlidersHorizontal className="h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
             Filters
             <span className="flex h-4 min-w-4 animate-heartbeat items-center justify-center rounded-full bg-emerald-600 px-1 text-[10px] font-bold text-white">
@@ -179,8 +179,8 @@ export default function DashboardVisual() {
               className={cn(
                 "group relative whitespace-nowrap rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-300 animate-fade-in-up hover:scale-105 active:scale-95",
                 activeTab === t
-                  ? 'bg-slate-900 text-white shadow-md'
-                  : 'border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:border-emerald-300 hover:text-emerald-700'
+                  ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-md'
+                  : 'border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-[#1a382b] hover:border-emerald-300 hover:text-emerald-700 dark:hover:text-emerald-300'
               )}
             >
               {t}
@@ -191,59 +191,59 @@ export default function DashboardVisual() {
           ))}
         </div>
 
-        <div className="mt-4 overflow-hidden rounded-xl border border-slate-100">
-          <div className="grid grid-cols-12 gap-2 border-b border-slate-100 bg-slate-50/60 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-            <div className="col-span-5 transition-colors hover:text-emerald-600">Material</div>
-            <div className="col-span-2 text-right transition-colors hover:text-emerald-600">Qty / Price</div>
-            <div className="col-span-3 transition-colors hover:text-emerald-600">Location</div>
-            <div className="col-span-2 text-right transition-colors hover:text-emerald-600">Match</div>
+        <div className="mt-4 overflow-hidden rounded-xl border border-slate-100 dark:border-[#1e332a]">
+          <div className="grid grid-cols-12 gap-2 border-b border-slate-100 dark:border-[#1e332a] bg-slate-50/60 dark:bg-[#0e1714]/80 px-4 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="col-span-5 transition-colors hover:text-emerald-600 dark:hover:text-emerald-400">Material</div>
+            <div className="col-span-2 text-right transition-colors hover:text-emerald-600 dark:hover:text-emerald-400">Qty / Price</div>
+            <div className="col-span-3 transition-colors hover:text-emerald-600 dark:hover:text-emerald-400">Location</div>
+            <div className="col-span-2 text-right transition-colors hover:text-emerald-600 dark:hover:text-emerald-400">Match</div>
           </div>
 
           {displayRows.map((r, i) => (
             <div
               key={r.id || i}
-              className="group grid grid-cols-12 animate-slide-up-fade cursor-pointer items-center gap-2 border-b border-slate-50 px-4 py-3 transition-all duration-300 hover:bg-emerald-50/40 hover:pl-6"
+              className="group grid grid-cols-12 animate-slide-up-fade cursor-pointer items-center gap-2 border-b border-slate-50 dark:border-[#1e332a]/60 px-4 py-3 transition-all duration-300 hover:bg-emerald-50/40 dark:hover:bg-[#162520]/80 hover:pl-6"
               style={{ animationDelay: `${0.4 + i * 0.06}s` }}
             >
               <div className="col-span-5 flex items-center gap-3 min-w-0">
                 <img
                   src={MATERIAL_IMAGES[r.code] || MATERIAL_IMAGES.WD}
                   alt=""
-                  className="h-11 w-11 shrink-0 rounded-lg object-cover ring-1 ring-slate-100 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
+                  className="h-11 w-11 shrink-0 rounded-lg object-cover ring-1 ring-slate-100 dark:ring-[#1e332a] transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3"
                 />
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="truncate text-sm font-semibold text-slate-900">{r.name}</span>
+                    <span className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{r.name}</span>
                   </div>
                   <div className="mt-1 flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-700 ring-1 ring-emerald-100 transition-all duration-300 group-hover:bg-emerald-700 group-hover:text-white">
+                    <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-100 dark:ring-emerald-500/20 transition-all duration-300 group-hover:bg-emerald-700 group-hover:text-white">
                       <CheckCircle2 className="h-2.5 w-2.5 transition-transform group-hover:rotate-180" />
                       Verified
                     </span>
-                    <span className="truncate text-[11px] text-slate-500">{r.spec}</span>
+                    <span className="truncate text-[11px] text-slate-500 dark:text-slate-400">{r.spec}</span>
                   </div>
                 </div>
               </div>
 
               <div className="col-span-2 text-right">
-                <div className="text-sm font-bold text-slate-900">{r.qty}</div>
-                <div className="text-[11px] text-slate-500">
-                  {r.price} <span className="text-slate-400">{r.priceUnit}</span>
+                <div className="text-sm font-bold text-slate-900 dark:text-slate-100">{r.qty}</div>
+                <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                  {r.price} <span className="text-slate-400 dark:text-slate-500">{r.priceUnit}</span>
                 </div>
               </div>
 
               <div className="col-span-3">
-                <div className="flex items-center gap-1 text-sm font-medium text-slate-700">
+                <div className="flex items-center gap-1 text-sm font-medium text-slate-700 dark:text-slate-300">
                   <MapPin className="h-3 w-3 text-emerald-500" /> {r.loc}
                 </div>
-                <div className="text-[11px] text-slate-400">{r.dist}</div>
+                <div className="text-[11px] text-slate-400 dark:text-slate-500">{r.dist}</div>
               </div>
 
               <div className="col-span-2 flex items-center justify-end gap-2">
-                <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-xs font-bold text-emerald-700 ring-1 ring-emerald-100 transition-all duration-300 group-hover:bg-emerald-700 group-hover:text-white group-hover:scale-110">
+                <span className="rounded-md bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 text-xs font-bold text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-100 dark:ring-emerald-500/20 transition-all duration-300 group-hover:bg-emerald-700 group-hover:text-white group-hover:scale-110">
                   {r.match}%
                 </span>
-                <ArrowRight className="h-4 w-4 text-slate-400 transition-all duration-300 group-hover:translate-x-1 group-hover:text-emerald-600 group-hover:animate-magnetic" />
+                <ArrowRight className="h-4 w-4 text-slate-400 transition-all duration-300 group-hover:translate-x-1 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:animate-magnetic" />
               </div>
             </div>
           ))}

@@ -307,26 +307,26 @@ export function ListWastePage({ role: _role }: { role: Role }) {
   return (
     <div className="space-y-6 animate-fade-in-up">
       {/* Breadcrumb */}
-      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[12px] text-slate-500">
-        <Link to="/dashboard" className="transition hover:text-emerald-700">Workspace</Link>
-        <span className="text-slate-300">/</span>
-        <span className="text-slate-600">Sell</span>
-        <span className="text-slate-300">/</span>
-        <span className="font-semibold text-slate-800">List Waste</span>
+      <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-[12px] text-slate-500 dark:text-slate-400">
+        <Link to="/dashboard" className="transition hover:text-emerald-700 dark:hover:text-emerald-400">Workspace</Link>
+        <span className="text-slate-300 dark:text-slate-600">/</span>
+        <span className="text-slate-600 dark:text-slate-400">Sell</span>
+        <span className="text-slate-300 dark:text-slate-600">/</span>
+        <span className="font-semibold text-slate-800 dark:text-slate-200">List Waste</span>
       </nav>
 
       {/* Page Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 pb-2">
         <div className="min-w-0">
           <div className="mb-2 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/60 bg-emerald-50/70 px-3 py-1 text-[10.5px] font-bold tracking-[0.16em] text-emerald-700 backdrop-blur">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 bg-emerald-50/70 dark:bg-emerald-950/60 px-3 py-1 text-[10.5px] font-bold tracking-[0.16em] text-emerald-700 dark:text-emerald-400 backdrop-blur">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inset-0 animate-soft-ping rounded-full bg-emerald-400" />
                 <span className="relative h-1.5 w-1.5 rounded-full bg-emerald-500" />
               </span>
               GENERATOR WORKFLOW
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200/60 bg-gradient-to-r from-amber-50 to-orange-50 px-3 py-1 text-[10.5px] font-bold tracking-[0.16em] text-amber-700">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200/60 dark:border-amber-800/60 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/60 dark:to-orange-950/60 px-3 py-1 text-[10.5px] font-bold tracking-[0.16em] text-amber-700 dark:text-amber-400">
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inset-0 animate-soft-ping rounded-full bg-amber-400" />
                 <span className="relative h-1.5 w-1.5 rounded-full bg-amber-500" />
@@ -335,10 +335,10 @@ export function ListWastePage({ role: _role }: { role: Role }) {
             </span>
           </div>
 
-          <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-600 bg-clip-text text-[28px] font-extrabold leading-[1.15] tracking-tight text-transparent">
+          <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-600 dark:from-white dark:via-slate-100 dark:to-slate-300 bg-clip-text text-[28px] font-extrabold leading-[1.15] tracking-tight text-transparent">
             List a secondary-material opportunity
           </h1>
-          <p className="mt-1.5 max-w-xl text-[14px] leading-relaxed text-slate-500">
+          <p className="mt-1.5 max-w-xl text-[14px] leading-relaxed text-slate-500 dark:text-slate-400">
             Describe the waste in your own words. CircularMatch returns a
             structured profile and runs deterministic matching once published.
           </p>
@@ -351,15 +351,15 @@ export function ListWastePage({ role: _role }: { role: Role }) {
           onClick={() => setStep(1)}
           className={`inline-flex items-center gap-2.5 rounded-full border px-4 py-2 text-[13px] font-semibold transition-all duration-300 ${
             step === 1
-              ? 'border-emerald-200 bg-white text-slate-900 shadow-sm'
-              : 'border-transparent text-slate-600 hover:text-slate-900'
+              ? 'border-emerald-200 dark:border-[#1e332a] bg-white dark:bg-[#111d19] text-slate-900 dark:text-[#f8fafc] shadow-sm'
+              : 'border-transparent text-slate-600 dark:text-[#94a3b8] hover:text-slate-900 dark:hover:text-[#f8fafc]'
           }`}
         >
           <span
             className={`flex h-6 w-6 items-center justify-center rounded-full text-[11.5px] font-extrabold transition-all duration-300 ${
               step === 2
                 ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/30'
-                : 'bg-slate-900 text-white'
+                : 'bg-slate-900 dark:bg-emerald-700 text-white'
             }`}
           >
             {step === 2 ? <Check className="h-3.5 w-3.5" /> : '1'}
@@ -368,8 +368,8 @@ export function ListWastePage({ role: _role }: { role: Role }) {
         </button>
 
         <div className="flex items-center">
-          <div className={`h-px w-10 ${step === 2 ? 'bg-gradient-to-r from-emerald-400 to-emerald-200' : 'bg-slate-200'}`} />
-          <ChevronRight className={`h-3 w-3 ${step === 2 ? 'text-emerald-500' : 'text-slate-300'}`} />
+          <div className={`h-px w-10 ${step === 2 ? 'bg-gradient-to-r from-emerald-400 to-emerald-200 dark:from-emerald-500 dark:to-emerald-700' : 'bg-slate-200 dark:bg-[#1e332a]'}`} />
+          <ChevronRight className={`h-3 w-3 ${step === 2 ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600'}`} />
         </div>
 
         <button
@@ -379,13 +379,13 @@ export function ListWastePage({ role: _role }: { role: Role }) {
           disabled={!extraction}
           className={`inline-flex items-center gap-2.5 rounded-full border px-4 py-2 text-[13px] font-semibold transition-all duration-300 ${
             step === 2
-              ? 'border-emerald-200 bg-white text-slate-900 shadow-sm'
-              : 'border-transparent text-slate-400'
+              ? 'border-emerald-200 dark:border-[#1e332a] bg-white dark:bg-[#111d19] text-slate-900 dark:text-[#f8fafc] shadow-sm'
+              : 'border-transparent text-slate-400 dark:text-slate-500'
           }`}
         >
           <span
             className={`flex h-6 w-6 items-center justify-center rounded-full text-[11.5px] font-extrabold transition-all duration-300 ${
-              step === 2 ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-500'
+              step === 2 ? 'bg-slate-900 dark:bg-emerald-700 text-white' : 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-slate-400'
             }`}
           >
             2
@@ -393,8 +393,8 @@ export function ListWastePage({ role: _role }: { role: Role }) {
           <span>Review & publish</span>
         </button>
 
-        <span className="ml-2 hidden text-[11px] text-slate-500 sm:inline">
-          · Estimated time: <span className="font-semibold text-slate-700">~90 seconds</span>
+        <span className="ml-2 hidden text-[11px] text-slate-500 dark:text-slate-400 sm:inline">
+          · Estimated time: <span className="font-semibold text-slate-700 dark:text-slate-300">~90 seconds</span>
         </span>
       </div>
 
@@ -402,7 +402,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
         /* STEP 1: Describe Form */
         <div className="mt-4 grid grid-cols-1 gap-5 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="lift-hover shine-wrap relative flex flex-col overflow-hidden rounded-3xl border border-emerald-100/60 bg-white shadow-sm">
+            <div className="lift-hover shine-wrap relative flex flex-col overflow-hidden rounded-3xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] shadow-sm">
               <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500" />
               <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-emerald-300/30 blur-2xl" />
 
@@ -416,10 +416,10 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                       </div>
                     </div>
                     <div>
-                      <h2 className="text-[17px] font-bold tracking-tight text-slate-900">
+                      <h2 className="text-[17px] font-bold tracking-tight text-slate-900 dark:text-[#f8fafc]">
                         Describe the material stream
                       </h2>
-                      <p className="mt-0.5 max-w-md text-[13px] leading-snug text-slate-500">
+                      <p className="mt-0.5 max-w-md text-[13px] leading-snug text-slate-500 dark:text-[#94a3b8]">
                         Include quantity, frequency, location, quality and availability if known — you'll edit every field before publishing.
                       </p>
                     </div>
@@ -427,7 +427,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
 
                   <button
                     onClick={() => setDescription(SAMPLE_GENERATOR_TEXT)}
-                    className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-slate-700 transition hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 hover:shadow-md"
+                    className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-1.5 text-[12px] font-semibold text-slate-700 dark:text-[#cbd5e1] transition hover:-translate-y-0.5 hover:border-emerald-300 dark:hover:border-emerald-700 hover:bg-emerald-50/50 dark:hover:bg-[#1c3029] hover:text-emerald-700 dark:hover:text-[#f8fafc] hover:shadow-md"
                   >
                     <Sparkles className="h-3 w-3 text-emerald-500 transition-transform group-hover:rotate-[20deg]" />
                     Use sample input
@@ -435,10 +435,10 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                 </div>
 
                 <div
-                  className={`relative mt-4 rounded-2xl border bg-slate-50/40 p-1 transition-all duration-300 ${
+                  className={`relative mt-4 rounded-2xl border bg-slate-50/40 dark:bg-[#121f1a] p-1 transition-all duration-300 ${
                     focus
-                      ? 'border-emerald-400 bg-white shadow-[0_0_0_4px_rgba(16,185,129,0.12)]'
-                      : 'border-slate-200'
+                      ? 'border-emerald-400 bg-white dark:bg-[#121f1a] shadow-[0_0_0_4px_rgba(16,185,129,0.12)]'
+                      : 'border-slate-200 dark:border-[#1e332a]'
                   }`}
                 >
                   <textarea
@@ -447,41 +447,41 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                     onFocus={() => setFocus(true)}
                     onBlur={() => setFocus(false)}
                     rows={6}
-                    className="w-full resize-none rounded-xl bg-transparent p-3.5 text-[14px] leading-relaxed text-slate-800 outline-none placeholder:text-slate-400"
+                    className="w-full resize-none rounded-xl bg-transparent p-3.5 text-[14px] leading-relaxed text-slate-800 dark:text-[#f8fafc] outline-none placeholder:text-slate-400 dark:placeholder:text-[#647d73]"
                     placeholder="Describe your waste stream in your own words…"
                   />
 
-                  <div className="flex flex-wrap items-center gap-1.5 border-t border-slate-100/80 bg-white/70 px-3 py-2.5 rounded-b-2xl">
-                    <span className="inline-flex items-center gap-1 mr-0.5 text-[10.5px] font-bold uppercase tracking-[0.14em] text-emerald-700">
+                  <div className="flex flex-wrap items-center gap-1.5 border-t border-slate-100/80 dark:border-[#1e332a] bg-white/70 dark:bg-[#111d19] px-3 py-2.5 rounded-b-2xl">
+                    <span className="inline-flex items-center gap-1 mr-0.5 text-[10.5px] font-bold uppercase tracking-[0.14em] text-emerald-700 dark:text-emerald-400">
                       <Sparkles className="h-2.5 w-2.5" />
                       Detected
                     </span>
                     {detected.map((d) => (
                       <span
                         key={d.label}
-                        className="inline-flex items-center gap-1 rounded-full bg-emerald-50/80 px-2.5 py-1 text-[12px] font-medium text-slate-700 ring-1 ring-emerald-100 transition hover:scale-105 hover:bg-emerald-50 hover:shadow-sm"
+                        className="inline-flex items-center gap-1 rounded-full bg-emerald-50/80 dark:bg-emerald-950/60 px-2.5 py-1 text-[12px] font-medium text-slate-700 dark:text-slate-300 ring-1 ring-emerald-100 dark:ring-emerald-800/60 transition hover:scale-105 hover:bg-emerald-50 dark:hover:bg-emerald-950/80 hover:shadow-sm"
                       >
-                        <d.icon className="h-3 w-3 text-emerald-600" />
-                        <span className="text-slate-500">{d.label}:</span>
-                        <span className="font-semibold text-slate-800">{d.value}</span>
+                        <d.icon className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                        <span className="text-slate-500 dark:text-slate-400">{d.label}:</span>
+                        <span className="font-semibold text-slate-800 dark:text-slate-100">{d.value}</span>
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-2.5 flex items-center justify-between px-1 text-[11.5px] text-slate-500">
+                <div className="mt-2.5 flex items-center justify-between px-1 text-[11.5px] text-slate-500 dark:text-slate-400">
                   <div className="flex items-center gap-1.5">
                     <AlertCircle className="h-3.5 w-3.5 text-amber-500 shrink-0" />
                     <span>Draft category only — composition & certification need evidence.</span>
                   </div>
-                  <span className="font-medium tabular-nums text-slate-400">{description.length} chars</span>
+                  <span className="font-medium tabular-nums text-slate-400 dark:text-slate-500">{description.length} chars</span>
                 </div>
               </div>
 
-              <div className="mt-auto flex items-center justify-between gap-3 rounded-b-3xl border-t border-slate-100 bg-slate-50/40 px-6 py-3.5">
+              <div className="mt-auto flex items-center justify-between gap-3 rounded-b-3xl border-t border-slate-100 dark:border-white/10 bg-slate-50/40 dark:bg-[#0c1e19]/60 px-6 py-3.5">
                 <div className="hidden items-center gap-2 sm:flex">
-                  <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-500">
-                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+                  <span className="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-500 dark:text-slate-400">
+                    <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                     Auto-anonymize sensitive data
                   </span>
                 </div>
@@ -489,7 +489,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                 <div className="flex items-center gap-2">
                   <Link
                     to="/dashboard"
-                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-4 text-[13px] font-medium text-slate-700 dark:text-slate-300 transition hover:border-slate-300 dark:hover:border-white/20 hover:bg-slate-50 dark:hover:bg-white/5"
                   >
                     <ArrowLeft className="h-3.5 w-3.5" />
                     Cancel
@@ -497,7 +497,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                   <button
                     disabled={analyzing || description.trim().length < 8}
                     onClick={() => void analyze()}
-                    className="group inline-flex h-9 items-center gap-1.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 px-4 text-[13px] font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:shadow-emerald-500/20 hover:shadow-xl disabled:opacity-60"
+                    className="group inline-flex h-9 items-center gap-1.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 dark:from-emerald-600 dark:to-teal-600 px-4 text-[13px] font-semibold text-white shadow-lg shadow-slate-900/25 dark:shadow-emerald-950/40 transition hover:-translate-y-0.5 hover:shadow-emerald-500/20 hover:shadow-xl disabled:opacity-60"
                   >
                     {analyzing ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -514,19 +514,19 @@ export function ListWastePage({ role: _role }: { role: Role }) {
 
           <div className="lg:col-span-1 space-y-4">
             {/* What Happens Next Card */}
-            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-gradient-to-br from-emerald-50 via-teal-50/60 to-white p-5 shadow-sm">
+            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 dark:border-[#1e332a] bg-gradient-to-br from-emerald-50 via-teal-50/60 to-white dark:from-[#111d19] dark:via-[#162520] dark:to-[#0e1714] p-5 shadow-sm">
               <div className="pointer-events-none absolute -top-12 -right-12 h-28 w-28 rounded-full bg-emerald-300/40 blur-2xl" />
               <div className="absolute inset-y-3 left-0 w-0.5 rounded-full bg-gradient-to-b from-emerald-400 via-teal-400 to-emerald-200" />
 
               <div className="relative pl-3">
-                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/60 bg-white/80 px-2.5 py-1 text-[10.5px] font-bold tracking-[0.16em] text-emerald-700">
+                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/60 dark:border-emerald-800/60 bg-white/80 dark:bg-emerald-950/80 px-2.5 py-1 text-[10.5px] font-bold tracking-[0.16em] text-emerald-700 dark:text-emerald-300">
                   <Sparkles className="h-2.5 w-2.5" />
                   WHAT HAPPENS NEXT
                 </div>
-                <h2 className="bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-[18px] font-bold tracking-tight text-transparent leading-tight">
+                <h2 className="bg-gradient-to-br from-slate-900 to-slate-700 dark:from-white dark:to-slate-200 bg-clip-text text-[18px] font-bold tracking-tight text-transparent leading-tight">
                   Useful, not magical.
                 </h2>
-                <p className="mt-1 text-[12.5px] leading-snug text-slate-600">
+                <p className="mt-1 text-[12.5px] leading-snug text-slate-600 dark:text-slate-400">
                   Deterministic extraction — every field is auditable and editable.
                 </p>
 
@@ -559,7 +559,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                   ].map((s) => (
                     <li
                       key={s.n}
-                      className="group relative flex items-start gap-2.5 rounded-xl p-1.5 transition hover:bg-white/70"
+                      className="group relative flex items-start gap-2.5 rounded-xl p-1.5 transition hover:bg-white/70 dark:hover:bg-white/5"
                     >
                       <div className="relative shrink-0">
                         <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${s.tint} blur-md opacity-50 transition-opacity duration-300 group-hover:opacity-100`} />
@@ -569,12 +569,12 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <div className="text-[13px] font-bold text-slate-900">{s.title}</div>
-                          <span className="rounded-full bg-white/70 px-1.5 py-0 text-[9px] font-bold uppercase tracking-wider text-slate-500 ring-1 ring-slate-200">
+                          <div className="text-[13px] font-bold text-slate-900 dark:text-slate-100">{s.title}</div>
+                          <span className="rounded-full bg-white/70 dark:bg-white/10 px-1.5 py-0 text-[9px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ring-1 ring-slate-200 dark:ring-white/10">
                             {s.tag}
                           </span>
                         </div>
-                        <div className="mt-0.5 text-[11.5px] leading-snug text-slate-600">{s.body}</div>
+                        <div className="mt-0.5 text-[11.5px] leading-snug text-slate-600 dark:text-slate-400">{s.body}</div>
                       </div>
                     </li>
                   ))}
@@ -583,7 +583,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
             </div>
 
             {/* Pro Tip Card */}
-            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-amber-100/60 bg-gradient-to-br from-amber-50 via-orange-50/40 to-white p-5 shadow-sm">
+            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-amber-100/60 dark:border-[#1e332a] bg-gradient-to-br from-amber-50 via-orange-50/40 to-white dark:from-[#1a1811] dark:via-[#1c221b] dark:to-[#111d19] p-5 shadow-sm">
               <div className="pointer-events-none absolute -top-10 -right-10 h-24 w-24 rounded-full bg-amber-200/40 blur-2xl" />
 
               <div className="relative">
@@ -595,34 +595,34 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                     </div>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-amber-700 ring-1 ring-amber-100">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/70 dark:bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-amber-700 dark:text-amber-400 ring-1 ring-amber-100 dark:ring-amber-800/40">
                       PRO TIP
                     </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10.5px] font-bold text-emerald-700">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-[10.5px] font-bold text-emerald-700 dark:text-emerald-400">
                       <TrendingUp className="h-2.5 w-2.5" />
                       +32% accuracy
                     </span>
                   </div>
                 </div>
 
-                <p className="mt-3 text-[13px] leading-relaxed text-slate-700">
+                <p className="mt-3 text-[13px] leading-relaxed text-slate-700 dark:text-slate-300">
                   Listings that include{' '}
-                  <span className="inline-flex items-center gap-0.5 rounded bg-emerald-100 px-2 py-0.5 text-[11.5px] font-semibold text-emerald-700 ring-1 ring-emerald-200/60">
+                  <span className="inline-flex items-center gap-0.5 rounded bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 text-[11.5px] font-semibold text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-200/60 dark:ring-emerald-800/60">
                     frequency
                   </span>{' '}
                   and{' '}
-                  <span className="inline-flex items-center gap-0.5 rounded bg-emerald-100 px-2 py-0.5 text-[11.5px] font-semibold text-emerald-700 ring-1 ring-emerald-200/60">
+                  <span className="inline-flex items-center gap-0.5 rounded bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 text-[11.5px] font-semibold text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-200/60 dark:ring-emerald-800/60">
                     location
                   </span>{' '}
                   are matched significantly faster.
                 </p>
 
-                <div className="mt-3 flex items-center justify-between rounded-xl bg-white/70 px-3 py-2 text-[11.5px] text-slate-500 ring-1 ring-amber-100/60">
+                <div className="mt-3 flex items-center justify-between rounded-xl bg-white/70 dark:bg-white/5 px-3 py-2 text-[11.5px] text-slate-500 dark:text-slate-400 ring-1 ring-amber-100/60 dark:ring-white/10">
                   <div className="flex items-center gap-1.5">
                     <Zap className="h-3 w-3 text-amber-500" />
                     <span>Avg. response time</span>
                   </div>
-                  <span className="font-bold text-slate-700 tabular-nums">4h 12m</span>
+                  <span className="font-bold text-slate-700 dark:text-slate-200 tabular-nums">4h 12m</span>
                 </div>
               </div>
             </div>
@@ -632,24 +632,24 @@ export function ListWastePage({ role: _role }: { role: Role }) {
         /* STEP 2: Review and Publish */
         <div className="mt-4 grid grid-cols-1 gap-5 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <div className="lift-hover shine-wrap relative flex flex-col overflow-hidden rounded-3xl border border-emerald-100/60 bg-white shadow-sm p-6 sm:p-7">
+            <div className="lift-hover shine-wrap relative flex flex-col overflow-hidden rounded-3xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] shadow-sm p-6 sm:p-7">
               <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-500" />
 
-              <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-5">
+              <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 dark:border-[#1e332a] pb-5">
                 <div>
                   <div className="flex items-center gap-2">
-                    <ClipboardCheck className="h-5 w-5 text-emerald-600" />
-                    <h2 className="text-lg font-bold tracking-tight text-slate-900">
+                    <ClipboardCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                    <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-100">
                       Review structured listing
                     </h2>
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                     Edit the draft before it becomes available for matching.
                   </p>
                 </div>
                 <button
                   onClick={() => setStep(1)}
-                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 hover:border-emerald-300"
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-white/5 hover:border-emerald-300 dark:hover:border-emerald-700"
                 >
                   <ArrowLeft className="h-3.5 w-3.5" />
                   Edit description
@@ -657,7 +657,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
               </div>
 
               {extraction?.structured?.missing_fields?.length ? (
-                <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-xs text-amber-800">
+                <div className="mt-4 rounded-xl border border-amber-200 dark:border-amber-800/60 bg-amber-50/70 dark:bg-amber-950/40 p-3 text-xs text-amber-800 dark:text-amber-300">
                   <strong>Complete before publishing:</strong>
                   <ul className="mt-1 list-disc space-y-0.5 pl-4">
                     {extraction.structured.missing_fields.map((item) => (
@@ -669,7 +669,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
 
               <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">Controlled Material</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Controlled Material</label>
                   <select
                     value={form.material_id}
                     onChange={(e) => {
@@ -681,7 +681,7 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                         selected_use_id: m?.uses?.[0]?.id || '',
                       }))
                     }}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                   >
                     {catalog.map((m) => (
                       <option key={m.id} value={m.id}>
@@ -692,25 +692,25 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">Quantity Available</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Quantity Available</label>
                   <div className="relative mt-1">
                     <input
                       type="number"
                       min="1"
                       value={form.quantity_kg}
                       onChange={(e) => update('quantity_kg', e.target.value)}
-                      className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 pr-12 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                      className="w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 pr-12 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                     />
-                    <span className="absolute right-3 top-2.5 text-xs font-semibold text-slate-400">kg</span>
+                    <span className="absolute right-3 top-2.5 text-xs font-semibold text-slate-400 dark:text-slate-500">kg</span>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">Frequency</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Frequency</label>
                   <select
                     value={form.frequency}
                     onChange={(e) => update('frequency', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                   >
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
@@ -719,11 +719,11 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">City / Location</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">City / Location</label>
                   <select
                     value={form.city}
                     onChange={(e) => update('city', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                   >
                     {DELHI_NCR_CITIES.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -732,11 +732,11 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">Stated Quality Grade</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Stated Quality Grade</label>
                   <select
                     value={form.quality_grade}
                     onChange={(e) => update('quality_grade', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                   >
                     {QUALITY_OPTIONS.map((q) => (
                       <option key={q} value={q}>{titleCase(q)}</option>
@@ -745,52 +745,52 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">Availability</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Availability</label>
                   <input
                     value={form.availability}
                     onChange={(e) => update('availability', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
-                    Target Asking Price <span className="font-normal text-slate-400">₹/kg</span>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                    Target Asking Price <span className="font-normal text-slate-400 dark:text-slate-500">₹/kg</span>
                   </label>
                   <input
                     type="number"
                     min="0"
                     value={form.asking_price_per_kg}
                     onChange={(e) => update('asking_price_per_kg', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
-                    Disposal Cost Avoided <span className="font-normal text-slate-400">₹/kg</span>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                    Disposal Cost Avoided <span className="font-normal text-slate-400 dark:text-slate-500">₹/kg</span>
                   </label>
                   <input
                     type="number"
                     min="0"
                     value={form.disposal_cost_per_kg}
                     onChange={(e) => update('disposal_cost_per_kg', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">Quality Note</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Quality Note</label>
                   <input
                     value={form.quality_notes}
                     onChange={(e) => update('quality_notes', e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm transition hover:border-emerald-300 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                    className="mt-1 w-full rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-2 text-sm text-slate-800 dark:text-slate-100 shadow-sm transition hover:border-emerald-300 dark:hover:border-emerald-700 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950/40"
                   />
                 </div>
 
                 {/* Supporting Document */}
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">Supporting Document (Upload Certificate / Photo / Spec)</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Supporting Document (Upload Certificate / Photo / Spec)</label>
                   <div className="mt-1 flex items-center gap-3">
                     <input
                       type="file"
@@ -815,43 +815,43 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                           }
                         }
                       }}
-                      className="block w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer"
+                      className="block w-full text-xs text-slate-500 dark:text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 dark:file:bg-emerald-950/60 file:text-emerald-700 dark:file:text-emerald-400 hover:file:bg-emerald-100 dark:hover:file:bg-emerald-900/60 cursor-pointer"
                     />
-                    <span className="text-xs text-slate-500 shrink-0">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 shrink-0">
                       {uploadingDoc ? 'Uploading...' : form.document_name ? `Attached: ${form.document_name}` : 'Optional'}
                     </span>
                   </div>
                 </div>
 
                 {/* Material Passport Starter */}
-                <div className="sm:col-span-2 mt-2 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4">
+                <div className="sm:col-span-2 mt-2 rounded-2xl border border-emerald-100 dark:border-white/10 bg-emerald-50/40 dark:bg-white/5 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-bold text-slate-900">Material Passport Starter</p>
-                      <p className="mt-0.5 text-xs text-slate-500">
+                      <p className="text-sm font-bold text-slate-900 dark:text-slate-100">Material Passport Starter</p>
+                      <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                         These are supplier-declared lot details that improve matching and build trust with buyers.
                       </p>
                     </div>
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                    <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
                       Lot Data
                     </span>
                   </div>
 
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600">Material Form</label>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400">Material Form</label>
                       <input
                         value={form.material_form}
                         onChange={(e) => update('material_form', e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        className="mt-1 w-full rounded-lg border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600">Source Status</label>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400">Source Status</label>
                       <select
                         value={form.source_status}
                         onChange={(e) => update('source_status', e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        className="mt-1 w-full rounded-lg border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       >
                         <option value="pre_consumer">Pre-consumer</option>
                         <option value="post_consumer">Post-consumer</option>
@@ -859,33 +859,33 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600">Colour / Mix</label>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400">Colour / Mix</label>
                       <input
                         value={form.colour}
                         onChange={(e) => update('colour', e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        className="mt-1 w-full rounded-lg border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600">Packaging Format</label>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400">Packaging Format</label>
                       <input
                         value={form.packaging}
                         onChange={(e) => update('packaging', e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        className="mt-1 w-full rounded-lg border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="block text-[11px] font-semibold text-slate-600">Storage Condition</label>
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-400">Storage Condition</label>
                       <input
                         value={form.storage_condition}
                         onChange={(e) => update('storage_condition', e.target.value)}
-                        className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        className="mt-1 w-full rounded-lg border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-3 py-1.5 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500"
                       />
                     </div>
-                    <div className="sm:col-span-2 flex items-center justify-between rounded-xl bg-white p-3 border border-emerald-100">
+                    <div className="sm:col-span-2 flex items-center justify-between rounded-xl bg-white dark:bg-[#162520] p-3 border border-emerald-100 dark:border-[#1e332a]">
                       <div>
-                        <p className="text-xs font-semibold text-slate-800">Representative Sample Available</p>
-                        <p className="text-[10.5px] text-slate-500">Allows matching buyers to request inspection before closing.</p>
+                        <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Representative Sample Available</p>
+                        <p className="text-[10.5px] text-slate-500 dark:text-slate-400">Allows matching buyers to request inspection before closing.</p>
                       </div>
                       <input
                         type="checkbox"
@@ -899,16 +899,16 @@ export function ListWastePage({ role: _role }: { role: Role }) {
               </div>
 
               {/* Step 2 Footer */}
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5">
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 dark:border-white/10 pt-5">
                 <div className="flex items-center gap-2">
                   {form.document_name ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-800/60">
+                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
                       Document Attached ({form.document_name})
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                      <Info className="h-3.5 w-3.5 text-slate-400" />
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 dark:bg-white/10 px-3 py-1 text-xs font-semibold text-slate-600 dark:text-slate-400">
+                      <Info className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                       Supplier-declared ({titleCase(form.quality_grade)})
                     </span>
                   )}
@@ -918,14 +918,14 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                   <button
                     type="button"
                     onClick={() => setStep(1)}
-                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 transition hover:bg-slate-50"
+                    className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-slate-200 dark:border-[#1e332a] bg-white dark:bg-[#162520] px-4 text-[13px] font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-white/5"
                   >
                     Back
                   </button>
                   <button
                     disabled={publishing || uploadingDoc || !form.material_id || !Number(form.quantity_kg) || !form.city}
                     onClick={() => void publish()}
-                    className="group inline-flex h-9 items-center gap-1.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 px-4 text-[13px] font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:shadow-emerald-500/20 hover:shadow-xl disabled:opacity-60"
+                    className="group inline-flex h-9 items-center gap-1.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 dark:from-emerald-600 dark:to-teal-600 px-4 text-[13px] font-semibold text-white shadow-lg shadow-slate-900/25 dark:shadow-emerald-950/40 transition hover:-translate-y-0.5 hover:shadow-emerald-500/20 hover:shadow-xl disabled:opacity-60"
                   >
                     {publishing ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -942,25 +942,25 @@ export function ListWastePage({ role: _role }: { role: Role }) {
 
           <div className="lg:col-span-1 space-y-4">
             {/* AI Identified Material Visual Card */}
-            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
+            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-5 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
                     <Camera className="h-4 w-4" />
                   </div>
                   <div>
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-[#f8fafc]">
                       Material Visual Match
                     </h3>
-                    <p className="text-[11px] text-slate-500">{selectedMaterial?.canonical_name || 'Standard stream'}</p>
+                    <p className="text-[11px] text-slate-500 dark:text-[#94a3b8]">{selectedMaterial?.canonical_name || 'Standard stream'}</p>
                   </div>
                 </div>
-                <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200">
+                <span className="rounded-full bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-800/60">
                   AI Verified
                 </span>
               </div>
 
-              <div className="group relative mt-3 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100">
+              <div className="group relative mt-3 overflow-hidden rounded-2xl border border-slate-200/80 dark:border-[#1e332a] bg-slate-100 dark:bg-black/40">
                 <img
                   src={getMaterialImage(selectedMaterial?.canonical_name, selectedMaterial?.category)}
                   alt={selectedMaterial?.canonical_name}
@@ -973,18 +973,18 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                 </div>
               </div>
 
-              <p className="mt-2.5 text-[11px] text-slate-500 leading-snug">
+              <p className="mt-2.5 text-[11px] text-slate-500 dark:text-[#94a3b8] leading-snug">
                 This photorealistic reference will display on your listing and Material Passport until you attach facility batch photos.
               </p>
             </div>
 
             {/* Potential Industrial Uses Card */}
-            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
+            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-5 shadow-sm">
               <div className="flex items-center gap-2">
-                <Recycle className="h-4 w-4 text-emerald-600" />
-                <h3 className="text-sm font-bold text-slate-900">Potential Industrial Uses</h3>
+                <Recycle className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">Potential Industrial Uses</h3>
               </div>
-              <p className="mt-1 text-xs text-slate-500">Catalog-backed pathways for this material.</p>
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Catalog-backed pathways for this material.</p>
 
               <div className="mt-3 space-y-2">
                 {potentialUses.map((use) => (
@@ -992,8 +992,8 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                     key={use.id}
                     className={`block cursor-pointer rounded-xl border p-3 transition ${
                       form.selected_use_id === use.id
-                        ? 'border-emerald-500 bg-emerald-50/50 shadow-sm'
-                        : 'border-slate-100 hover:border-emerald-200'
+                        ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 shadow-sm'
+                        : 'border-slate-100 dark:border-white/10 hover:border-emerald-200 dark:hover:border-emerald-800'
                     }`}
                   >
                     <div className="flex items-start gap-2.5">
@@ -1005,8 +1005,8 @@ export function ListWastePage({ role: _role }: { role: Role }) {
                         className="mt-0.5 h-3.5 w-3.5 accent-emerald-600"
                       />
                       <div>
-                        <p className="text-xs font-bold text-slate-900">{use.title}</p>
-                        <p className="mt-0.5 text-[11px] text-slate-500 leading-snug">{use.description}</p>
+                        <p className="text-xs font-bold text-slate-900 dark:text-slate-100">{use.title}</p>
+                        <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400 leading-snug">{use.description}</p>
                       </div>
                     </div>
                   </label>
@@ -1015,12 +1015,12 @@ export function ListWastePage({ role: _role }: { role: Role }) {
             </div>
 
             {/* Location Handling Notice */}
-            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-emerald-50/40 p-5 shadow-sm">
-              <div className="flex items-center gap-2 text-emerald-800">
-                <MapPin className="h-4 w-4 text-emerald-600" />
+            <div className="lift-hover shine-wrap relative overflow-hidden rounded-3xl border border-emerald-100/60 dark:border-white/10 bg-emerald-50/40 dark:bg-white/5 p-5 shadow-sm">
+              <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-400">
+                <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                 <h3 className="text-xs font-bold uppercase tracking-wider">Location Handling</h3>
               </div>
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
+              <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
                 Cities use central logistics coordinates for transport distance calculation. Specific facility addresses are only shared with confirmed counterparties.
               </p>
             </div>

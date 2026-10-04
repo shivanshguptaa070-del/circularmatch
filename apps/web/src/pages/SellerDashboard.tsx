@@ -121,13 +121,13 @@ function Breadcrumb() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="flex items-center gap-1.5 text-[12px] text-slate-500"
+      className="flex items-center gap-1.5 text-[12px] text-slate-500 dark:text-slate-400"
     >
-      <Link to="/dashboard" className="transition hover:text-emerald-700">Workspace</Link>
-      <span className="text-slate-300">/</span>
-      <span className="text-slate-600">Sell</span>
-      <span className="text-slate-300">/</span>
-      <span className="font-semibold text-slate-800">Dashboard</span>
+      <Link to="/dashboard" className="transition hover:text-emerald-700 dark:hover:text-emerald-400">Workspace</Link>
+      <span className="text-slate-300 dark:text-slate-600">/</span>
+      <span className="text-slate-600 dark:text-slate-300">Sell</span>
+      <span className="text-slate-300 dark:text-slate-600">/</span>
+      <span className="font-semibold text-slate-800 dark:text-emerald-50">Dashboard</span>
     </nav>
   );
 }
@@ -139,31 +139,31 @@ function DashboardHeader() {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 pb-2">
       <div>
-        <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/60 bg-emerald-50/70 px-3 py-1 text-[11px] font-bold tracking-[0.16em] text-emerald-700 backdrop-blur">
-          <Sparkles className="h-3 w-3 text-emerald-500" />
+        <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/60 bg-emerald-50/70 px-3 py-1 text-[11px] font-bold tracking-[0.16em] text-emerald-700 backdrop-blur dark:border-emerald-800/60 dark:bg-emerald-950/60 dark:text-emerald-300">
+          <Sparkles className="h-3 w-3 text-emerald-500 dark:text-emerald-400" />
           LIVE OVERVIEW
         </div>
-        <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-600 bg-clip-text text-[32px] font-extrabold leading-tight tracking-tight text-transparent">
+        <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-600 bg-clip-text text-[32px] font-extrabold leading-tight tracking-tight text-transparent dark:from-white dark:via-slate-100 dark:to-slate-300">
           Sell Dashboard
         </h1>
-        <p className="mt-1.5 max-w-2xl text-[14px] leading-relaxed text-slate-500">
+        <p className="mt-1.5 max-w-2xl text-[14px] leading-relaxed text-slate-500 dark:text-[#94a3b8]">
           Track your listed waste streams, active buyer matches, and potential
           revenue across{' '}
-          <span className="font-semibold text-slate-700">all your facilities</span>.
+          <span className="font-semibold text-slate-700 dark:text-[#cbd5e1]">all your facilities</span>.
         </p>
       </div>
 
       <div className="flex items-center gap-2.5">
-        <button className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 shadow-sm lift-hover">
+        <button className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 text-[13px] font-medium text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 shadow-sm lift-hover dark:border-[#1e332a] dark:bg-[#111d19] dark:text-[#cbd5e1] dark:hover:bg-[#162520] dark:hover:text-[#f8fafc]">
           Last 30 days
         </button>
         <Link
           to="/list-waste"
-          className="group inline-flex h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 px-4 text-[13px] font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:shadow-emerald-500/20 hover:shadow-xl"
+          className="group inline-flex h-10 items-center gap-1.5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-800 px-4 text-[13px] font-semibold text-white shadow-lg shadow-slate-900/25 transition hover:-translate-y-0.5 hover:shadow-emerald-500/20 hover:shadow-xl dark:from-[#00c980] dark:to-[#00b06f] dark:text-[#062417] dark:font-bold dark:shadow-[0_0_24px_rgba(0,201,128,0.45)] dark:hover:shadow-[0_0_35px_rgba(0,201,128,0.65)]"
         >
-          <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90" />
+          <Plus className="h-3.5 w-3.5 transition-transform group-hover:rotate-90 dark:text-[#062417]" />
           List a waste stream
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 dark:text-[#062417]" />
         </Link>
       </div>
     </div>
@@ -299,17 +299,23 @@ function StatsGrid({ wasteListed, activeBuyers, successfulSales, potentialRevenu
     violet: 'from-violet-500 to-purple-500',
     amber: 'from-amber-500 to-orange-500',
   };
+  const darkCardGradients: Record<string, string> = {
+    emerald: 'dark:bg-gradient-to-b dark:from-[#11241c] dark:to-[#0c1612] dark:border-emerald-500/30 dark:hover:border-emerald-400/60',
+    sky: 'dark:bg-gradient-to-b dark:from-[#0d222b] dark:to-[#0c1614] dark:border-sky-500/30 dark:hover:border-sky-400/60',
+    violet: 'dark:bg-gradient-to-b dark:from-[#1b152b] dark:to-[#0d1417] dark:border-violet-500/30 dark:hover:border-violet-400/60',
+    amber: 'dark:bg-gradient-to-b dark:from-[#261f10] dark:to-[#0d1612] dark:border-amber-500/30 dark:hover:border-amber-400/60',
+  };
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {stats.map((s, i) => (
         <div
           key={i}
-          className="group shine-wrap relative overflow-hidden rounded-2xl border border-emerald-100/60 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_20px_40px_-20px_rgba(16,185,129,0.25)]"
+          className={`group shine-wrap relative overflow-hidden rounded-2xl border border-emerald-100/60 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200 hover:shadow-[0_20px_40px_-20px_rgba(16,185,129,0.25)] ${darkCardGradients[s.accent]}`}
         >
           {/* corner radial accent */}
           <div
-            className={`pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full ${accentBg[s.accent]} blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100`}
+            className={`pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full ${accentBg[s.accent]} blur-2xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-100 dark:opacity-20`}
           />
           {/* top accent bar */}
           <div
@@ -317,29 +323,29 @@ function StatsGrid({ wasteListed, activeBuyers, successfulSales, potentialRevenu
           />
 
           <div className="relative flex items-start justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-500 dark:text-[#94a3b8]">
               {s.label}
             </span>
-            <s.icon className="h-4 w-4 text-slate-400 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-600" />
+            <s.icon className="h-4 w-4 text-slate-400 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-600 dark:text-slate-500 dark:group-hover:text-emerald-400" />
           </div>
 
           <div className="relative mt-3 flex items-baseline gap-1.5">
-            <span className="bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-[28px] font-extrabold tracking-tight text-transparent">
+            <span className="bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-[28px] font-extrabold tracking-tight text-transparent dark:from-white dark:to-slate-200">
               {s.value}
             </span>
             {s.unit && (
-              <span className="text-sm font-medium text-slate-500">{s.unit}</span>
+              <span className="text-sm font-medium text-slate-500 dark:text-[#94a3b8]">{s.unit}</span>
             )}
           </div>
 
           <div className="mt-1.5 flex items-center gap-2">
             <span
-              className="inline-flex items-center gap-0.5 rounded-md bg-gradient-to-r from-emerald-50 to-teal-50 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200/60 transition-all duration-300 group-hover:scale-105"
+              className="inline-flex items-center gap-0.5 rounded-md bg-gradient-to-r from-emerald-50 to-teal-50 px-1.5 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-emerald-200/60 transition-all duration-300 group-hover:scale-105 dark:from-emerald-950/80 dark:to-teal-950/80 dark:text-emerald-400 dark:ring-emerald-800/60"
             >
               <ArrowUpRight className="h-3 w-3" />
               {s.delta}
             </span>
-            <span className="text-[11px] text-slate-500">{s.sub}</span>
+            <span className="text-[11px] text-slate-500 dark:text-[#94a3b8]">{s.sub}</span>
           </div>
 
           <div className="mt-3 -mb-1">{s.chart}</div>
@@ -364,21 +370,21 @@ function ChartsRow({ timeframe, setTimeframe, categoryData, revenuePipeline, tot
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       {/* Donut */}
-      <div className="lift-hover shine-wrap group rounded-2xl border border-emerald-100/60 bg-white p-6 shadow-sm">
+      <div className="lift-hover shine-wrap group rounded-2xl border border-emerald-100/60 bg-white p-6 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-[15px] font-semibold tracking-tight text-slate-900">
+              <h3 className="text-[15px] font-semibold tracking-tight text-slate-900 dark:text-[#f8fafc]">
                 Waste by Category
               </h3>
-              <span className="rounded-full bg-violet-50 px-1.5 py-0.5 text-[10px] font-bold text-violet-700 ring-1 ring-violet-200/60">
+              <span className="rounded-full bg-violet-50 px-1.5 py-0.5 text-[10px] font-bold text-violet-700 ring-1 ring-violet-200/60 dark:bg-violet-950/60 dark:text-violet-300 dark:ring-violet-900/60">
                 Live
               </span>
             </div>
-            <p className="mt-0.5 text-[12px] text-slate-500">Material composition this month</p>
+            <p className="mt-0.5 text-[12px] text-slate-500 dark:text-[#94a3b8]">Material composition this month</p>
           </div>
           <button
-            className="rounded-md p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="rounded-md p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-500 dark:hover:bg-[#162520] dark:hover:text-[#cbd5e1]"
             title="Configure view"
           >
             <SlidersHorizontal className="h-4 w-4" />
@@ -398,17 +404,17 @@ function ChartsRow({ timeframe, setTimeframe, categoryData, revenuePipeline, tot
             ).map((l, i) => (
               <li
                 key={i}
-                className="flex items-center justify-between rounded-md px-2 py-1.5 text-[12px] transition hover:bg-slate-50"
+                className="flex items-center justify-between rounded-md px-2 py-1.5 text-[12px] transition hover:bg-slate-50 dark:hover:bg-[#162520]"
               >
                 <div className="flex items-center gap-2">
                   <span
                     className="h-2 w-2 rounded-full shadow-sm"
                     style={{ backgroundColor: l.color, boxShadow: `0 0 8px ${l.color}50` }}
                   />
-                  <span className="font-medium text-slate-700">{l.name}</span>
+                  <span className="font-medium text-slate-700 dark:text-[#cbd5e1]">{l.name}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="w-10 text-right font-semibold tabular-nums text-slate-900">
+                  <span className="w-10 text-right font-semibold tabular-nums text-slate-900 dark:text-[#f8fafc]">
                     {l.pct}%
                   </span>
                 </div>
@@ -419,29 +425,29 @@ function ChartsRow({ timeframe, setTimeframe, categoryData, revenuePipeline, tot
       </div>
 
       {/* Bar */}
-      <div className="lift-hover shine-wrap group rounded-2xl border border-emerald-100/60 bg-white p-6 shadow-sm">
+      <div className="lift-hover shine-wrap group rounded-2xl border border-emerald-100/60 bg-white p-6 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
         <div className="flex items-start justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-[15px] font-semibold tracking-tight text-slate-900">
+              <h3 className="text-[15px] font-semibold tracking-tight text-slate-900 dark:text-[#f8fafc]">
                 Revenue Pipeline
               </h3>
-              <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200/60">
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200/60 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-800/60">
                 <TrendingUp className="h-2.5 w-2.5" />
                 +24%
               </span>
             </div>
-            <p className="mt-0.5 text-[12px] text-slate-500">Secured vs potential revenue</p>
+            <p className="mt-0.5 text-[12px] text-slate-500 dark:text-[#94a3b8]">Secured vs potential revenue</p>
           </div>
-          <div className="flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50/60 p-0.5">
+          <div className="flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50/60 p-0.5 dark:border-[#1e332a] dark:bg-[#121f1a]">
             {(['Month', 'Quarter', 'Year'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTimeframe(t)}
                 className={`rounded px-2.5 py-1 text-[11px] font-medium transition ${
                   timeframe === t
-                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200 dark:bg-[#162520] dark:text-[#f8fafc] dark:ring-[#1e332a]'
+                    : 'text-slate-500 hover:text-slate-900 dark:text-[#94a3b8] dark:hover:text-[#f8fafc]'
                 }`}
               >
                 {t}
@@ -480,7 +486,7 @@ function DonutChart({ categoryData, totalKg }: { categoryData?: { name: string; 
             </feMerge>
           </filter>
         </defs>
-        <circle cx="70" cy="70" r={r} stroke="#f1f5f9" strokeWidth="14" fill="none" />
+        <circle cx="70" cy="70" r={r} stroke="#f1f5f9" strokeWidth="14" fill="none" className="dark:stroke-[#183628]" />
         {segments.map((s, i) => {
           const priorLen = segments.slice(0, i).reduce((sum, seg) => sum + (seg.pct / 100) * c, 0);
           const len = (s.pct / 100) * c;
@@ -505,13 +511,13 @@ function DonutChart({ categoryData, totalKg }: { categoryData?: { name: string; 
         })}
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-slate-400 dark:text-[#94a3b8]">
           Total
         </div>
-        <div className="bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-[20px] font-bold tracking-tight text-transparent">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-[20px] font-bold tracking-tight text-transparent dark:from-white dark:to-slate-200">
           {totalKg}
         </div>
-        <div className="text-[10px] text-slate-400">{hasData ? `${categoryData!.length} categories` : 'no listings yet'}</div>
+        <div className="text-[10px] text-slate-400 dark:text-[#94a3b8]">{hasData ? `${categoryData!.length} categories` : 'no listings yet'}</div>
       </div>
     </div>
   );
@@ -528,16 +534,16 @@ function BarChart({ revenuePipeline }: { revenuePipeline?: { name: string; value
   return (
     <div className="mt-5">
       {data.length === 0 ? (
-        <div className="flex h-44 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 text-center">
-          <TrendingUp className="h-6 w-6 text-slate-300" />
-          <p className="text-[12px] text-slate-400">Revenue pipeline will appear once you have active listings</p>
+        <div className="flex h-44 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-200 text-center dark:border-[#1e332a]">
+          <TrendingUp className="h-6 w-6 text-slate-300 dark:text-slate-600" />
+          <p className="text-[12px] text-slate-400 dark:text-[#94a3b8]">Revenue pipeline will appear once you have active listings</p>
         </div>
       ) : (
       <div className="relative flex h-44 items-end justify-between gap-3">
         {[0, 1, 2, 3].map((g) => (
           <div
             key={g}
-            className="absolute left-0 right-0 h-px bg-slate-100"
+            className="absolute left-0 right-0 h-px bg-slate-100 dark:bg-[#1e332a]"
             style={{ bottom: `${(g * maxHeight) / 4 + 8}px` }}
           />
         ))}
@@ -546,7 +552,7 @@ function BarChart({ revenuePipeline }: { revenuePipeline?: { name: string; value
           const h2 = (d.potential / maxVal) * maxHeight;
           return (
             <div key={i} className="group relative flex flex-1 flex-col items-center gap-1">
-              <div className="absolute -top-7 z-10 hidden rounded-md bg-slate-900 px-2 py-1 text-[11px] font-semibold text-white shadow-lg group-hover:block pointer-events-none">
+              <div className="absolute -top-7 z-10 hidden rounded-md bg-slate-900 dark:bg-[#0c1f19] dark:border dark:border-[#1e332a] px-2 py-1 text-[11px] font-semibold text-white shadow-lg group-hover:block pointer-events-none">
                 ₹{d.potential}k
               </div>
               <div className="flex h-full items-end gap-1">
@@ -557,13 +563,13 @@ function BarChart({ revenuePipeline }: { revenuePipeline?: { name: string; value
                   <span className="absolute inset-x-0 top-0 h-1 bg-white/40" />
                 </div>
                 <div
-                  className="relative w-3 overflow-hidden rounded-t-sm bg-gradient-to-t from-emerald-200 to-emerald-100 shadow-sm transition-all duration-500 group-hover:from-emerald-300 group-hover:to-emerald-200"
+                  className="relative w-3 overflow-hidden rounded-t-sm bg-gradient-to-t from-emerald-200 to-emerald-100 shadow-sm transition-all duration-500 group-hover:from-emerald-300 group-hover:to-emerald-200 dark:from-emerald-900 dark:to-emerald-800"
                   style={{ height: `${h2}px` }}
                 >
                   <span className="absolute inset-x-0 top-0 h-1 bg-white/40" />
                 </div>
               </div>
-              <span className="mt-1 text-[11px] font-medium text-slate-500 transition-colors group-hover:text-emerald-700">
+              <span className="mt-1 text-[11px] font-medium text-slate-500 transition-colors group-hover:text-emerald-700 dark:text-[#94a3b8] dark:group-hover:text-emerald-300">
                 {d.label}
               </span>
             </div>
@@ -572,13 +578,13 @@ function BarChart({ revenuePipeline }: { revenuePipeline?: { name: string; value
       </div>
       )}
 
-      <div className="mt-4 flex items-center justify-end gap-4 border-t border-slate-100 pt-3 text-[12px]">
-        <div className="flex items-center gap-1.5 text-slate-600">
+      <div className="mt-4 flex items-center justify-end gap-4 border-t border-slate-100 dark:border-[#1e332a] pt-3 text-[12px]">
+        <div className="flex items-center gap-1.5 text-slate-600 dark:text-[#94a3b8]">
           <span className="h-2.5 w-2.5 rounded-sm bg-gradient-to-br from-emerald-400 to-emerald-600" />
           Secured
         </div>
-        <div className="flex items-center gap-1.5 text-slate-600">
-          <span className="h-2.5 w-2.5 rounded-sm bg-gradient-to-br from-emerald-100 to-emerald-200" />
+        <div className="flex items-center gap-1.5 text-slate-600 dark:text-[#94a3b8]">
+          <span className="h-2.5 w-2.5 rounded-sm bg-gradient-to-br from-emerald-100 to-emerald-200 dark:from-emerald-800 dark:to-emerald-900" />
           Potential
         </div>
       </div>
@@ -611,21 +617,21 @@ function ActivityRow({
   const statusTone: Record<string, { dot: string; pill: string }> = {
     Active: {
       dot: 'bg-emerald-500',
-      pill: 'bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 ring-emerald-200/60',
+      pill: 'bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 ring-emerald-200/60 dark:from-emerald-950/80 dark:to-teal-950/80 dark:text-emerald-300 dark:ring-emerald-800/60',
     },
     Matching: {
       dot: 'bg-amber-500',
-      pill: 'bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 ring-amber-200/60',
+      pill: 'bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 ring-amber-200/60 dark:from-amber-950/80 dark:to-orange-950/80 dark:text-amber-300 dark:ring-amber-800/60',
     },
     Completed: {
       dot: 'bg-sky-500',
-      pill: 'bg-gradient-to-r from-sky-50 to-blue-50 text-sky-700 ring-sky-200/60',
+      pill: 'bg-gradient-to-r from-sky-50 to-blue-50 text-sky-700 ring-sky-200/60 dark:from-sky-950/80 dark:to-blue-950/80 dark:text-sky-300 dark:ring-sky-800/60',
     },
   };
 
   return (
-    <div className="lift-hover shine-wrap overflow-hidden rounded-2xl border border-emerald-100/60 bg-white shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-100/60 p-5">
+    <div className="lift-hover shine-wrap overflow-hidden rounded-2xl border border-emerald-100/60 bg-white shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-emerald-100/60 dark:border-[#1e332a] p-5">
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="absolute inset-0 rounded-lg bg-emerald-400/40 blur-sm" />
@@ -634,23 +640,23 @@ function ActivityRow({
             </div>
           </div>
           <div>
-            <h3 className="text-[15px] font-semibold tracking-tight text-slate-900">
+            <h3 className="text-[15px] font-semibold tracking-tight text-slate-900 dark:text-[#f8fafc]">
               Recent Listings
             </h3>
-            <p className="text-[12px] text-slate-500">
+            <p className="text-[12px] text-slate-500 dark:text-[#94a3b8]">
               Your latest waste streams in the marketplace
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="group flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/60 px-3 transition-all duration-300 hover:border-emerald-300 hover:bg-white focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-100">
-            <Search className="h-3.5 w-3.5 text-slate-400 transition-colors group-focus-within:text-emerald-600" />
+          <div className="group flex h-9 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50/60 px-3 transition-all duration-300 hover:border-emerald-300 hover:bg-white focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-100 dark:border-[#1e332a] dark:bg-[#121f1a] dark:hover:border-emerald-700 dark:hover:bg-[#162520] dark:focus-within:bg-[#121f1a] dark:focus-within:ring-emerald-900/40">
+            <Search className="h-3.5 w-3.5 text-slate-400 transition-colors group-focus-within:text-emerald-600 dark:text-slate-500 dark:group-focus-within:text-emerald-400" />
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search listings…"
-              className="w-36 sm:w-44 bg-transparent text-[13px] text-slate-700 outline-none placeholder:text-slate-400"
+              className="w-36 sm:w-44 bg-transparent text-[13px] text-slate-700 dark:text-[#cbd5e1] outline-none placeholder:text-slate-400 dark:placeholder:text-[#647d73]"
             />
           </div>
 
@@ -658,7 +664,7 @@ function ActivityRow({
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="inline-flex h-9 items-center rounded-lg border border-slate-200 bg-white px-2.5 text-[12.5px] font-medium text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/40 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="inline-flex h-9 items-center rounded-lg border border-slate-200 bg-white px-2.5 text-[12.5px] font-medium text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/40 focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:border-[#1e332a] dark:bg-[#121f1a] dark:text-[#cbd5e1] dark:hover:border-emerald-700"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
@@ -670,7 +676,7 @@ function ActivityRow({
       </div>
 
       {/* Table head */}
-      <div className="hidden grid-cols-12 gap-2 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-slate-50/40 px-5 py-2.5 text-[10.5px] font-semibold uppercase tracking-wider text-slate-500 sm:grid">
+      <div className="hidden grid-cols-12 gap-2 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-slate-50/40 px-5 py-2.5 text-[10.5px] font-semibold uppercase tracking-wider text-slate-500 sm:grid dark:border-[#1e332a] dark:from-[#121f1a] dark:to-transparent dark:text-[#94a3b8]">
         <div className="col-span-5">Material</div>
         <div className="col-span-2">Quantity</div>
         <div className="col-span-3">Location</div>
@@ -682,12 +688,12 @@ function ActivityRow({
         <div className="flex flex-col gap-3 p-6">
           {[1, 2, 3].map((n) => (
             <div key={n} className="flex items-center gap-3 animate-pulse">
-              <div className="h-10 w-10 rounded-lg bg-slate-100" />
+              <div className="h-10 w-10 rounded-lg bg-slate-100 dark:bg-[#162520]" />
               <div className="flex-1 space-y-2">
-                <div className="h-3 w-1/3 rounded bg-slate-100" />
-                <div className="h-2.5 w-1/2 rounded bg-slate-100" />
+                <div className="h-3 w-1/3 rounded bg-slate-100 dark:bg-[#162520]" />
+                <div className="h-2.5 w-1/2 rounded bg-slate-100 dark:bg-[#162520]" />
               </div>
-              <div className="h-6 w-16 rounded-full bg-slate-100" />
+              <div className="h-6 w-16 rounded-full bg-slate-100 dark:bg-[#162520]" />
             </div>
           ))}
         </div>
@@ -696,13 +702,13 @@ function ActivityRow({
         <div className="flex flex-col items-center gap-4 px-8 py-14 text-center">
           <div className="relative">
             <div className="absolute inset-0 rounded-2xl bg-emerald-400/20 blur-xl" />
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 shadow-sm">
-              <Boxes className="h-8 w-8 text-emerald-600" />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-100 to-teal-100 shadow-sm dark:from-emerald-950 dark:to-teal-950">
+              <Boxes className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
             </div>
           </div>
           <div>
-            <h4 className="text-[15px] font-semibold text-slate-800">No waste streams listed yet</h4>
-            <p className="mt-1 max-w-xs text-[13px] leading-relaxed text-slate-500">
+            <h4 className="text-[15px] font-semibold text-slate-800 dark:text-[#f8fafc]">No waste streams listed yet</h4>
+            <p className="mt-1 max-w-xs text-[13px] leading-relaxed text-slate-500 dark:text-[#94a3b8]">
               List your first waste stream to start matching with verified buyers across India.
             </p>
           </div>
@@ -717,7 +723,7 @@ function ActivityRow({
         </div>
       ) : listings.length === 0 ? (
         /* Search / filter returned nothing */
-        <div className="p-8 text-center text-sm text-slate-400">
+        <div className="p-8 text-center text-sm text-slate-400 dark:text-[#94a3b8]">
           No listings match your search criteria.
         </div>
       ) : (
@@ -726,7 +732,7 @@ function ActivityRow({
           return (
             <div
               key={l.id || i}
-              className="group relative grid grid-cols-1 items-center gap-2 border-b border-slate-100 px-5 py-3.5 transition hover:bg-gradient-to-r hover:from-emerald-50/40 hover:to-transparent sm:grid-cols-12 sm:gap-3"
+              className="group relative grid grid-cols-1 items-center gap-2 border-b border-slate-100 px-5 py-3.5 transition hover:bg-gradient-to-r hover:from-emerald-50/40 hover:to-transparent sm:grid-cols-12 sm:gap-3 dark:border-[#1e332a] dark:hover:from-[#162520]/50"
             >
               {/* Emerald sweep on hover */}
               <div className="absolute inset-y-0 left-0 w-1 origin-top scale-y-0 bg-emerald-500 transition-transform duration-300 group-hover:scale-y-100" />
@@ -743,21 +749,21 @@ function ActivityRow({
                 <div className="min-w-0">
                   <Link
                     to={`/listings`}
-                    className="truncate block text-[13.5px] font-semibold text-slate-900 transition-colors group-hover:text-emerald-700"
+                    className="truncate block text-[13.5px] font-semibold text-slate-900 transition-colors group-hover:text-emerald-700 dark:text-[#f8fafc] dark:group-hover:text-emerald-400"
                   >
                     {l.title}
                   </Link>
-                  <div className="truncate text-[12px] text-slate-500">{l.spec}</div>
+                  <div className="truncate text-[12px] text-slate-500 dark:text-[#94a3b8]">{l.spec}</div>
                 </div>
               </div>
               <div className="col-span-2">
-                <div className="text-[13.5px] font-semibold tabular-nums text-slate-900">
+                <div className="text-[13.5px] font-semibold tabular-nums text-slate-900 dark:text-[#f8fafc]">
                   {l.qty}
                 </div>
-                <div className="text-[12px] text-slate-500">{l.price}</div>
+                <div className="text-[12px] text-slate-500 dark:text-[#94a3b8]">{l.price}</div>
               </div>
-              <div className="col-span-3 flex items-center gap-1 text-[13px] font-medium text-slate-700">
-                <MapPin className="h-3 w-3 text-slate-400 transition-colors group-hover:text-emerald-600 shrink-0" />
+              <div className="col-span-3 flex items-center gap-1 text-[13px] font-medium text-slate-700 dark:text-[#cbd5e1]">
+                <MapPin className="h-3 w-3 text-slate-400 transition-colors group-hover:text-emerald-600 shrink-0 dark:text-slate-500 dark:group-hover:text-emerald-400" />
                 <span className="truncate">{l.loc}</span>
               </div>
               <div className="col-span-2 flex justify-end">
@@ -777,14 +783,14 @@ function ActivityRow({
       )}
 
       {/* Footer */}
-      <div className="flex items-center justify-between border-t border-slate-100 bg-gradient-to-r from-slate-50/50 to-transparent px-5 py-3 text-[12px]">
-        <span className="text-slate-500">
-          Showing <span className="font-semibold text-slate-700">{listings.length}</span> of{' '}
-          <span className="font-semibold text-slate-700">{totalListings}</span> {totalListings === 1 ? 'listing' : 'listings'}
+      <div className="flex items-center justify-between border-t border-slate-100 bg-gradient-to-r from-slate-50/50 to-transparent px-5 py-3 text-[12px] dark:border-[#1e332a] dark:from-[#121f1a]/80">
+        <span className="text-slate-500 dark:text-[#94a3b8]">
+          Showing <span className="font-semibold text-slate-700 dark:text-[#cbd5e1]">{listings.length}</span> of{' '}
+          <span className="font-semibold text-slate-700 dark:text-[#cbd5e1]">{totalListings}</span> {totalListings === 1 ? 'listing' : 'listings'}
         </span>
         <Link
           to="/listings"
-          className="group inline-flex items-center gap-1 rounded-md px-2 py-1 font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700"
+          className="group inline-flex items-center gap-1 rounded-md px-2 py-1 font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700 dark:text-[#cbd5e1] dark:hover:bg-[#162520] dark:hover:text-emerald-300"
         >
           View all
           <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-1" />

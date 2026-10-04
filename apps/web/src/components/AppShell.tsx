@@ -25,6 +25,7 @@ import type { ActiveMode, UserProfile } from '../lib/supabase'
 import { supabase } from '../lib/supabase'
 import type { Notification } from '../types'
 import { getNotifications, markNotificationRead, post } from '../lib/api'
+import { ThemeToggle } from './ThemeToggle'
 
 interface NavItem {
   label: string
@@ -165,7 +166,7 @@ export function AppShell({
   }
 
   const sidebar = (
-    <div className="flex h-full flex-col border-r border-emerald-100/60 bg-white/75 px-4 py-5 backdrop-blur-md transition-all duration-300">
+    <div className="flex h-full flex-col border-r border-emerald-100/60 bg-white/75 px-4 py-5 backdrop-blur-md transition-all duration-300 dark:border-[#1a2a24] dark:bg-[#0d1513]">
       <div className="relative z-10 flex flex-col h-full">
         {/* Brand Header */}
         <div className="flex items-center justify-between px-1 pb-2">
@@ -177,10 +178,10 @@ export function AppShell({
               </div>
             </div>
             <div className="leading-tight">
-              <div className="text-[15px] font-bold tracking-tight text-slate-900">
+              <div className="text-[15px] font-bold tracking-tight text-slate-900 dark:text-white">
                 CIRCULAR<span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">MATCH</span>
               </div>
-              <div className="text-[9px] font-semibold tracking-[0.22em] text-slate-400">
+              <div className="text-[9px] font-semibold tracking-[0.22em] text-slate-400 dark:text-[#718b80]">
                 MATERIAL INTELLIGENCE
               </div>
             </div>
@@ -189,7 +190,7 @@ export function AppShell({
           <button
             type="button"
             onClick={() => setSidebarCollapsed(true)}
-            className="hidden h-7 w-7 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 lg:grid"
+            className="hidden h-7 w-7 place-items-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#162721] dark:hover:text-white lg:grid"
             title="Collapse sidebar (Ctrl+B)"
             aria-label="Collapse sidebar"
           >
@@ -203,20 +204,20 @@ export function AppShell({
             <button
               onClick={() => setShowModeMenu(!showModeMenu)}
               disabled={modeSwitching}
-              className="group lift-hover flex w-full items-center gap-2.5 rounded-xl border border-emerald-100/80 bg-gradient-to-br from-emerald-50/70 to-teal-50/50 p-2.5 text-left transition hover:border-emerald-200 hover:shadow-md hover:shadow-emerald-500/10"
+              className="group lift-hover flex w-full items-center gap-2.5 rounded-xl border border-emerald-100/80 bg-gradient-to-br from-emerald-50/70 to-teal-50/50 p-2.5 text-left transition hover:border-emerald-200 hover:shadow-md hover:shadow-emerald-500/10 dark:border-[#1e332a] dark:from-[#111d19] dark:to-[#14231e]"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-emerald-700 shadow-sm ring-1 ring-emerald-100">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-emerald-700 shadow-sm ring-1 ring-emerald-100 dark:bg-[#162922] dark:text-[#34d399] dark:ring-[#234235]">
                 <ModeIcon className="h-4 w-4" />
               </div>
               <div className="flex-1 min-w-0 leading-tight">
-                <div className="text-[13.5px] font-semibold text-slate-900">{modeInfo.label}</div>
-                <div className="truncate text-[11.5px] text-slate-500">{modeInfo.description}</div>
+                <div className="text-[13.5px] font-semibold text-slate-900 dark:text-[#f8fafc]">{modeInfo.label}</div>
+                <div className="truncate text-[11.5px] text-slate-500 dark:text-[#94a3b8]">{modeInfo.description}</div>
               </div>
-              <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition group-hover:text-emerald-700 ${showModeMenu ? 'rotate-180' : ''}`} />
+              <ChevronDown className={`h-3.5 w-3.5 text-slate-400 transition group-hover:text-emerald-700 dark:text-slate-500 dark:group-hover:text-[#34d399] ${showModeMenu ? 'rotate-180' : ''}`} />
             </button>
 
             {showModeMenu && (
-              <div className="animate-scale-in absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-2xl border border-emerald-100 bg-white p-1.5 shadow-xl">
+              <div className="animate-scale-in absolute left-0 right-0 top-full z-50 mt-1.5 overflow-hidden rounded-2xl border border-emerald-100 bg-white p-1.5 shadow-xl dark:border-[#1e332a] dark:bg-[#111d19]">
                 {(Object.entries(MODE_CONFIG) as [ActiveMode, typeof MODE_CONFIG[ActiveMode]][]).map(([mode, info]) => {
                   const Icon = info.icon
                   const isActive = mode === profile.active_mode
@@ -225,15 +226,17 @@ export function AppShell({
                       key={mode}
                       onClick={() => void switchMode(mode)}
                       className={`flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition ${
-                        isActive ? 'bg-emerald-50 text-emerald-800 font-semibold' : 'text-slate-700 hover:bg-slate-50'
+                        isActive
+                          ? 'bg-emerald-50 text-emerald-800 font-semibold dark:bg-[#162721] dark:text-[#34d399]'
+                          : 'text-slate-700 hover:bg-slate-50 dark:text-[#cbd5e1] dark:hover:bg-white/[0.06] dark:hover:text-white'
                       }`}
                     >
-                      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${isActive ? 'bg-emerald-200/60 text-emerald-800' : 'bg-slate-100 text-slate-500'}`}>
+                      <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${isActive ? 'bg-emerald-200/60 text-emerald-800 dark:bg-[#162721] dark:text-[#34d399]' : 'bg-slate-100 text-slate-500 dark:bg-[#162721] dark:text-slate-400'}`}>
                         <Icon size={14} />
                       </span>
                       <div className="min-w-0 flex-1">
                         <p className="text-[13px] font-semibold">{info.actionLabel}</p>
-                        <p className="truncate text-[11px] text-slate-500">{info.description}</p>
+                        <p className="truncate text-[11px] text-slate-500 dark:text-[#94a3b8]">{info.description}</p>
                       </div>
                     </button>
                   )
@@ -244,7 +247,7 @@ export function AppShell({
         )}
 
         {/* Workspace Label */}
-        <div className="mt-6 px-2 text-[10.5px] font-bold uppercase tracking-[0.2em] text-emerald-700/80">
+        <div className="mt-6 px-2 text-[10.5px] font-bold uppercase tracking-[0.2em] text-emerald-700/80 dark:text-[#6b877d]">
           Workspace
         </div>
 
@@ -259,8 +262,8 @@ export function AppShell({
                 onClick={() => setMobileOpen(false)}
                 className={`group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-[13.5px] font-medium transition-all duration-300 ${
                   selected
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30 dark:from-[#00c980] dark:to-[#00b06f] dark:text-[#062417] dark:font-bold dark:shadow-[0_0_20px_rgba(0,201,128,0.4)]'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-[#cbd5e1] dark:hover:bg-white/[0.06] dark:hover:text-white'
                 }`}
               >
                 <span className="flex items-center gap-2.5">
@@ -268,7 +271,7 @@ export function AppShell({
                     className={`h-4 w-4 transition-all duration-300 ${
                       selected
                         ? 'text-white'
-                        : 'text-slate-400 group-hover:text-emerald-600 group-hover:scale-110'
+                        : 'text-slate-400 group-hover:text-emerald-600 dark:text-[#8fa39a] dark:group-hover:text-[#34d399] group-hover:scale-110'
                     }`}
                   />
                   <span>{label}</span>
@@ -278,7 +281,7 @@ export function AppShell({
                     className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold transition ${
                       selected
                         ? 'bg-white/25 text-white backdrop-blur'
-                        : 'bg-slate-100 text-slate-600 group-hover:bg-emerald-100 group-hover:text-emerald-700'
+                        : 'bg-slate-100 text-slate-600 group-hover:bg-emerald-100 group-hover:text-emerald-700 dark:bg-[#162721] dark:text-[#94a3b8] dark:border dark:border-[#223d32] dark:group-hover:bg-[#1c332b] dark:group-hover:text-white'
                     }`}
                   >
                     {badge}
@@ -290,7 +293,7 @@ export function AppShell({
         </nav>
 
         {/* Bottom user card */}
-        <div className="mt-auto lift-hover flex items-center gap-2.5 rounded-xl border border-emerald-100/60 bg-gradient-to-br from-slate-50 to-white p-3 shadow-sm transition hover:border-emerald-200 hover:shadow-md">
+        <div className="mt-auto lift-hover flex items-center gap-2.5 rounded-xl border border-emerald-100/60 bg-gradient-to-br from-slate-50 to-white p-3 shadow-sm transition hover:border-emerald-200 hover:shadow-md dark:border-[#1e332a] dark:from-[#111d19] dark:to-[#14221d] dark:hover:border-[#2b493c]">
           {profile.avatar_url ? (
             <img src={profile.avatar_url} alt={profile.full_name} className="h-9 w-9 rounded-full object-cover shadow-sm" />
           ) : (
@@ -302,12 +305,12 @@ export function AppShell({
             </div>
           )}
           <div className="flex-1 min-w-0 leading-tight">
-            <div className="truncate text-[13.5px] font-semibold text-slate-900">{profile.full_name}</div>
-            <div className="truncate text-[11px] text-slate-500">{profile.company_name || profile.email}</div>
+            <div className="truncate text-[13.5px] font-semibold text-slate-900 dark:text-[#f8fafc]">{profile.full_name}</div>
+            <div className="truncate text-[11px] text-slate-500 dark:text-[#94a3b8]">{profile.company_name || profile.email}</div>
           </div>
           <button
             onClick={() => void onSignOut()}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-700"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-700 dark:text-slate-400 dark:hover:bg-[#162721] dark:hover:text-[#34d399]"
             title="Sign out"
             aria-label="Log out"
           >
@@ -319,12 +322,12 @@ export function AppShell({
   )
 
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden text-slate-900 antialiased">
+    <div className="relative min-h-screen w-full overflow-x-hidden text-slate-900 dark:text-[#f8fafc] antialiased">
       {/* Background Decor (Mint gradient + dot pattern + soft drifting blobs) */}
-      <div className="fixed inset-0 z-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50" />
+      <div className="fixed inset-0 z-0 bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 dark:from-[#0a110f] dark:via-[#0b1311] dark:to-[#0a100e]" />
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 opacity-[0.35]"
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.35] dark:opacity-[0.14]"
         style={{
           backgroundImage: 'radial-gradient(circle, rgba(16,185,129,0.25) 1px, transparent 1px)',
           backgroundSize: '22px 22px',
@@ -332,11 +335,11 @@ export function AppShell({
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed -top-32 left-1/4 z-0 h-[460px] w-[460px] rounded-full bg-emerald-200/40 blur-3xl animate-blob"
+        className="pointer-events-none fixed -top-32 left-1/4 z-0 h-[460px] w-[460px] rounded-full bg-emerald-200/40 dark:bg-emerald-500/[0.04] blur-3xl animate-blob"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none fixed -bottom-32 right-0 z-0 h-[400px] w-[400px] rounded-full bg-teal-200/40 blur-3xl animate-blob"
+        className="pointer-events-none fixed -bottom-32 right-0 z-0 h-[400px] w-[400px] rounded-full bg-teal-200/40 dark:bg-teal-500/[0.03] blur-3xl animate-blob"
         style={{ animationDelay: '4s' }}
       />
 
@@ -355,7 +358,7 @@ export function AppShell({
           <button
             type="button"
             onClick={() => setSidebarCollapsed(false)}
-            className="fixed left-0 top-1/2 z-20 hidden -translate-y-1/2 items-center rounded-r-xl border border-l-0 border-emerald-200 bg-white/95 p-2 text-emerald-800 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:pl-3 hover:text-emerald-600 hover:shadow-lg lg:flex group"
+            className="fixed left-0 top-1/2 z-20 hidden -translate-y-1/2 items-center rounded-r-xl border border-l-0 border-emerald-200 bg-white/95 p-2 text-emerald-800 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:pl-3 hover:text-emerald-600 hover:shadow-lg dark:border-[#1e332a] dark:bg-[#0d1513] dark:text-[#34d399] dark:hover:bg-[#162721] lg:flex group"
             title="Expand sidebar (Ctrl+B)"
             aria-label="Expand sidebar"
           >
@@ -368,13 +371,13 @@ export function AppShell({
           <div className="fixed inset-0 z-50 lg:hidden">
             <button
               aria-label="Close navigation"
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm"
               onClick={() => setMobileOpen(false)}
             />
             <aside className="relative h-full w-[260px] shadow-2xl">{sidebar}</aside>
             <button
               aria-label="Close navigation"
-              className="absolute left-[272px] top-4 grid h-9 w-9 place-items-center rounded-xl bg-white text-slate-700 shadow-xl"
+              className="absolute left-[272px] top-4 grid h-9 w-9 place-items-center rounded-xl bg-white text-slate-700 dark:bg-[#121f1a] dark:text-[#f8fafc] shadow-xl"
               onClick={() => setMobileOpen(false)}
             >
               <X size={18} />
@@ -389,11 +392,11 @@ export function AppShell({
           }`}
         >
           {/* TopBar */}
-          <header className="sticky top-0 z-20 flex h-[64px] items-center justify-between border-b border-emerald-100/60 bg-white/75 px-6 backdrop-blur-md md:px-8 lg:px-10 animate-fade-in-up">
+          <header className="sticky top-0 z-20 flex h-[64px] items-center justify-between border-b border-emerald-100/60 bg-white/75 px-6 backdrop-blur-md md:px-8 lg:px-10 animate-fade-in-up dark:border-[#1a2a24] dark:bg-[#0d1513]/90">
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-emerald-300 lift-hover"
+                className="grid h-9 w-9 place-items-center rounded-xl border border-slate-200 bg-white text-slate-700 shadow-sm transition hover:bg-slate-50 hover:border-emerald-300 lift-hover dark:border-[#1e332a] dark:bg-[#121f1a] dark:text-[#cbd5e1] dark:hover:bg-[#162721] dark:hover:text-white"
                 onClick={() => {
                   if (window.innerWidth >= 1024) {
                     setSidebarCollapsed((prev) => !prev)
@@ -414,26 +417,26 @@ export function AppShell({
                 )}
               </button>
 
-              <div className="flex items-center gap-2 text-[13.5px] font-medium text-slate-700">
+              <div className="flex items-center gap-2 text-[13.5px] font-medium text-slate-700 dark:text-[#cbd5e1]">
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inset-0 animate-soft-ping rounded-full bg-emerald-400" />
                   <span className="relative h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
-                <span className="hidden sm:inline font-semibold">{profile.company_name || 'CircularMatch'}</span>
-                <span className="hidden text-slate-400 sm:inline">·</span>
-                <span className="text-slate-600 capitalize">{isAdmin ? 'Admin Mode' : profile.active_mode === 'sourcing' ? 'Buyer Mode' : 'Seller Mode'}</span>
+                <span className="hidden sm:inline font-semibold dark:text-[#f8fafc]">{profile.company_name || 'CircularMatch'}</span>
+                <span className="hidden text-slate-400 dark:text-emerald-700 sm:inline">·</span>
+                <span className="text-slate-600 dark:text-[#94a3b8] capitalize">{isAdmin ? 'Admin Mode' : profile.active_mode === 'sourcing' ? 'Buyer Mode' : 'Seller Mode'}</span>
               </div>
             </div>
 
             <div className="flex items-center gap-2.5">
               {/* Search Bar */}
-              <div className="group hidden h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 transition-all duration-300 hover:border-emerald-300 hover:bg-white focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-100 sm:flex">
-                <Search className="h-4 w-4 text-slate-400 transition-colors group-focus-within:text-emerald-600" />
+              <div className="group hidden h-10 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 transition-all duration-300 hover:border-emerald-300 hover:bg-white focus-within:border-emerald-500 focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-100 sm:flex dark:border-[#1e332a] dark:bg-[#121f1a] dark:hover:border-[#2a4a3c] dark:hover:bg-[#14231e] dark:focus-within:bg-[#14231e] dark:focus-within:ring-emerald-900/40">
+                <Search className="h-4 w-4 text-slate-400 transition-colors group-focus-within:text-emerald-600 dark:text-[#8fa39a] dark:group-focus-within:text-[#34d399]" />
                 <input
                   placeholder="Search…"
-                  className="w-32 lg:w-44 bg-transparent text-[13.5px] text-slate-700 outline-none placeholder:text-slate-400"
+                  className="w-32 lg:w-44 bg-transparent text-[13.5px] text-slate-700 dark:text-[#f8fafc] outline-none placeholder:text-slate-400 dark:placeholder:text-[#647d73]"
                 />
-                <span className="hidden items-center gap-0.5 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[9.5px] font-semibold text-slate-500 lg:flex">
+                <span className="hidden items-center gap-0.5 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[9.5px] font-semibold text-slate-500 dark:border-[#1e332a] dark:bg-[#162721] dark:text-[#94a3b8] lg:flex">
                   <Command className="h-2.5 w-2.5" /> K
                 </span>
               </div>
@@ -442,27 +445,27 @@ export function AppShell({
               <div className="relative" ref={notificationRef}>
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
-                  className="group lift-hover relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-md hover:shadow-emerald-500/20"
+                  className="group lift-hover relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-500 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-md hover:shadow-emerald-500/20 dark:border-[#1e332a] dark:bg-[#121f1a] dark:text-[#cbd5e1] dark:hover:bg-[#162721] dark:hover:text-white"
                   aria-label="Notifications"
                 >
                   <Bell className="h-4 w-4 transition-transform group-hover:rotate-[12deg]" />
                   {notifications.some((n) => !n.is_read) && (
                     <span className="absolute right-1.5 top-1.5 flex h-2.5 w-2.5">
                       <span className="absolute inset-0 animate-soft-ping rounded-full bg-rose-400 opacity-75" />
-                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white" />
+                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-[#0d1513]" />
                     </span>
                   )}
                 </button>
 
                 {showNotifications && (
-                  <div className="animate-scale-in absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-2xl z-50">
+                  <div className="animate-scale-in absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl border border-emerald-100 bg-white shadow-2xl z-50 dark:border-[#1e332a] dark:bg-[#111d19]">
                     <div className="bg-gradient-to-r from-emerald-600 to-teal-700 px-4 py-3 text-sm font-bold text-white flex justify-between items-center">
                       <span>Notifications</span>
                       <span className="text-[11px] bg-white/20 px-2.5 py-0.5 rounded-full font-bold">{notifications.length}</span>
                     </div>
-                    <div className="max-h-96 overflow-y-auto divide-y divide-slate-100">
+                    <div className="max-h-96 overflow-y-auto divide-y divide-slate-100 dark:divide-[#1e332a]">
                       {notifications.length === 0 ? (
-                        <div className="p-6 text-center text-sm text-slate-400">No new notifications</div>
+                        <div className="p-6 text-center text-sm text-slate-400 dark:text-[#94a3b8]">No new notifications</div>
                       ) : (
                         notifications.map((n) => (
                           <div
@@ -471,7 +474,7 @@ export function AppShell({
                               if (!n.is_read) {
                                 await markNotificationRead(n.id).catch(console.error)
                                 setNotifications((prev) =>
-                                  prev.map((p) => (p.id === n.id ? { ...p, is_read: true } : p))
+                                   prev.map((p) => (p.id === n.id ? { ...p, is_read: true } : p))
                                 )
                               }
                               if (n.reference_url && n.reference_url.startsWith('/')) {
@@ -479,12 +482,12 @@ export function AppShell({
                               }
                               setShowNotifications(false)
                             }}
-                            className={`cursor-pointer p-3.5 transition hover:bg-emerald-50/50 ${
-                              n.is_read ? 'opacity-60' : 'bg-emerald-50/20'
+                            className={`cursor-pointer p-3.5 transition hover:bg-emerald-50/50 dark:hover:bg-white/[0.04] ${
+                              n.is_read ? 'opacity-60' : 'bg-emerald-50/20 dark:bg-white/[0.02]'
                             }`}
                           >
-                            <p className="text-[12.5px] font-bold text-slate-900">{n.title}</p>
-                            <p className="mt-0.5 text-[11.5px] text-slate-500 leading-relaxed">{n.message}</p>
+                            <p className="text-[12.5px] font-bold text-slate-900 dark:text-[#f8fafc]">{n.title}</p>
+                            <p className="mt-0.5 text-[11.5px] text-slate-500 dark:text-[#94a3b8] leading-relaxed">{n.message}</p>
                           </div>
                         ))
                       )}
@@ -493,8 +496,11 @@ export function AppShell({
                 )}
               </div>
 
+              {/* Theme Toggle Button */}
+              <ThemeToggle />
+
               {/* User Avatar Pill */}
-              <div className="group lift-hover flex items-center gap-2 rounded-xl border border-slate-200 bg-white py-1 pl-1 pr-2.5 transition hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-500/20">
+              <div className="group lift-hover flex items-center gap-2 rounded-xl border border-slate-200 bg-white py-1 pl-1 pr-2.5 transition hover:border-emerald-300 hover:shadow-md hover:shadow-emerald-500/20 dark:border-[#1e332a] dark:bg-[#121f1a] dark:hover:border-[#2a493c]">
                 {profile.avatar_url ? (
                   <img src={profile.avatar_url} alt={profile.full_name} className="h-7 w-7 rounded-lg object-cover" />
                 ) : (
@@ -503,11 +509,11 @@ export function AppShell({
                   </div>
                 )}
                 <div className="hidden leading-tight sm:block max-w-[120px]">
-                  <div className="truncate text-[12.5px] font-semibold text-slate-900">{profile.full_name}</div>
-                  <div className="truncate text-[10px] text-slate-500">{profile.company_name || profile.email}</div>
+                  <div className="truncate text-[12.5px] font-semibold text-slate-900 dark:text-[#f8fafc]">{profile.full_name}</div>
+                  <div className="truncate text-[10px] text-slate-500 dark:text-[#94a3b8]">{profile.company_name || profile.email}</div>
                 </div>
                 {isDemo && (
-                  <span className="ml-1 hidden sm:inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200">
+                  <span className="ml-1 hidden sm:inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:ring-amber-900/60">
                     DEMO
                   </span>
                 )}
@@ -520,15 +526,15 @@ export function AppShell({
             <div
               role="banner"
               aria-label="Demo environment banner"
-              className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 px-6 py-2.5 sm:px-8 lg:px-10"
+              className="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 px-6 py-2.5 sm:px-8 lg:px-10 dark:border-[#543912] dark:from-[#241808] dark:via-[#2e1f0a] dark:to-[#241808]"
             >
-              <div className="flex items-center gap-2 text-[12.5px] font-semibold text-amber-800">
+              <div className="flex items-center gap-2 text-[12.5px] font-semibold text-amber-800 dark:text-[#fde68a]">
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-[10px] font-bold text-white">⚡</span>
                 <span className="hidden sm:inline">DEMO ENVIRONMENT</span>
-                <span className="text-amber-500">·</span>
+                <span className="text-amber-500 dark:text-amber-400">·</span>
                 <span className="capitalize">{demoRole ?? 'demo'} Workspace</span>
                 <span className="hidden text-amber-400 sm:inline">·</span>
-                <span className="hidden text-[11.5px] font-normal text-amber-600 sm:inline">Data is isolated from production</span>
+                <span className="hidden text-[11.5px] font-normal text-amber-600 dark:text-amber-300/80 sm:inline">Data is isolated from production</span>
               </div>
               <div className="flex items-center gap-1.5">
                 {(['seller', 'buyer', 'admin'] as const).filter((r) => r !== demoRole).map((role) => (
@@ -541,7 +547,7 @@ export function AppShell({
                       localStorage.setItem('cm_active_mode', role === 'seller' ? 'selling' : role === 'buyer' ? 'sourcing' : 'admin')
                       window.location.href = `/dashboard?demo=${role}`
                     }}
-                    className="rounded-full border border-amber-300 bg-white px-3 py-1 text-[11.5px] font-semibold text-amber-800 transition hover:bg-amber-100 hover:border-amber-400 capitalize"
+                    className="rounded-full border border-amber-300 bg-white px-3 py-1 text-[11.5px] font-semibold text-amber-800 transition hover:bg-amber-100 hover:border-amber-400 capitalize dark:border-[#4d3410] dark:bg-[#2e210d] dark:text-[#fde68a] dark:hover:bg-[#3d2c12]"
                   >
                     → {role.charAt(0).toUpperCase() + role.slice(1)}
                   </button>
@@ -556,7 +562,7 @@ export function AppShell({
                     localStorage.removeItem('cm_demo_listings')
                     window.location.reload()
                   }}
-                  className="rounded-full border border-amber-300 bg-white px-3 py-1 text-[11.5px] font-semibold text-amber-800 transition hover:bg-amber-100 hover:border-amber-400"
+                  className="rounded-full border border-amber-300 bg-white px-3 py-1 text-[11.5px] font-semibold text-amber-800 transition hover:bg-amber-100 hover:border-amber-400 dark:border-[#4d3410] dark:bg-[#2e210d] dark:text-[#fde68a] dark:hover:bg-[#3d2c12]"
                   title="Reset demo data back to clean demonstration state"
                 >
                   ↺ Reset Demo Data
@@ -568,7 +574,7 @@ export function AppShell({
                     localStorage.removeItem('cm_demo_session')
                     window.location.href = '/'
                   }}
-                  className="rounded-full border border-red-200 bg-white px-3 py-1 text-[11.5px] font-semibold text-red-600 transition hover:bg-red-50 hover:border-red-300"
+                  className="rounded-full border border-red-200 bg-white px-3 py-1 text-[11.5px] font-semibold text-red-600 transition hover:bg-red-50 hover:border-red-300 dark:border-red-900/60 dark:bg-red-950/60 dark:text-red-200 dark:hover:bg-red-900/50"
                 >
                   ✕ Exit Demo
                 </button>

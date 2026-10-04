@@ -350,13 +350,13 @@ export function MaterialPassportPage({ role }: { role: Role }) {
       {/* Notice & Flash Banners */}
       <Disclosure>{data.notice}</Disclosure>
       {message && (
-        <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 text-sm text-emerald-900 shadow-sm">
-          <CheckCircle2 className="shrink-0 text-emerald-600" size={18} />
+        <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/80 p-4 text-sm text-emerald-900 shadow-sm dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-300">
+          <CheckCircle2 className="shrink-0 text-emerald-600 dark:text-emerald-400" size={18} />
           <span>{message}</span>
         </div>
       )}
       {error && (
-        <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-900 shadow-sm">
+        <div className="rounded-2xl border border-rose-200 bg-rose-50/80 p-4 text-sm text-rose-900 shadow-sm dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
           {error}
         </div>
       )}
@@ -409,18 +409,18 @@ export function MaterialPassportPage({ role }: { role: Role }) {
           />
 
           {/* 4. DISPATCHABLE LOTS & DECLARED SPECIFICATIONS */}
-          <section className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white/90 p-5 sm:p-7 shadow-sm">
-            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-emerald-50 pb-5">
+          <section className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white/90 p-5 sm:p-7 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
+            <div className="flex flex-wrap items-start justify-between gap-4 border-b border-emerald-50 pb-5 dark:border-[#1e332a]">
               <div>
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700 dark:bg-white/10 dark:text-emerald-300">
                     <ClipboardCheck size={18} />
                   </div>
-                  <h2 className="text-lg font-bold tracking-tight text-slate-900">
+                  <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-[#f8fafc]">
                     Lots and Declared Specification
                   </h2>
                 </div>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-slate-500 dark:text-[#94a3b8]">
                   A recurring listing can contain several dispatchable lots. Matching uses the currently available lot.
                 </p>
               </div>
@@ -436,7 +436,7 @@ export function MaterialPassportPage({ role }: { role: Role }) {
             </div>
 
             {showLotForm && (
-              <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4 animate-fade-in-up">
+              <div className="mt-5 rounded-2xl border border-emerald-100 bg-emerald-50/40 p-4 animate-fade-in-up dark:border-[#1e332a] dark:bg-[#162520]">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label>
                     <span className="field-label !text-xs">Lot code</span>
@@ -521,35 +521,35 @@ export function MaterialPassportPage({ role }: { role: Role }) {
                 data.lots.map((lot) => (
                   <article
                     key={lot.id}
-                    className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition hover:bg-white hover:shadow-sm"
+                    className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 transition hover:bg-white hover:shadow-sm dark:border-[#1e332a] dark:bg-[#162520] hover:dark:bg-[#1a382b]"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-bold text-slate-900">{lot.lot_code}</p>
-                        <p className="mt-0.5 text-xs text-slate-500">
+                        <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{lot.lot_code}</p>
+                        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                           {formatKg(lot.available_quantity_kg)} · {lot.material_form} ·{' '}
                           {titleCase(lot.source_status)}
                         </p>
                       </div>
-                      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-200">
+                      <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-800 ring-1 ring-inset ring-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-800/40">
                         {titleCase(lot.status)}
                       </span>
                     </div>
                     <div className="mt-3 grid gap-2 text-xs sm:grid-cols-3">
                       <div>
                         <span className="block text-[11px] text-slate-400">Colour</span>
-                        <strong className="mt-0.5 block text-slate-800">{lot.colour}</strong>
+                        <strong className="mt-0.5 block text-slate-800 dark:text-slate-200">{lot.colour}</strong>
                       </div>
                       <div>
                         <span className="block text-[11px] text-slate-400">Packaging</span>
-                        <strong className="mt-0.5 block text-slate-800">{lot.packaging}</strong>
+                        <strong className="mt-0.5 block text-slate-800 dark:text-slate-200">{lot.packaging}</strong>
                       </div>
                       <div>
                         <span className="block text-[11px] text-slate-400">Compliance triage</span>
-                        <strong className="mt-0.5 block text-slate-800">{lot.triage_label}</strong>
+                        <strong className="mt-0.5 block text-slate-800 dark:text-slate-200">{lot.triage_label}</strong>
                       </div>
                     </div>
-                    <p className="mt-3 rounded-xl bg-white p-2.5 text-xs leading-relaxed text-slate-600 border border-slate-100">
+                    <p className="mt-3 rounded-xl bg-white p-2.5 text-xs leading-relaxed text-slate-600 border border-slate-100 dark:bg-[#111d19] dark:text-slate-300 dark:border-[#1e332a]">
                       {String(lot.declared_spec.supplier_statement || 'No supplier statement added.')}
                     </p>
                   </article>
@@ -579,10 +579,10 @@ export function MaterialPassportPage({ role }: { role: Role }) {
 
           {/* ADD EVIDENCE FORM DRAWER (if toggled) */}
           {showEvidenceForm && (
-            <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm animate-fade-in-up">
-              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <UploadCloud className="text-emerald-700" size={18} />
-                <h3 className="text-sm font-bold text-slate-900">Upload Supporting Evidence</h3>
+            <div className="rounded-3xl border border-emerald-100 bg-white p-5 shadow-sm animate-fade-in-up dark:border-[#1e332a] dark:bg-[#111d19]">
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-3 dark:border-[#1e332a]">
+                <UploadCloud className="text-emerald-700 dark:text-emerald-400" size={18} />
+                <h3 className="text-sm font-bold text-slate-900 dark:text-[#f8fafc]">Upload Supporting Evidence</h3>
               </div>
               <div className="mt-3 space-y-2.5">
                 <select
@@ -672,27 +672,27 @@ export function MaterialPassportPage({ role }: { role: Role }) {
           />
 
           {/* AUDIT ACTIVITY LOG */}
-          <div className="rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-[#1e332a]">
               <div>
-                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-700">Audit Trail</p>
-                <h3 className="text-sm font-bold text-slate-900">Traceable Changes</h3>
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-400">Audit Trail</p>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-[#f8fafc]">Traceable Changes</h3>
               </div>
-              <Stamp className="h-4 w-4 text-emerald-600" />
+              <Stamp className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="mt-4 space-y-3">
               {data.audit_events.length ? (
                 data.audit_events.slice(0, 5).map((event) => (
                   <div key={event.id} className="border-l-2 border-emerald-400 pl-3">
-                    <p className="text-xs font-semibold text-slate-900">{titleCase(event.action)}</p>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500">{event.summary}</p>
+                    <p className="text-xs font-semibold text-slate-900 dark:text-slate-100">{titleCase(event.action)}</p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">{event.summary}</p>
                     <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400">
                       System Record
                     </p>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-slate-500">No audit events recorded yet.</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">No audit events recorded yet.</p>
               )}
             </div>
           </div>
@@ -736,16 +736,16 @@ function PassportHeader({
 }) {
   const tierStyle =
     tier === 'qualified'
-      ? 'bg-emerald-50 text-emerald-800 ring-emerald-300/80 border-emerald-200'
+      ? 'bg-emerald-50 text-emerald-800 ring-emerald-300/80 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-800/40 dark:border-emerald-800/40'
       : tier === 'partial'
-      ? 'bg-amber-50 text-amber-800 ring-amber-300/80 border-amber-200'
-      : 'bg-rose-50 text-rose-800 ring-rose-300/80 border-rose-200'
+      ? 'bg-amber-50 text-amber-800 ring-amber-300/80 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:ring-amber-800/40 dark:border-amber-800/40'
+      : 'bg-rose-50 text-rose-800 ring-rose-300/80 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:ring-rose-800/40 dark:border-rose-800/40'
 
   const tierLabel =
     tier === 'qualified' ? 'Qualified' : tier === 'partial' ? 'Partially Qualified' : 'Not Qualified'
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/80 bg-white/95 p-6 shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/80 bg-white/95 p-6 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600" />
       <div className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full bg-emerald-200/30 blur-3xl" />
 
@@ -756,32 +756,32 @@ function PassportHeader({
             material={material}
             category={category}
             sizeClassName="h-16 w-16 sm:h-20 sm:w-20 shrink-0"
-            className="rounded-2xl shadow-md border-2 border-white ring-2 ring-emerald-100"
+            className="rounded-2xl shadow-md border-2 border-white ring-2 ring-emerald-100 dark:border-slate-800 dark:ring-white/10"
           />
           <div className="min-w-0 flex-1">
-            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/70 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.16em] text-emerald-800">
-              <Stamp className="h-3 w-3 text-emerald-700" />
+            <div className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/70 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.16em] text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/50 dark:text-emerald-300">
+              <Stamp className="h-3 w-3 text-emerald-700 dark:text-emerald-400" />
               MATERIAL PASSPORT · v2.1
             </div>
-            <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-2xl font-black tracking-tight text-transparent sm:text-3xl md:text-4xl">
+            <h1 className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-2xl font-black tracking-tight text-transparent sm:text-3xl md:text-4xl dark:from-white dark:via-slate-100 dark:to-slate-300">
               {material}
             </h1>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 font-mono text-xs font-bold tracking-wider text-emerald-300 shadow-sm">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-900 px-3 py-1 font-mono text-xs font-bold tracking-wider text-emerald-300 shadow-sm dark:bg-black/60">
               {passportId}
             </span>
             <button
               onClick={onCopyId}
-              className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700"
+              className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-medium text-slate-600 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 dark:border-[#1e332a] dark:bg-[#162520] dark:text-[#cbd5e1] hover:dark:bg-[#1c3029] hover:dark:text-emerald-300"
             >
-              {copiedId ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+              {copiedId ? <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" /> : <Copy className="h-3 w-3" />}
               {copiedId ? 'Copied' : 'Copy ID'}
             </button>
-            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 border border-emerald-100">
+            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 border border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800/40">
               <MapPin className="h-3 w-3" />
               {location}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 border border-slate-200">
+            <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700 border border-slate-200 dark:bg-white/5 dark:text-slate-300 dark:border-white/10">
               <Tag className="h-3 w-3" />
               {category}
             </span>
@@ -799,7 +799,7 @@ function PassportHeader({
                 Qualification
               </span>
               <div className="flex items-baseline gap-1">
-                <span className="bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-3xl font-black leading-none tracking-tight text-transparent sm:text-4xl tabular-nums">
+                <span className="bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-3xl font-black leading-none tracking-tight text-transparent sm:text-4xl tabular-nums dark:from-slate-100 dark:to-slate-300">
                   {total}
                 </span>
                 <span className="text-sm font-bold text-slate-400 tabular-nums">/ 100</span>
@@ -836,17 +836,17 @@ function PassportHeader({
           <div className="flex flex-col gap-2">
             <Link
               to={`/listings/${listingId}/matches`}
-              className="group inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 px-4 text-xs font-bold text-white shadow-md shadow-slate-900/20 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-900/20"
+              className="group inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 px-4 text-xs font-bold text-white shadow-md shadow-slate-900/20 transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-900/20 dark:from-[#00c980] dark:to-[#00b06f] dark:text-[#062417] dark:font-bold dark:shadow-[0_0_24px_rgba(0,201,128,0.45)] dark:hover:shadow-[0_0_35px_rgba(0,201,128,0.65)]"
             >
-              <Sparkles className="h-3.5 w-3.5 text-emerald-400 transition-transform group-hover:rotate-12" />
+              <Sparkles className="h-3.5 w-3.5 text-emerald-400 transition-transform group-hover:rotate-12 dark:text-[#062417]" />
               Find Matches
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 dark:text-[#062417]" />
             </Link>
             <div className="flex items-center gap-1.5">
               {canEdit && (
                 <Link
                   to={`/list-waste?edit=${listingId}`}
-                  className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700"
+                  className="inline-flex h-8 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 dark:border-[#1e332a] dark:bg-[#162520] dark:text-slate-300 hover:dark:bg-[#1a382b] hover:dark:text-emerald-300"
                 >
                   <Pencil className="h-3 w-3" />
                   Edit Listing
@@ -854,14 +854,14 @@ function PassportHeader({
               )}
               <button
                 onClick={onShare}
-                className="inline-flex h-8 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                className="inline-flex h-8 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-[#1e332a] dark:bg-[#162520] dark:text-slate-300 hover:dark:bg-[#1a382b] hover:dark:text-emerald-300"
               >
                 <Share2 className="h-3 w-3" />
                 {copiedLink ? 'Copied' : 'Share'}
               </button>
               <button
                 onClick={onDownloadPdf}
-                className="inline-flex h-8 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                className="inline-flex h-8 items-center justify-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 dark:border-[#1e332a] dark:bg-[#162520] dark:text-slate-300 hover:dark:bg-[#1a382b] hover:dark:text-emerald-300"
               >
                 <Download className="h-3 w-3" />
                 PDF
@@ -883,17 +883,17 @@ function ScoreRing({
   max: number
   tier: 'qualified' | 'partial' | 'none'
 }) {
-  const r = 26
+  const r = 30
   const c = 2 * Math.PI * r
   const offset = c - (score / max) * c
   const color = tier === 'qualified' ? '#10b981' : tier === 'partial' ? '#f59e0b' : '#f43f5e'
   return (
-    <div className="relative h-16 w-16 shrink-0">
-      <svg viewBox="0 0 70 70" className="h-full w-full -rotate-90">
-        <circle cx="35" cy="35" r={r} stroke="#f1f5f9" strokeWidth="6" fill="none" />
+    <div className="relative h-20 w-20 shrink-0 flex items-center justify-center">
+      <svg viewBox="0 0 76 76" className="h-full w-full -rotate-90">
+        <circle cx="38" cy="38" r={r} stroke="#e2e8f0" strokeWidth="6" fill="none" className="stroke-slate-100 dark:stroke-[#1e332a]" />
         <circle
-          cx="35"
-          cy="35"
+          cx="38"
+          cy="38"
           r={r}
           stroke={color}
           strokeWidth="6"
@@ -901,11 +901,17 @@ function ScoreRing({
           strokeDasharray={c}
           strokeDashoffset={offset}
           strokeLinecap="round"
+          className="dark:filter dark:drop-shadow-[0_0_8px_rgba(52,211,153,0.65)]"
           style={{ transition: 'stroke-dashoffset 1.2s cubic-bezier(0.22,1,0.36,1)' }}
         />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Award className="h-5 w-5" style={{ color }} />
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <span className="text-[17px] font-black leading-none tracking-tight text-slate-900 dark:text-[#f8fafc]">
+          {score}
+        </span>
+        <span className="text-[9px] font-bold text-slate-400 dark:text-[#94a3b8]">
+          /{max}
+        </span>
       </div>
     </div>
   )
@@ -945,22 +951,22 @@ function MaterialDetailsTable({
   ]
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 sm:p-6 shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 sm:p-6 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
       <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-emerald-300/25 blur-2xl" />
       <div className="relative">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4 dark:border-[#1e332a]">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20">
               <FileText className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold tracking-tight text-slate-900">
+              <h2 className="text-base font-bold tracking-tight text-slate-900 dark:text-[#f8fafc]">
                 Material Details Specification
               </h2>
-              <p className="text-xs text-slate-500">Deterministic attributes and declared characteristics</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Deterministic attributes and declared characteristics</p>
             </div>
           </div>
-          <span className="hidden sm:inline-flex items-center gap-1 rounded-xl border border-emerald-100 bg-emerald-50/60 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
+          <span className="hidden sm:inline-flex items-center gap-1 rounded-xl border border-emerald-100 bg-emerald-50/60 px-2.5 py-1 text-[11px] font-bold text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300">
             8 Attributes Verified
           </span>
         </div>
@@ -970,13 +976,13 @@ function MaterialDetailsTable({
           {rows.map((r) => (
             <div
               key={r.label}
-              className="group rounded-xl border border-slate-100 bg-slate-50/50 p-3 transition hover:border-emerald-200 hover:bg-white hover:shadow-sm"
+              className="group rounded-xl border border-slate-100 bg-slate-50/50 p-3 transition hover:border-emerald-200 hover:bg-white hover:shadow-sm dark:border-[#1e332a] dark:bg-[#162520] hover:dark:bg-[#1a382b]"
             >
               <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
-                <r.icon className="h-3 w-3 text-emerald-600" />
+                <r.icon className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
                 {r.label}
               </div>
-              <div className="mt-1 text-xs sm:text-[13px] font-semibold text-slate-900 truncate" title={r.value}>
+              <div className="mt-1 text-xs sm:text-[13px] font-semibold text-slate-900 dark:text-slate-100 truncate" title={r.value}>
                 {r.value}
               </div>
             </div>
@@ -1000,24 +1006,24 @@ function QualificationBreakdown({
   maxTotal: number
 }) {
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 sm:p-6 shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 sm:p-6 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
       <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-emerald-300/20 blur-2xl" />
       <div className="relative">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4 dark:border-[#1e332a]">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20">
               <TrendingUp className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold tracking-tight text-slate-900">
+              <h2 className="text-base font-bold tracking-tight text-slate-900 dark:text-[#f8fafc]">
                 Qualification Score Breakdown
               </h2>
-              <p className="text-xs text-slate-500">Recomputed when listing fields or evidence change.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Recomputed when listing fields or evidence change.</p>
             </div>
           </div>
           <div className="text-right">
             <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">Total</div>
-            <div className="bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-xl sm:text-2xl font-extrabold leading-none tracking-tight text-transparent tabular-nums">
+            <div className="bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-xl sm:text-2xl font-extrabold leading-none tracking-tight text-transparent tabular-nums dark:from-slate-100 dark:to-slate-300">
               {total}
               <span className="ml-1 text-sm font-semibold text-slate-400">/ {maxTotal}</span>
             </div>
@@ -1031,15 +1037,15 @@ function QualificationBreakdown({
             return (
               <div key={b.key} className="group">
                 <div className="flex items-baseline justify-between text-xs">
-                  <span className="font-semibold text-slate-700">{b.label}</span>
-                  <span className="tabular-nums text-slate-500">
-                    <span className={`font-bold ${full ? 'text-emerald-700' : 'text-slate-900'}`}>
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">{b.label}</span>
+                  <span className="tabular-nums text-slate-500 dark:text-slate-400">
+                    <span className={`font-bold ${full ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-900 dark:text-slate-100'}`}>
                       {b.earned}
                     </span>
                     <span className="text-slate-400"> / {b.max}</span>
                   </span>
                 </div>
-                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100">
+                <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
                   <div
                     className={`h-full rounded-full transition-all duration-700 ${
                       full
@@ -1054,11 +1060,11 @@ function QualificationBreakdown({
           })}
         </div>
 
-        <div className="mt-4 border-t border-dashed border-slate-200 pt-3">
+        <div className="mt-4 border-t border-dashed border-slate-200 pt-3 dark:border-white/10">
           <div className="flex items-baseline justify-between">
-            <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">Total Score</span>
-            <span className="tabular-nums text-slate-500">
-              <span className="text-lg font-black text-slate-900">{total}</span>
+            <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">Total Score</span>
+            <span className="tabular-nums text-slate-500 dark:text-slate-400">
+              <span className="text-lg font-black text-slate-900 dark:text-slate-100">{total}</span>
               <span className="text-slate-400 font-semibold"> / {maxTotal}</span>
             </span>
           </div>
@@ -1088,26 +1094,26 @@ function CompositionCard({
   ]
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 sm:p-6 shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 sm:p-6 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
       <div className="relative">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-4 dark:border-[#1e332a]">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 text-white shadow-md shadow-violet-500/20">
               <FlaskConical className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-base font-bold tracking-tight text-slate-900">Composition & Source</h2>
-              <p className="text-xs text-slate-500">{material} · Polymer fraction and verified facility source</p>
+              <h2 className="text-base font-bold tracking-tight text-slate-900 dark:text-[#f8fafc]">Composition & Source</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{material} · Polymer fraction and verified facility source</p>
             </div>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700">
+          <span className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 dark:border-[#1e332a] dark:bg-[#162520] dark:text-slate-300">
             <ExternalLink className="h-3 w-3" />
             NABL Validated
           </span>
         </div>
 
         {/* Stacked composition bar */}
-        <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-4 flex h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
           {composition.map((c) => (
             <div
               key={c.name}
@@ -1122,36 +1128,36 @@ function CompositionCard({
           {composition.map((c) => (
             <li
               key={c.name}
-              className="rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition hover:border-emerald-200 hover:bg-white hover:shadow-sm"
+              className="rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition hover:border-emerald-200 hover:bg-white hover:shadow-sm dark:border-[#1e332a] dark:bg-[#162520] text-slate-700 dark:text-slate-300"
             >
               <div className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
-                <span className="text-[11px] font-semibold text-slate-700">{c.name}</span>
+                <span className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">{c.name}</span>
               </div>
               <div className="mt-0.5 flex items-baseline gap-1">
-                <span className="text-sm font-bold text-slate-900 tabular-nums">{c.pct}</span>
-                <span className="text-[10px] font-medium text-slate-500">%</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-slate-100 tabular-nums">{c.pct}</span>
+                <span className="text-[10px] font-medium text-slate-500 dark:text-slate-400">%</span>
               </div>
             </li>
           ))}
         </ul>
 
-        <div className="mt-4 grid grid-cols-1 gap-2.5 border-t border-slate-100 pt-4 sm:grid-cols-2">
-          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
-              <Factory className="h-3 w-3 text-emerald-600" />
+        <div className="mt-4 grid grid-cols-1 gap-2.5 border-t border-slate-100 pt-4 sm:grid-cols-2 dark:border-[#1e332a]">
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 dark:border-[#1e332a] dark:bg-[#162520]">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+              <Factory className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
               Source Facility
             </div>
-            <div className="mt-1 text-xs font-bold text-slate-900">{company || 'Industrial Facility'}</div>
-            <div className="text-[11px] text-slate-500">{location || 'Verified regional plant'}</div>
+            <div className="mt-1 text-xs font-bold text-slate-900 dark:text-slate-100">{company || 'Industrial Facility'}</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">{location || 'Verified regional plant'}</div>
           </div>
-          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
-              <Beaker className="h-3 w-3 text-violet-600" />
+          <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3 dark:border-[#1e332a] dark:bg-[#162520]">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+              <Beaker className="h-3 w-3 text-violet-600 dark:text-violet-400" />
               Lab Analysis
             </div>
-            <div className="mt-1 text-xs font-bold text-slate-900">SGS India · NABL-accredited</div>
-            <div className="text-[11px] text-slate-500">Report #SGS-IN-2026-04781 · Verified</div>
+            <div className="mt-1 text-xs font-bold text-slate-900 dark:text-slate-100">SGS India · NABL-accredited</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">Report #SGS-IN-2026-04781 · Verified</div>
           </div>
         </div>
       </div>
@@ -1184,27 +1190,27 @@ function EvidenceChecklist({
   ).length
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
       <div className="pointer-events-none absolute -top-12 -right-12 h-32 w-32 rounded-full bg-emerald-300/20 blur-2xl" />
       <div className="relative">
-        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 pb-3 dark:border-white/10">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20">
               <FileCheck2 className="h-4 w-4" />
             </div>
             <div>
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/80 px-2 py-0.5 text-[10px] font-bold tracking-[0.16em] text-emerald-800">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200/80 bg-emerald-50/80 px-2 py-0.5 text-[10px] font-bold tracking-[0.16em] text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/50 dark:text-emerald-300">
                 <CheckCircle2 className="h-2.5 w-2.5" />
                 EVIDENCE STATUS
               </div>
-              <h2 className="mt-0.5 text-sm font-bold tracking-tight text-slate-900">
+              <h2 className="mt-0.5 text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">
                 {done} of {total} Complete
               </h2>
             </div>
           </div>
           <button
             onClick={onAddClick}
-            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700"
+            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 dark:border-[#1e332a] dark:bg-[#162520] dark:text-slate-300 hover:dark:bg-[#1a382b] hover:dark:text-emerald-300"
           >
             <Upload className="h-3 w-3" />
             Add
@@ -1213,25 +1219,25 @@ function EvidenceChecklist({
 
         {/* Supplier view interaction tip */}
         {isSupplier && (
-          <div className="mt-2.5 flex items-center gap-1.5 rounded-xl border border-emerald-200/70 bg-emerald-50/70 px-2.5 py-1.5 text-[11px] font-medium text-emerald-800">
-            <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-600" />
+          <div className="mt-2.5 flex items-center gap-1.5 rounded-xl border border-emerald-200/70 bg-emerald-50/70 px-2.5 py-1.5 text-[11px] font-medium text-emerald-800 dark:border-emerald-800/40 dark:bg-emerald-950/40 dark:text-emerald-300">
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
             <span>Supplier view: Click any item below to simulate upload.</span>
           </div>
         )}
 
         {/* Progress mini bar */}
         <div className="mt-3">
-          <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-700"
               style={{ width: `${(done / total) * 100}%` }}
             />
           </div>
-          <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-500">
+          <div className="mt-1.5 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>
               {done} completed · {total - done} pending
             </span>
-            <span className="font-bold tabular-nums text-emerald-700">+{done * 2}/10 pts</span>
+            <span className="font-bold tabular-nums text-emerald-700 dark:text-emerald-400">+{done * 2}/10 pts</span>
           </div>
         </div>
 
@@ -1265,10 +1271,6 @@ function EvidenceRow({
   isSupplier?: boolean
   onClick?: () => void
 }) {
-  // Spec:
-  // ✓ Green  = Reviewed or Verified
-  // ⚠ Yellow = Uploaded or Pending
-  // ○ Grey   = Not Started
   const isGreen = item.status === 'reviewed' || item.status === 'verified'
   const isYellow = item.status === 'uploaded' || item.status === 'pending'
 
@@ -1277,29 +1279,29 @@ function EvidenceRow({
         symbol: '✓',
         Icon: CheckCircle2,
         label: item.status === 'verified' ? 'Verified' : 'Reviewed',
-        pill: 'bg-emerald-50 text-emerald-800 ring-emerald-300/80 border-emerald-200',
-        iconBg: 'bg-emerald-100 text-emerald-700',
+        pill: 'bg-emerald-50 text-emerald-800 ring-emerald-300/80 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-800/40 dark:border-emerald-800/40',
+        iconBg: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-300',
       }
     : isYellow
     ? {
         symbol: '⚠',
         Icon: AlertCircle,
         label: item.status === 'uploaded' ? 'Uploaded' : 'Pending',
-        pill: 'bg-amber-50 text-amber-800 ring-amber-300/80 border-amber-200',
-        iconBg: 'bg-amber-100 text-amber-700',
+        pill: 'bg-amber-50 text-amber-800 ring-amber-300/80 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:ring-amber-800/40 dark:border-amber-800/40',
+        iconBg: 'bg-amber-100 text-amber-700 dark:bg-amber-900/60 dark:text-amber-300',
       }
     : {
         symbol: '○',
         Icon: CircleDashed,
         label: 'Not Started',
-        pill: 'bg-slate-100 text-slate-600 ring-slate-200 border-slate-200',
-        iconBg: 'bg-slate-100 text-slate-500',
+        pill: 'bg-slate-100 text-slate-600 ring-slate-200 border-slate-200 dark:bg-white/10 dark:text-slate-400 dark:ring-white/10 dark:border-white/10',
+        iconBg: 'bg-slate-100 text-slate-500 dark:bg-white/10 dark:text-slate-400',
       }
 
   return (
     <li
       onClick={onClick}
-      className={`group flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition ${
+      className={`group flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition dark:border-[#1e332a] dark:bg-[#162520] hover:dark:bg-[#1a382b] ${
         isSupplier
           ? 'cursor-pointer hover:border-emerald-300 hover:bg-emerald-50/40 active:scale-[0.99]'
           : 'hover:bg-white hover:shadow-sm'
@@ -1307,20 +1309,20 @@ function EvidenceRow({
       title={isSupplier ? `Click to simulate upload (toggle state) for ${item.label}` : undefined}
     >
       <div
-        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${cfg.iconBg} ring-1 ring-inset ring-white/60`}
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg ${cfg.iconBg} ring-1 ring-inset ring-white/60 dark:ring-white/10`}
       >
         <cfg.Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-bold text-slate-900">{item.label}</span>
+          <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{item.label}</span>
           {isSupplier && (
-            <span className="opacity-0 transition group-hover:opacity-100 text-[10px] font-semibold text-emerald-700">
+            <span className="opacity-0 transition group-hover:opacity-100 text-[10px] font-semibold text-emerald-700 dark:text-emerald-400">
               (Click to toggle)
             </span>
           )}
         </div>
-        <div className="truncate text-[10.5px] text-slate-500">{item.hint}</div>
+        <div className="truncate text-[10.5px] text-slate-500 dark:text-slate-400">{item.hint}</div>
       </div>
       <span
         className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ring-inset ${cfg.pill}`}
@@ -1359,23 +1361,23 @@ function DocumentsCard({
   ]
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
       <div className="relative">
-        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-[#1e332a]">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white shadow-md shadow-sky-500/20">
               <FileText className="h-4 w-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold tracking-tight text-slate-900">Documents Vault</h3>
-              <p className="text-xs text-slate-500">
+              <h3 className="text-sm font-bold tracking-tight text-slate-900 dark:text-slate-100">Documents Vault</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 {realEvidence.length ? `${realEvidence.length} files attached` : 'Uploaded lot files'}
               </p>
             </div>
           </div>
           <button
             onClick={onUploadClick}
-            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700"
+            className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-700 transition hover:border-emerald-300 hover:bg-emerald-50/50 hover:text-emerald-700 dark:border-[#1e332a] dark:bg-[#162520] dark:text-slate-300 hover:dark:bg-[#1a382b] hover:dark:text-emerald-300"
           >
             <Upload className="h-3 w-3" />
             Upload
@@ -1387,14 +1389,14 @@ function DocumentsCard({
             realEvidence.map((ev) => (
               <li
                 key={ev.id}
-                className="group flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition hover:bg-white hover:shadow-sm"
+                className="group flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition hover:bg-white hover:shadow-sm dark:border-[#1e332a] dark:bg-[#162520] hover:dark:bg-[#1a382b]"
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-white/10 dark:text-emerald-300">
                   <FileText className="h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs font-bold text-slate-800">{ev.title}</div>
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider">
+                  <div className="truncate text-xs font-bold text-slate-800 dark:text-slate-200">{ev.title}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     {ev.status_label || ev.status} · {ev.issuer}
                   </div>
                 </div>
@@ -1402,7 +1404,7 @@ function DocumentsCard({
                   <button
                     onClick={() => onReview(ev.id, 'reviewed')}
                     disabled={reviewingId === ev.id}
-                    className="flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 text-[10.5px] font-semibold text-emerald-700 hover:bg-emerald-50"
+                    className="flex h-7 items-center gap-1 rounded-lg border border-slate-200 bg-white px-2 text-[10.5px] font-semibold text-emerald-700 hover:bg-emerald-50 dark:border-[#1e332a] dark:bg-[#162520] dark:text-emerald-300"
                   >
                     {reviewingId === ev.id ? <Loader2 className="animate-spin" size={11} /> : <CheckCircle2 size={11} />}
                     Review
@@ -1410,7 +1412,7 @@ function DocumentsCard({
                 )}
                 <button
                   onClick={() => onDownload(ev)}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 dark:border-[#1e332a] dark:bg-[#162520] dark:text-slate-400 hover:dark:bg-[#1a382b] hover:dark:text-emerald-300"
                   title="Download document"
                 >
                   <Download className="h-3.5 w-3.5" />
@@ -1421,20 +1423,20 @@ function DocumentsCard({
             sampleDocs.map((d) => (
               <li
                 key={d.name}
-                className="group flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition hover:bg-white hover:shadow-sm"
+                className="group flex items-center gap-2.5 rounded-xl border border-slate-100 bg-slate-50/40 p-2.5 transition hover:bg-white hover:shadow-sm dark:border-[#1e332a] dark:bg-[#162520] hover:dark:bg-[#1a382b]"
               >
                 <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${d.tint}`}>
                   <d.icon className="h-4 w-4" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-xs font-bold text-slate-800">{d.name}</div>
-                  <div className="text-[10px] text-slate-500 uppercase tracking-wider">
+                  <div className="truncate text-xs font-bold text-slate-800 dark:text-slate-200">{d.name}</div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                     {d.type} · {d.size}
                   </div>
                 </div>
                 <button
                   onClick={() => onDownload({ document_name: d.name })}
-                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 dark:border-[#1e332a] dark:bg-[#162520] dark:text-slate-400 hover:dark:bg-[#1a382b] hover:dark:text-emerald-300"
                   title="Download document"
                 >
                   <Download className="h-3.5 w-3.5" />
@@ -1493,19 +1495,19 @@ function ImpactCard({ quantityKg }: { quantityKg: number }) {
   ]
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-gradient-to-br from-emerald-50/60 via-teal-50/40 to-white p-5 shadow-sm">
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-gradient-to-br from-emerald-50/60 via-teal-50/40 to-white p-5 shadow-sm dark:from-[#111d19] dark:via-[#162520] dark:to-[#111d19] dark:border-[#1e332a]">
       <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-emerald-300/30 blur-2xl" />
       <div className="relative">
-        <div className="flex items-center gap-2.5 border-b border-emerald-100/50 pb-3">
+        <div className="flex items-center gap-2.5 border-b border-emerald-100/50 pb-3 dark:border-[#1e332a]">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/20">
             <TrendingUp className="h-4 w-4" />
           </div>
           <div>
-            <div className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[9.5px] font-bold tracking-[0.16em] text-emerald-800 border border-emerald-200/60">
-              <Sparkles className="h-2.5 w-2.5 text-emerald-600" />
+            <div className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[9.5px] font-bold tracking-[0.16em] text-emerald-800 border border-emerald-200/60 dark:bg-white/10 dark:text-emerald-300 dark:border-white/10">
+              <Sparkles className="h-2.5 w-2.5 text-emerald-600 dark:text-emerald-400" />
               ENVIRONMENTAL IMPACT
             </div>
-            <h3 className="mt-0.5 text-xs font-bold text-slate-900">Calculated Batch Benefit</h3>
+            <h3 className="mt-0.5 text-xs font-bold text-slate-900 dark:text-slate-100">Calculated Batch Benefit</h3>
           </div>
         </div>
 
@@ -1513,7 +1515,7 @@ function ImpactCard({ quantityKg }: { quantityKg: number }) {
           {impacts.map((s) => (
             <div
               key={s.label}
-              className={`rounded-xl border border-white/80 ${s.bg} p-2.5 transition hover:shadow-sm`}
+              className={`rounded-xl border border-white/80 ${s.bg} p-2.5 transition hover:shadow-sm dark:border-[#1e332a] dark:bg-[#162520]`}
             >
               <div className="flex items-center gap-1.5">
                 <div
@@ -1521,24 +1523,24 @@ function ImpactCard({ quantityKg }: { quantityKg: number }) {
                 >
                   <s.icon className="h-3 w-3" />
                 </div>
-                <span className="text-[9.5px] font-bold uppercase tracking-wider text-slate-500 truncate">
+                <span className="text-[9.5px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 truncate">
                   {s.label}
                 </span>
               </div>
-              <div className="mt-1 bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-base font-extrabold leading-none tracking-tight text-transparent tabular-nums">
+              <div className="mt-1 bg-gradient-to-br from-slate-900 to-slate-700 bg-clip-text text-base font-extrabold leading-none tracking-tight text-transparent tabular-nums dark:from-slate-100 dark:to-slate-300">
                 {s.value}
               </div>
-              <div className="mt-0.5 text-[10px] text-slate-500">{s.sub}</div>
+              <div className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400">{s.sub}</div>
             </div>
           ))}
         </div>
 
         <div className="mt-3.5">
-          <div className="flex items-center justify-between text-[11px] text-slate-500">
+          <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
             <span>Facility emission target progress</span>
-            <span className="font-bold text-emerald-700 tabular-nums">82%</span>
+            <span className="font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">82%</span>
           </div>
-          <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100">
+          <div className="mt-1 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-white/10">
             <div
               className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500"
               style={{ width: '82%' }}
@@ -1562,25 +1564,25 @@ function MaterialVisualCard({
 }) {
   const imgSrc = getMaterialImage(material, category)
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm">
-      <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+    <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 bg-white p-5 shadow-sm dark:border-[#1e332a] dark:bg-[#111d19]">
+      <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-[#1e332a]">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700 dark:bg-white/10 dark:text-emerald-300">
             <Camera className="h-4 w-4" />
           </div>
           <div>
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-slate-100">
               Material Lot Inspection
             </h3>
-            <p className="text-[11px] text-slate-500">Verified stream reference</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Verified stream reference</p>
           </div>
         </div>
-        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200">
+        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-800/40">
           AI Verified
         </span>
       </div>
 
-      <div className="group relative mt-3.5 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100">
+      <div className="group relative mt-3.5 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100 dark:border-white/10 dark:bg-black/40">
         <img
           src={imgSrc}
           alt={material}
@@ -1598,12 +1600,12 @@ function MaterialVisualCard({
         </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+      <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
         <span>AI Generated stream reference</span>
         <button
           type="button"
           onClick={() => alert('Photo upload drawer will allow plant camera uploads.')}
-          className="font-semibold text-emerald-700 hover:underline"
+          className="font-semibold text-emerald-700 dark:text-emerald-400 hover:underline"
         >
           Add custom photo
         </button>

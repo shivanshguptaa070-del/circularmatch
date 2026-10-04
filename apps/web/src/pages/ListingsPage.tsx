@@ -35,8 +35,8 @@ export function ListingsPage({ role }: { role: Role }) {
         actions={generator ? <Link className="btn-primary rounded-xl" to="/list-waste"><PlusCircle size={17} />List my waste</Link> : <Link className="btn-primary rounded-xl" to="/buyer-requirements"><Factory size={17} />Set Requirement</Link>}
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-sm text-[#61776f]">
-          <SlidersHorizontal size={16} className="text-spruce" />
+        <div className="flex items-center gap-2 text-sm text-[#61776f] dark:text-slate-400">
+          <SlidersHorizontal size={16} className="text-spruce dark:text-emerald-400" />
           <span className="font-medium text-[13.5px]">{generator ? 'My active listings' : 'Available material streams'}</span>
         </div>
         <StatusBadge>{listings.data.length} active listing{listings.data.length === 1 ? '' : 's'}</StatusBadge>
@@ -52,9 +52,9 @@ export function ListingsPage({ role }: { role: Role }) {
           {listings.data.map((listing) => (
             <article
               key={listing.id}
-              className="card card-interactive lift-hover shine-wrap flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 shadow-sm transition-all duration-300"
+              className="card card-interactive lift-hover shine-wrap flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 dark:border-[#1e332a] dark:bg-[#111d19] shadow-sm transition-all duration-300"
             >
-              <div className="flex items-start justify-between bg-[#edf7f0] p-5 gap-3">
+              <div className="flex items-start justify-between bg-[#edf7f0] dark:bg-[#121f1a] border-b dark:border-[#1e332a] p-5 gap-3">
                 <div className="flex items-center gap-3 min-w-0">
                   <MaterialThumbnail
                     material={listing.material}
@@ -63,17 +63,17 @@ export function ListingsPage({ role }: { role: Role }) {
                     className="shadow-sm"
                   />
                   <div className="min-w-0">
-                    <span className="eyebrow truncate block text-[10.5px] font-bold tracking-[0.14em] text-emerald-800">{listing.category}</span>
-                    <h2 className="mt-1 text-[18px] font-bold tracking-tight text-ink truncate">{listing.material}</h2>
+                    <span className="eyebrow truncate block text-[10.5px] font-bold tracking-[0.14em] text-emerald-800 dark:text-emerald-400">{listing.category}</span>
+                    <h2 className="mt-1 text-[18px] font-bold tracking-tight text-ink dark:text-[#f8fafc] truncate">{listing.material}</h2>
                   </div>
                 </div>
-                <div className="shrink-0 rounded-xl bg-white px-3.5 py-2 text-right shadow-sm border border-emerald-100/60">
-                  <p className="text-[18px] font-extrabold tracking-tight text-spruce">{formatKg(listing.normalized_kg_per_week)}</p>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#759087]">per week</p>
+                <div className="shrink-0 rounded-xl bg-white dark:bg-[#162520] px-3.5 py-2 text-right shadow-sm border border-emerald-100/60 dark:border-[#1e332a]">
+                  <p className="text-[18px] font-extrabold tracking-tight text-spruce dark:text-emerald-400">{formatKg(listing.normalized_kg_per_week)}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#759087] dark:text-[#94a3b8]">per week</p>
                 </div>
               </div>
               <div className="flex flex-1 flex-col p-5">
-                <p className="line-clamp-2 text-[13.5px] leading-relaxed text-[#637970]">{listing.raw_description}</p>
+                <p className="line-clamp-2 text-[13.5px] leading-relaxed text-[#637970] dark:text-[#cbd5e1]">{listing.raw_description}</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <QualityPill verified={listing.quality_verified} grade={titleCase(listing.quality_grade)} />
                   <span className="badge-safe text-[11px] font-semibold py-1 px-3 rounded-full flex items-center">
@@ -83,27 +83,34 @@ export function ListingsPage({ role }: { role: Role }) {
                     {titleCase(listing.passport.status)} · {Math.round(listing.passport.score)}%
                   </span>
                 </div>
-                <div className="mt-5 grid grid-cols-2 gap-3 border-y border-[#e7eee9] py-3.5 text-[13px]">
+                <div className="mt-5 grid grid-cols-2 gap-3 border-y border-[#e7eee9] dark:border-[#1e332a] py-3.5 text-[13px]">
                   <div>
-                    <span className="block text-[11.5px] font-medium text-[#7d9189]">Availability</span>
-                    <strong className="mt-0.5 block font-semibold text-ink text-[13.5px] leading-snug">{listing.availability}</strong>
+                    <span className="block text-[11.5px] font-medium text-[#7d9189] dark:text-[#94a3b8]">Availability</span>
+                    <strong className="mt-0.5 block font-semibold text-ink dark:text-[#f8fafc] text-[13.5px] leading-snug">{listing.availability}</strong>
                   </div>
                   <div>
-                    <span className="block text-[11.5px] font-medium text-[#7d9189]">Listed at</span>
-                    <strong className="mt-0.5 block font-semibold text-ink text-[13.5px] leading-snug">{formatCurrency(listing.asking_price_per_kg)}/kg</strong>
+                    <span className="block text-[11.5px] font-medium text-[#7d9189] dark:text-[#94a3b8]">Listed at</span>
+                    <strong className="mt-0.5 block font-semibold text-ink dark:text-[#f8fafc] text-[13.5px] leading-snug">{formatCurrency(listing.asking_price_per_kg)}/kg</strong>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center justify-between text-[12px] text-[#728780]">
+                <div className="mt-4 flex items-center justify-between text-[12px] text-[#728780] dark:text-[#94a3b8]">
                   <span className="font-medium">{listing.company}</span>
                   <span>{listing.source === 'ai_assisted' ? 'AI-assisted draft' : 'Manual record'}</span>
                 </div>
                 <div className={`mt-5 grid gap-2.5 ${generator ? 'sm:grid-cols-2' : ''}`}>
-                  <Link className="btn-secondary rounded-xl w-full !py-2.5 text-[13px] font-medium text-center" to={`/listings/${listing.id}/passport`}>
-                    Material Passport
+                  <Link
+                    className="btn-primary rounded-xl w-full !py-2.5 text-[13px] font-bold text-center justify-center dark:from-[#00c980] dark:to-[#00b06f] dark:text-[#062417] dark:shadow-[0_0_20px_rgba(0,201,128,0.4)]"
+                    to={`/listings/${listing.id}/passport`}
+                  >
+                    View Material Passport
+                    <ArrowRight size={14} className="ml-1" />
                   </Link>
                   {generator && (
-                    <Link className="btn-primary rounded-xl w-full text-[13px] font-semibold justify-center" to={`/listings/${listing.id}/matches`}>
-                      <PackageSearch size={16} />Find buyers<ArrowRight size={15} />
+                    <Link
+                      className="btn-secondary rounded-xl w-full text-[13px] font-semibold justify-center"
+                      to={`/listings/${listing.id}/matches`}
+                    >
+                      <PackageSearch size={15} className="mr-1" />Find buyers
                     </Link>
                   )}
                 </div>

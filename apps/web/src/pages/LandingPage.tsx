@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import HeroVisual from '../components/landing/HeroVisual';
+import ThemeToggle from '../components/ThemeToggle';
 import {
   Leaf,
   MapPin,
@@ -42,7 +43,7 @@ import {
 /* =========================================================== */
 export default function LandingPage() {
   return (
-    <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 text-slate-900">
+    <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 dark:from-[#0b110f] dark:via-[#0e1714] dark:to-[#0b110f] text-slate-900 dark:text-slate-100 transition-colors duration-300">
       <BackgroundDecor />
 
       <NavBar />
@@ -65,7 +66,7 @@ function BackgroundDecor() {
     <>
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 opacity-[0.35]"
+        className="pointer-events-none fixed inset-0 z-0 opacity-[0.35] dark:opacity-[0.18]"
         style={{
           backgroundImage:
             'radial-gradient(circle, rgba(16,185,129,0.25) 1px, transparent 1px)',
@@ -74,16 +75,16 @@ function BackgroundDecor() {
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed -top-32 -left-24 z-0 h-[480px] w-[480px] rounded-full bg-emerald-200/40 blur-3xl animate-blob"
+        className="pointer-events-none fixed -top-32 -left-24 z-0 h-[480px] w-[480px] rounded-full bg-emerald-200/40 dark:bg-emerald-900/30 blur-3xl animate-blob"
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed top-40 -right-20 z-0 h-[420px] w-[420px] rounded-full bg-teal-200/40 blur-3xl animate-blob"
+        className="pointer-events-none fixed top-40 -right-20 z-0 h-[420px] w-[420px] rounded-full bg-teal-200/40 dark:bg-teal-900/25 blur-3xl animate-blob"
         style={{ animationDelay: '3s' }}
       />
       <div
         aria-hidden
-        className="pointer-events-none fixed bottom-0 left-1/3 z-0 h-[380px] w-[380px] rounded-full bg-green-200/40 blur-3xl animate-blob"
+        className="pointer-events-none fixed bottom-0 left-1/3 z-0 h-[380px] w-[380px] rounded-full bg-green-200/40 dark:bg-green-950/30 blur-3xl animate-blob"
         style={{ animationDelay: '6s' }}
       />
     </>
@@ -111,7 +112,7 @@ function SectionWrapper({
 
 function SectionEyebrow({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-4 inline-flex items-center gap-2.5 rounded-full border border-emerald-200/60 bg-white/80 px-4 py-1.5 text-sm font-bold uppercase tracking-[0.15em] text-emerald-800 shadow-sm backdrop-blur">
+    <div className="mb-4 inline-flex items-center gap-2.5 rounded-full border border-emerald-200/60 dark:border-[#1e332a] bg-white/80 dark:bg-[#111d19]/80 px-4 py-1.5 text-sm font-bold uppercase tracking-[0.15em] text-emerald-800 dark:text-emerald-400 shadow-sm backdrop-blur">
       <Sparkles className="h-4 w-4 text-emerald-500" />
       {children}
     </div>
@@ -120,7 +121,7 @@ function SectionEyebrow({ children }: { children: React.ReactNode }) {
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+    <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-slate-100 sm:text-4xl lg:text-5xl">
       {children}
     </h2>
   );
@@ -128,7 +129,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function SectionLead({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
+    <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600 dark:text-slate-400">
       {children}
     </p>
   );
@@ -147,30 +148,31 @@ function NavBar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 mx-auto flex max-w-7xl animate-fade-in-up items-center justify-between bg-emerald-50/70 px-6 py-4 backdrop-blur-md lg:px-10">
+    <header className="sticky top-0 z-40 mx-auto flex max-w-7xl animate-fade-in-up items-center justify-between bg-emerald-50/70 dark:bg-[#0b110f]/90 border-b border-emerald-100/40 dark:border-[#1e332a] px-6 py-4 backdrop-blur-md lg:px-10 transition-colors duration-200">
       <a href="#" className="flex items-center gap-2 transition hover:opacity-90">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-md ring-1 ring-emerald-100">
-          <Leaf className="h-5 w-5 text-emerald-600" strokeWidth={2.2} />
+        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white dark:bg-[#111d19] shadow-md ring-1 ring-emerald-100 dark:ring-[#1e332a]">
+          <Leaf className="h-5 w-5 text-emerald-600 dark:text-emerald-400" strokeWidth={2.2} />
         </div>
-        <div className="text-xl font-extrabold tracking-tight">
+        <div className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
           CIRCULAR<span className="text-emerald-500">MATCH</span>
         </div>
       </a>
 
-      <nav className="hidden items-center gap-9 text-sm font-medium text-slate-700 md:flex">
-        <a href="#features" onClick={scrollTo('features')} className="hover:text-emerald-700 transition">Features</a>
-        <a href="#how" onClick={scrollTo('how')} className="hover:text-emerald-700 transition">How it works</a>
-        <a href="#marketplace" onClick={scrollTo('marketplace')} className="hover:text-emerald-700 transition">Marketplace</a>
-        <a href="#faq" onClick={scrollTo('faq')} className="hover:text-emerald-700 transition">FAQ</a>
+      <nav className="hidden items-center gap-9 text-sm font-medium text-slate-700 dark:text-slate-300 md:flex">
+        <a href="#features" onClick={scrollTo('features')} className="hover:text-emerald-700 dark:hover:text-emerald-400 transition">Features</a>
+        <a href="#how" onClick={scrollTo('how')} className="hover:text-emerald-700 dark:hover:text-emerald-400 transition">How it works</a>
+        <a href="#marketplace" onClick={scrollTo('marketplace')} className="hover:text-emerald-700 dark:hover:text-emerald-400 transition">Marketplace</a>
+        <a href="#faq" onClick={scrollTo('faq')} className="hover:text-emerald-700 dark:hover:text-emerald-400 transition">FAQ</a>
       </nav>
 
-      <div className="flex items-center gap-2">
-        <a href="/auth" className="hidden text-sm font-semibold text-slate-700 transition hover:text-emerald-700 sm:block px-3 py-2">
+      <div className="flex items-center gap-3">
+        <ThemeToggle />
+        <a href="/auth" className="hidden text-sm font-semibold text-slate-700 dark:text-slate-300 transition hover:text-emerald-700 dark:hover:text-emerald-400 sm:block px-3 py-2">
           Log in
         </a>
-        <a href="/list-waste" className="group shine-wrap relative inline-flex animate-glow items-center gap-2 overflow-hidden rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-700/25 ring-1 ring-emerald-800/20 transition hover:bg-emerald-800">
+        <a href="/list-waste" className="group shine-wrap relative inline-flex animate-glow items-center gap-2 overflow-hidden rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-700/25 ring-1 ring-emerald-800/20 transition hover:bg-emerald-800 dark:from-[#00c980] dark:to-[#00b06f] dark:bg-gradient-to-r dark:text-[#062417] dark:font-bold dark:shadow-[0_0_22px_rgba(0,201,128,0.5)] dark:hover:shadow-[0_0_32px_rgba(0,201,128,0.7)]">
           Get Started
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:animate-magnetic" />
+          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:animate-magnetic dark:text-[#062417]" />
         </a>
       </div>
     </header>
@@ -186,17 +188,17 @@ function Hero() {
       <div className="flex flex-col justify-center animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
         {/* Location pill */}
         <div
-          className="mb-7 inline-flex w-fit animate-fade-in-right items-center gap-2 rounded-full border border-emerald-200/60 bg-white/80 px-3 py-1.5 text-[11px] font-bold tracking-[0.18em] text-emerald-800 shadow-sm backdrop-blur transition hover:scale-[1.03] hover:border-emerald-300 hover:shadow-md"
+          className="mb-7 inline-flex w-fit animate-fade-in-right items-center gap-2 rounded-full border border-emerald-200/60 dark:border-[#1e332a] bg-white/80 dark:bg-[#111d19]/80 px-3 py-1.5 text-[11px] font-bold tracking-[0.18em] text-emerald-800 dark:text-emerald-400 shadow-sm backdrop-blur transition hover:scale-[1.03] hover:border-emerald-300 hover:shadow-md"
           style={{ animationDelay: '0.35s' }}
         >
-          <MapPin className="h-3.5 w-3.5 text-emerald-600 animate-pop" />
+          <MapPin className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 animate-pop" />
           <span>DELHI NCR</span>
           <span className="h-1 w-1 rounded-full bg-emerald-400 animate-heartbeat" />
           <span>INDUSTRIAL CIRCULAR ECONOMY</span>
         </div>
 
         <h1
-          className="text-5xl font-extrabold leading-[1.05] tracking-tight text-slate-900 sm:text-6xl lg:text-[64px] animate-fade-in-up"
+          className="text-5xl font-extrabold leading-[1.05] tracking-tight text-slate-900 dark:text-slate-100 sm:text-6xl lg:text-[64px] animate-fade-in-up"
           style={{ animationDelay: '0.25s' }}
         >
           Turn your <br />
@@ -230,12 +232,12 @@ function Hero() {
         </h1>
 
         <p
-          className="mt-7 max-w-lg text-[17px] leading-relaxed text-slate-600 animate-fade-in-up"
+          className="mt-7 max-w-lg text-[17px] leading-relaxed text-slate-600 dark:text-slate-400 animate-fade-in-up"
           style={{ animationDelay: '0.4s' }}
         >
           CircularMatch uses AI to match waste generators with certified recyclers
           across Delhi NCR.{' '}
-          <span className="font-bold text-slate-900">Free to list, instant matching.</span>
+          <span className="font-bold text-slate-900 dark:text-slate-100">Free to list, instant matching.</span>
         </p>
 
         <div
@@ -244,11 +246,11 @@ function Hero() {
         >
           <a
             href="/list-waste"
-            className="group shine-wrap relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-emerald-700 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-700/30 ring-1 ring-emerald-800/30 transition-all duration-300 ease-out hover:bg-emerald-800 hover:shadow-emerald-800/40 hover:scale-[1.03]"
+            className="group shine-wrap relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-emerald-700 px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-emerald-700/30 ring-1 ring-emerald-800/30 transition-all duration-300 ease-out hover:bg-emerald-800 hover:shadow-emerald-800/40 hover:scale-[1.03] dark:from-[#00c980] dark:to-[#00b06f] dark:bg-gradient-to-r dark:text-[#062417] dark:font-bold dark:shadow-[0_0_30px_rgba(0,201,128,0.55)] dark:hover:shadow-[0_0_42px_rgba(0,201,128,0.75)]"
           >
             <span className="relative z-10">Get Started Free</span>
-            <ArrowRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            <span className="absolute inset-0 -z-0 animate-gradient-pan rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <ArrowRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 dark:text-[#062417]" />
+            <span className="absolute inset-0 -z-0 animate-gradient-pan rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 opacity-0 transition-opacity duration-500 group-hover:opacity-100 dark:hidden" />
           </a>
           <a
             href="#how"
@@ -256,10 +258,10 @@ function Hero() {
               e.preventDefault();
               document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' });
             }}
-            className="group inline-flex items-center gap-3 rounded-full bg-white px-5 py-3 text-sm font-semibold text-slate-800 shadow-md ring-1 ring-slate-200 transition-all duration-300 ease-out hover:bg-slate-50 hover:scale-[1.03] hover:shadow-lg hover:ring-emerald-200"
+            className="group inline-flex items-center gap-3 rounded-full bg-white dark:bg-[#111d19] px-5 py-3 text-sm font-semibold text-slate-800 dark:text-slate-200 shadow-md ring-1 ring-slate-200 dark:ring-[#1e332a] transition-all duration-300 ease-out hover:bg-slate-50 dark:hover:bg-[#162520] hover:scale-[1.03] hover:shadow-lg hover:ring-emerald-200 dark:hover:ring-emerald-500/30"
           >
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-white transition-transform group-hover:rotate-12">
-              <Play className="h-3 w-3 fill-white" />
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 dark:bg-[#00c980] text-white dark:text-[#062417] transition-transform group-hover:rotate-12">
+              <Play className="h-3 w-3 fill-current" />
             </span>
             See How It Works
           </a>
@@ -276,24 +278,24 @@ function Hero() {
           ].map((f, i) => (
             <div
               key={i}
-              className="group lift-hover flex animate-fade-in-up cursor-pointer items-start gap-2.5 rounded-lg p-1.5 transition-all duration-300 hover:bg-emerald-50/60"
+              className="group lift-hover flex animate-fade-in-up cursor-pointer items-start gap-2.5 rounded-lg p-1.5 transition-all duration-300 hover:bg-emerald-50/60 dark:hover:bg-[#162520]/60"
               style={{ animationDelay: `${0.6 + i * 0.08}s` }}
             >
-              <div className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200 transition-all duration-300 group-hover:rotate-[360deg] group-hover:bg-emerald-700 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-700/30">
+              <div className="mt-0.5 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 ring-1 ring-emerald-200 dark:ring-emerald-500/30 transition-all duration-300 group-hover:rotate-[360deg] group-hover:bg-emerald-700 group-hover:text-white group-hover:shadow-lg group-hover:shadow-emerald-700/30">
                 {f.icon}
               </div>
               <div className="leading-tight">
-                <div className="text-sm font-bold text-slate-900 transition-colors duration-200 group-hover:text-emerald-700">{f.title}</div>
-                <div className="text-xs text-slate-500">{f.sub}</div>
+                <div className="text-sm font-bold text-slate-900 dark:text-slate-100 transition-colors duration-200 group-hover:text-emerald-700 dark:group-hover:text-emerald-400">{f.title}</div>
+                <div className="text-xs text-slate-500 dark:text-slate-400">{f.sub}</div>
               </div>
             </div>
           ))}
         </div>
 
         <div className="mt-12 flex animate-fade-in-up items-center gap-3" style={{ animationDelay: '1.1s' }}>
-          <Leaf className="h-4 w-4 text-emerald-600 animate-pop" />
-          <span className="animate-tagline-pop text-sm font-semibold text-slate-700">
-            Cleaner Industries. <span className="text-emerald-700">A Greener Tomorrow.</span>
+          <Leaf className="h-4 w-4 text-emerald-600 dark:text-emerald-400 animate-pop" />
+          <span className="animate-tagline-pop text-sm font-semibold text-slate-700 dark:text-slate-300">
+            Cleaner Industries. <span className="text-emerald-700 dark:text-emerald-400">A Greener Tomorrow.</span>
           </span>
           <span className="animated-underline hidden h-0.5 flex-1 sm:block" />
         </div>
@@ -353,15 +355,15 @@ function FeaturesSection() {
         {features.map((f, i) => (
           <div
             key={i}
-            className="group lift-hover shine-wrap relative flex flex-col items-center text-center rounded-2xl border border-emerald-100/60 bg-white p-6 shadow-sm transition-all duration-500 animate-fade-in-up"
+            className="group lift-hover shine-wrap relative flex flex-col items-center text-center rounded-2xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-6 shadow-sm transition-all duration-500 animate-fade-in-up"
             style={{ animationDelay: `${i * 0.08}s` }}
           >
             <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${f.tint} text-white shadow-lg transition-transform duration-500 group-hover:rotate-[360deg] group-hover:scale-110`}>
               {f.icon}
             </div>
-            <h3 className="text-lg font-bold text-slate-900 transition-colors group-hover:text-emerald-700">{f.title}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">{f.desc}</p>
-            <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">{f.title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{f.desc}</p>
+            <div className="mt-4 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               Learn more <ArrowRight className="h-3 w-3" />
             </div>
           </div>
@@ -411,7 +413,7 @@ function HowItWorksSection() {
 
       <div className="relative mt-14">
         {/* Connecting line */}
-        <div className="absolute left-0 right-0 top-12 hidden h-0.5 bg-gradient-to-r from-emerald-200 via-emerald-400 to-emerald-200 lg:block" />
+        <div className="absolute left-0 right-0 top-12 hidden h-0.5 bg-gradient-to-r from-emerald-200 via-emerald-400 to-emerald-200 dark:from-emerald-900/50 dark:via-emerald-600/40 dark:to-emerald-900/50 lg:block" />
 
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
@@ -421,17 +423,17 @@ function HowItWorksSection() {
               style={{ animationDelay: `${i * 0.12}s` }}
             >
               <div className="relative mx-auto mb-5 flex h-24 w-24 items-center justify-center">
-                <div className="absolute inset-0 rounded-full bg-emerald-100 opacity-50 transition-all duration-500 group-hover:scale-125 group-hover:opacity-100" />
-                <div className="absolute inset-2 rounded-full bg-emerald-50 transition-all duration-500 group-hover:bg-emerald-700 group-hover:text-white" />
-                <span className="absolute -top-1 -right-1 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white shadow-md ring-2 ring-white transition-transform duration-500 group-hover:rotate-[360deg]">
+                <div className="absolute inset-0 rounded-full bg-emerald-100 dark:bg-emerald-900/40 opacity-50 transition-all duration-500 group-hover:scale-125 group-hover:opacity-100" />
+                <div className="absolute inset-2 rounded-full bg-emerald-50 dark:bg-[#162520] transition-all duration-500 group-hover:bg-emerald-700 group-hover:text-white" />
+                <span className="absolute -top-1 -right-1 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-emerald-700 text-xs font-bold text-white shadow-md ring-2 ring-white dark:ring-[#111d19] transition-transform duration-500 group-hover:rotate-[360deg]">
                   {i + 1}
                 </span>
-                <div className="relative z-10 flex h-12 w-12 items-center justify-center text-emerald-700 transition-colors duration-500 group-hover:text-white">
+                <div className="relative z-10 flex h-12 w-12 items-center justify-center text-emerald-700 dark:text-emerald-400 transition-colors duration-500 group-hover:text-white">
                   {s.icon}
                 </div>
               </div>
-              <h3 className="text-lg font-bold text-slate-900 transition-colors group-hover:text-emerald-700">{s.title}</h3>
-              <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-slate-600">{s.desc}</p>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">{s.title}</h3>
+              <p className="mx-auto mt-2 max-w-xs text-sm leading-relaxed text-slate-600 dark:text-slate-400">{s.desc}</p>
             </div>
           ))}
         </div>
@@ -452,12 +454,12 @@ function CategoriesSection() {
     async function fetchData() {
       try {
         const [materialsRes, listingsRes] = await Promise.all([
-          fetch('/api/reference/materials').then(res => res.json()),
-          fetch('/api/listings?active_only=true').then(res => res.json())
+          fetch('/api/reference/materials').then(res => res.ok ? res.json() : { data: [] }).catch(() => ({ data: [] })),
+          fetch('/api/listings?active_only=true').then(res => res.ok ? res.json() : { data: [] }).catch(() => ({ data: [] }))
         ]);
         
-        const materials = materialsRes.data || [];
-        const listings = listingsRes.data || [];
+        const materials = materialsRes?.data || [];
+        const listings = listingsRes?.data || [];
 
         const catCounts: Record<string, number> = {};
         listings.forEach((l: any) => {
@@ -506,20 +508,20 @@ function CategoriesSection() {
 
       <div className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         {loading ? (
-           <div className="col-span-full text-center text-slate-500 py-10 animate-pulse">Loading live marketplace data...</div>
+           <div className="col-span-full text-center text-slate-500 dark:text-slate-400 py-10 animate-pulse">Loading live marketplace data...</div>
         ) : categories.map((c, i) => (
           <a
             key={i}
             href="/listings"
-            className="group lift-hover shine-wrap relative flex flex-col items-center gap-3 rounded-2xl border border-emerald-100/60 bg-white p-6 text-center transition-all duration-500 animate-fade-in-up"
+            className="group lift-hover shine-wrap relative flex flex-col items-center gap-3 rounded-2xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-6 text-center transition-all duration-500 animate-fade-in-up"
             style={{ animationDelay: `${i * 0.06}s` }}
           >
             <div className={`mb-1 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${c.tint} text-2xl text-white shadow-md transition-transform duration-500 group-hover:rotate-[10deg] group-hover:scale-110`}>
               {c.emoji}
             </div>
-            <div className="text-sm font-bold text-slate-900 transition-colors group-hover:text-emerald-700">{c.name}</div>
-            <div className="text-xs text-slate-500">{c.count} active listing{c.count !== 1 ? 's' : ''}</div>
-            <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <div className="text-sm font-bold text-slate-900 dark:text-slate-100 transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400">{c.name}</div>
+            <div className="text-xs text-slate-500 dark:text-slate-400">{c.count} active listing{c.count !== 1 ? 's' : ''}</div>
+            <div className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
               Browse <ArrowRight className="h-3 w-3" />
             </div>
           </a>
@@ -537,24 +539,24 @@ function CategoriesSection() {
 function CTASection() {
   return (
     <SectionWrapper>
-      <div className="relative overflow-hidden rounded-3xl bg-white p-8 text-center shadow-xl ring-1 ring-emerald-100 sm:p-14 animate-fade-in-up">
+      <div className="relative overflow-hidden rounded-3xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-8 text-center shadow-xl dark:shadow-black/50 ring-1 ring-emerald-100 dark:ring-[#1e332a] sm:p-14 animate-fade-in-up">
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-20 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-emerald-200/50 blur-3xl animate-blob"
+          className="pointer-events-none absolute -top-20 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-emerald-200/50 dark:bg-emerald-900/30 blur-3xl animate-blob"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-20 right-0 h-72 w-72 rounded-full bg-teal-200/50 blur-3xl animate-blob"
+          className="pointer-events-none absolute -bottom-20 right-0 h-72 w-72 rounded-full bg-teal-200/50 dark:bg-teal-900/30 blur-3xl animate-blob"
           style={{ animationDelay: '3s' }}
         />
 
         <div className="relative">
           <SectionEyebrow>Ready when you are</SectionEyebrow>
-          <h2 className="mx-auto mt-3 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl">
+          <h2 className="mx-auto mt-3 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-slate-100 sm:text-5xl">
             Turn industrial by-products into <br className="hidden sm:block" />
             <span className="text-emerald-500">verified circular resources</span>.
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-base text-slate-600">
+          <p className="mx-auto mt-5 max-w-xl text-base text-slate-600 dark:text-slate-400">
             List your first material in under 3 minutes. Free to list. No
             contract. Just a smarter way to deal with the by-products of doing
             business.
@@ -571,20 +573,20 @@ function CTASection() {
             </a>
             <a
               href="mailto:shivanshguptaa070@gmail.com?subject=Demo%20Request%20-%20CircularMatch"
-              className="group inline-flex items-center gap-3 rounded-full bg-white px-5 py-3.5 text-sm font-semibold text-slate-800 shadow-md ring-1 ring-slate-200 transition-all duration-300 hover:scale-[1.03] hover:bg-slate-50 hover:shadow-lg hover:ring-emerald-200"
+              className="group inline-flex items-center gap-3 rounded-full bg-white dark:bg-[#162520] px-5 py-3.5 text-sm font-semibold text-slate-800 dark:text-slate-200 shadow-md ring-1 ring-slate-200 dark:ring-[#1e332a] transition-all duration-300 hover:scale-[1.03] hover:bg-slate-50 dark:hover:bg-[#1a382b] hover:shadow-lg hover:ring-emerald-200 dark:hover:ring-emerald-500/30"
             >
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-white transition-transform group-hover:rotate-12">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 dark:bg-emerald-600 text-white transition-transform group-hover:rotate-12">
                 <Play className="h-3 w-3 fill-white" />
               </span>
               Book a demo
             </a>
           </div>
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500">
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Free to list</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Zero commission</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> 100% verified recyclers</span>
-            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" /> Traceable Material Passports</span>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-slate-500 dark:text-slate-400">
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> Free to list</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> Zero commission</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> 100% verified recyclers</span>
+            <span className="flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> Traceable Material Passports</span>
           </div>
         </div>
       </div>
@@ -601,13 +603,13 @@ function FAQSection() {
 
   useEffect(() => {
     fetch('/api/reference/stats')
-      .then(res => res.json())
+      .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data.data) {
+        if (data?.data) {
           setStats(data.data);
         }
       })
-      .catch(console.error);
+      .catch(() => {});
   }, []);
 
   const qs = [
@@ -641,32 +643,32 @@ function FAQSection() {
           <SectionTitle>Everything you wanted to ask.</SectionTitle>
           <SectionLead>
             Have a different question? Reach our team at{' '}
-            <a href="mailto:shivanshguptaa070@gmail.com" className="font-semibold text-emerald-700 underline-offset-2 hover:underline">
+            <a href="mailto:shivanshguptaa070@gmail.com" className="font-semibold text-emerald-700 dark:text-emerald-400 underline-offset-2 hover:underline">
               shivanshguptaa070@gmail.com
             </a>{' '}
             — usually a 2-hour reply window.
           </SectionLead>
 
           <div className="mt-8 grid grid-cols-2 gap-4">
-            <div className="group lift-hover rounded-xl border border-emerald-100/60 bg-white p-4 transition-all duration-300 hover:border-emerald-300">
-              <Users className="h-5 w-5 text-emerald-600 transition-transform group-hover:rotate-[360deg]" />
-              <div className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.businesses || '500+'}</div>
-              <div className="text-xs text-slate-500">Businesses active</div>
+            <div className="group lift-hover rounded-xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-4 transition-all duration-300 hover:border-emerald-300 dark:hover:border-emerald-500/40">
+              <Users className="h-5 w-5 text-emerald-600 dark:text-emerald-400 transition-transform group-hover:rotate-[360deg]" />
+              <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-slate-100">{stats?.businesses || '500+'}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">Businesses active</div>
             </div>
-            <div className="group lift-hover rounded-xl border border-emerald-100/60 bg-white p-4 transition-all duration-300 hover:border-emerald-300">
-              <Package className="h-5 w-5 text-emerald-600 transition-transform group-hover:rotate-[360deg]" />
-              <div className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.listings || '50+'}</div>
-              <div className="text-xs text-slate-500">Active listings</div>
+            <div className="group lift-hover rounded-xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-4 transition-all duration-300 hover:border-emerald-300 dark:hover:border-emerald-500/40">
+              <Package className="h-5 w-5 text-emerald-600 dark:text-emerald-400 transition-transform group-hover:rotate-[360deg]" />
+              <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-slate-100">{stats?.listings || '50+'}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">Active listings</div>
             </div>
-            <div className="group lift-hover rounded-xl border border-emerald-100/60 bg-white p-4 transition-all duration-300 hover:border-emerald-300">
-              <Award className="h-5 w-5 text-emerald-600 transition-transform group-hover:rotate-[360deg]" />
-              <div className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.materials || '15+'}</div>
-              <div className="text-xs text-slate-500">Materials supported</div>
+            <div className="group lift-hover rounded-xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-4 transition-all duration-300 hover:border-emerald-300 dark:hover:border-emerald-500/40">
+              <Award className="h-5 w-5 text-emerald-600 dark:text-emerald-400 transition-transform group-hover:rotate-[360deg]" />
+              <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-slate-100">{stats?.materials || '15+'}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">Materials supported</div>
             </div>
-            <div className="group lift-hover rounded-xl border border-emerald-100/60 bg-white p-4 transition-all duration-300 hover:border-emerald-300">
-              <Building2 className="h-5 w-5 text-emerald-600 transition-transform group-hover:rotate-[360deg]" />
-              <div className="mt-2 text-2xl font-extrabold text-slate-900">{stats?.requirements || '20+'}</div>
-              <div className="text-xs text-slate-500">Active buyers</div>
+            <div className="group lift-hover rounded-xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] p-4 transition-all duration-300 hover:border-emerald-300 dark:hover:border-emerald-500/40">
+              <Building2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400 transition-transform group-hover:rotate-[360deg]" />
+              <div className="mt-2 text-2xl font-extrabold text-slate-900 dark:text-slate-100">{stats?.requirements || '20+'}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">Active buyers</div>
             </div>
           </div>
         </div>
@@ -676,17 +678,17 @@ function FAQSection() {
             {qs.map((item, i) => (
               <div
                 key={i}
-                className="group overflow-hidden rounded-2xl border border-emerald-100/60 bg-white shadow-sm transition-all duration-500 hover:border-emerald-300 hover:shadow-md"
+                className="group overflow-hidden rounded-2xl border border-emerald-100/60 dark:border-[#1e332a] bg-white dark:bg-[#111d19] shadow-sm transition-all duration-500 hover:border-emerald-300 dark:hover:border-emerald-500/40 hover:shadow-md"
               >
                 <button
                   onClick={() => setOpen(open === i ? null : i)}
                   className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
                 >
-                  <span className="text-sm font-bold text-slate-900 transition-colors group-hover:text-emerald-700 sm:text-base">
+                  <span className="text-sm font-bold text-slate-900 dark:text-slate-100 transition-colors group-hover:text-emerald-700 dark:group-hover:text-emerald-400 sm:text-base">
                     {item.q}
                   </span>
                   <ChevronDown
-                    className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-500 ${open === i ? 'rotate-180 text-emerald-600' : ''}`}
+                    className={`h-5 w-5 shrink-0 text-slate-400 dark:text-slate-500 transition-transform duration-500 ${open === i ? 'rotate-180 text-emerald-600 dark:text-emerald-400' : ''}`}
                   />
                 </button>
                 <div
@@ -694,7 +696,7 @@ function FAQSection() {
                   style={{ gridTemplateRows: open === i ? '1fr' : '0fr' }}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-5 pb-5 text-sm leading-relaxed text-slate-600">{item.a}</p>
+                    <p className="px-5 pb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{item.a}</p>
                   </div>
                 </div>
               </div>
@@ -752,7 +754,7 @@ function Footer() {
     },
   ];
   return (
-    <footer className="relative z-10 mt-12 border-t border-emerald-100/60 bg-white/50 backdrop-blur-sm">
+    <footer className="relative z-10 mt-12 border-t border-emerald-100/60 dark:border-[#1e332a] bg-white/50 dark:bg-[#0b110f]/90 backdrop-blur-sm transition-colors duration-200">
       <div className="mx-auto max-w-7xl px-5 py-14 sm:px-8 lg:px-12">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-3 lg:grid-cols-6">
           <div className="col-span-2">
@@ -760,11 +762,11 @@ function Footer() {
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-700 text-white shadow-md">
                 <Leaf className="h-5 w-5" />
               </div>
-              <div className="text-xl font-extrabold tracking-tight">
+              <div className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                 CIRCULAR<span className="text-emerald-500">MATCH</span>
               </div>
             </a>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-600">
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-slate-600 dark:text-slate-400">
               The AI-powered marketplace turning industrial waste into verified
               revenue across India's biggest manufacturing hubs.
             </p>
@@ -778,7 +780,7 @@ function Footer() {
                   key={i}
                   aria-label={s.label}
                   href="#"
-                  className="group flex h-9 w-9 items-center justify-center rounded-full bg-white text-slate-500 shadow-sm ring-1 ring-emerald-100 transition-all duration-300 hover:scale-110 hover:bg-emerald-700 hover:text-white hover:shadow-md"
+                  className="group flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-[#111d19] text-slate-500 dark:text-slate-400 shadow-sm ring-1 ring-emerald-100 dark:ring-[#1e332a] transition-all duration-300 hover:scale-110 hover:bg-emerald-700 dark:hover:bg-emerald-600 hover:text-white hover:shadow-md"
                 >
                   <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 transition-transform group-hover:rotate-[360deg]">
                     <path d={s.path} />
@@ -790,14 +792,14 @@ function Footer() {
 
           {linkCols.map((col, i) => (
             <div key={i}>
-              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700">{col.title}</h4>
+              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-emerald-700 dark:text-emerald-400">{col.title}</h4>
               <ul className="space-y-2">
                 {col.links.map((l) => (
                   <li key={l.label}>
                     <a
                       href={l.href}
                       onClick={l.href.startsWith('#') ? scrollTo(l.href.slice(1)) : undefined}
-                      className="text-sm text-slate-600 transition hover:text-emerald-700"
+                      className="text-sm text-slate-600 dark:text-slate-400 transition hover:text-emerald-700 dark:hover:text-emerald-400"
                     >
                       {l.label}
                     </a>
@@ -808,9 +810,9 @@ function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-emerald-100/60 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center">
+        <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-emerald-100/60 dark:border-white/10 pt-6 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:items-center">
           <div className="flex items-center gap-2">
-            <Leaf className="h-3.5 w-3.5 text-emerald-600" />
+            <Leaf className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>© 2026 CircularMatch Technologies Pvt. Ltd. · Made with intent in Delhi NCR.</span>
           </div>
           <div className="flex items-center gap-4">

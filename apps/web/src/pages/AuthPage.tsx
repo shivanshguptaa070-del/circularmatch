@@ -167,7 +167,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
   }
 
   return (
-    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 text-slate-900">
+    <div className="relative min-h-screen w-full overflow-hidden bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 text-slate-900 dark:from-[#0b110f] dark:via-[#0e1714] dark:to-[#0b110f] dark:text-slate-100">
       {/* Landing-style dot pattern */}
       <div
         aria-hidden
@@ -207,16 +207,16 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
         <div className="mb-7 flex animate-fade-in-up flex-col items-center gap-3">
           <div className="relative">
             <div className="absolute inset-0 -m-2 animate-pulse-ring rounded-full bg-emerald-400/40" />
-            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-xl shadow-emerald-700/20 ring-1 ring-emerald-100 animate-pop">
-              <Leaf className="h-7 w-7 text-emerald-600" strokeWidth={2.2} />
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-xl shadow-emerald-700/20 ring-1 ring-emerald-100 animate-pop dark:bg-[#111d19] dark:ring-[#1e332a] dark:shadow-black/40">
+              <Leaf className="h-7 w-7 text-emerald-600 dark:text-emerald-400" strokeWidth={2.2} />
             </div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-extrabold tracking-tight text-slate-900 font-display">
+            <div className="text-2xl font-extrabold tracking-tight text-slate-900 font-display dark:text-white">
               CIRCULAR<span className="text-emerald-500">MATCH</span>
             </div>
             {/* Material intelligence plate — slight emerald tint, mirroring the brand */}
-            <div className="mt-1.5 inline-block rounded-full bg-emerald-100/70 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.28em] text-emerald-700">
+            <div className="mt-1.5 inline-block rounded-full bg-emerald-100/70 px-2.5 py-0.5 text-[10px] font-bold tracking-[0.28em] text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border dark:border-emerald-800/40">
               MATERIAL INTELLIGENCE PLATFORM
             </div>
           </div>
@@ -224,7 +224,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
 
         {/* ===== Hackathon Judge Access Card ===== */}
         <div
-          className="relative w-full max-w-[420px] animate-fade-in-up mb-4 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 shadow-lg shadow-amber-900/10"
+          className="relative w-full max-w-[420px] animate-fade-in-up mb-4 rounded-2xl border border-amber-200 bg-gradient-to-br from-amber-50 to-yellow-50 p-5 shadow-lg shadow-amber-900/10 dark:border-amber-800/50 dark:from-amber-950/40 dark:to-yellow-950/30 dark:shadow-black/30"
           style={{ animationDelay: '0.05s' }}
         >
           {/* Amber accent line */}
@@ -232,8 +232,8 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
           <div className="flex items-center gap-2 mb-3">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 text-[11px] font-bold text-white">🏆</span>
             <div>
-              <p className="text-[13px] font-bold text-amber-900">Hackathon Demo Access</p>
-              <p className="text-[10.5px] text-amber-700">1-click judge login — isolated demo data</p>
+              <p className="text-[13px] font-bold text-amber-900 dark:text-amber-200">Hackathon Demo Access</p>
+              <p className="text-[10.5px] text-amber-700 dark:text-amber-400">1-click judge login — isolated demo data</p>
             </div>
           </div>
           <div className="flex flex-col gap-2">
@@ -253,22 +253,22 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                 }}
                 className={`group flex items-center justify-between rounded-xl border px-3.5 py-2.5 text-left transition-all duration-200 hover:scale-[1.015] hover:shadow-md ${
                   color === 'emerald'
-                    ? 'border-emerald-200 bg-white hover:border-emerald-400 hover:bg-emerald-50'
+                    ? 'border-emerald-200 bg-white hover:border-emerald-400 hover:bg-emerald-50 dark:border-[#1e332a] dark:bg-[#162520] dark:hover:bg-[#1a382b] dark:hover:border-emerald-500/50'
                     : color === 'teal'
-                    ? 'border-teal-200 bg-white hover:border-teal-400 hover:bg-teal-50'
-                    : 'border-violet-200 bg-white hover:border-violet-400 hover:bg-violet-50'
+                    ? 'border-teal-200 bg-white hover:border-teal-400 hover:bg-teal-50 dark:border-[#1e332a] dark:bg-[#162520] dark:hover:bg-[#1a382b] dark:hover:border-teal-500/50'
+                    : 'border-violet-200 bg-white hover:border-violet-400 hover:bg-violet-50 dark:border-[#1e332a] dark:bg-[#162520] dark:hover:bg-[#1a382b] dark:hover:border-violet-500/50'
                 }`}
               >
                 <div>
-                  <p className="text-[12.5px] font-bold text-slate-900">{name}</p>
-                  <p className="text-[10.5px] text-slate-500">{company}</p>
+                  <p className="text-[12.5px] font-bold text-slate-900 dark:text-slate-100">{name}</p>
+                  <p className="text-[10.5px] text-slate-500 dark:text-slate-400">{company}</p>
                 </div>
                 <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${
                   color === 'emerald'
-                    ? 'bg-emerald-100 text-emerald-700'
+                    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300'
                     : color === 'teal'
-                    ? 'bg-teal-100 text-teal-700'
-                    : 'bg-violet-100 text-violet-700'
+                    ? 'bg-teal-100 text-teal-700 dark:bg-teal-950/60 dark:text-teal-300'
+                    : 'bg-violet-100 text-violet-700 dark:bg-violet-950/60 dark:text-violet-300'
                 }`}>
                   {role}
                 </span>
@@ -279,7 +279,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
 
         {/* ===== Auth card (light theme matching landing) ===== */}
         <div
-          className="relative w-full max-w-[420px] animate-fade-in-up rounded-3xl border border-emerald-100/60 bg-white/80 p-7 shadow-2xl shadow-emerald-900/10 backdrop-blur-xl sm:p-8"
+          className="relative w-full max-w-[420px] animate-fade-in-up rounded-3xl border border-emerald-100/60 bg-white/80 p-7 shadow-2xl shadow-emerald-900/10 backdrop-blur-xl sm:p-8 dark:border-[#1e332a] dark:bg-[#111d19]/95 dark:shadow-black/50"
           style={{ animationDelay: '0.15s' }}
         >
           {/* Top emerald accent line */}
@@ -288,7 +288,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
           {step !== 'reset' && (
             <>
               {/* Mode toggle */}
-              <div className="relative mb-6 rounded-full border border-emerald-100 bg-emerald-50/60 p-1 shadow-inner">
+              <div className="relative mb-6 rounded-full border border-emerald-100 bg-emerald-50/60 p-1 shadow-inner dark:border-[#1e332a] dark:bg-[#0e1714]/80">
                 <div
                   className="absolute top-1 bottom-1 w-[calc(50%-4px)] rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 shadow-lg shadow-emerald-700/30 transition-all duration-500 ease-out"
                   style={{ left: isSignin ? '4px' : 'calc(50% + 0px)' }}
@@ -297,7 +297,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                   <button
                     onClick={() => { setStep('signin'); setError(null); setSuccessMsg(null); }}
                     className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 ${
-                      isSignin ? 'text-white' : 'text-slate-600 hover:text-emerald-700'
+                      isSignin ? 'text-white' : 'text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-300'
                     }`}
                   >
                     Sign in
@@ -305,7 +305,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                   <button
                     onClick={() => { setStep('signup'); setError(null); setSuccessMsg(null); }}
                     className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors duration-300 ${
-                      !isSignin ? 'text-white' : 'text-slate-600 hover:text-emerald-700'
+                      !isSignin ? 'text-white' : 'text-slate-600 hover:text-emerald-700 dark:text-slate-400 dark:hover:text-emerald-300'
                     }`}
                   >
                     Create account
@@ -317,7 +317,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
               <button 
                 onClick={() => void handleOAuth('google')}
                 disabled={oauthLoading !== null}
-                className="group shine-wrap relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-full bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-md ring-1 ring-slate-200 transition-all duration-300 hover:scale-[1.02] hover:bg-slate-50 hover:shadow-lg hover:ring-emerald-200 disabled:opacity-60"
+                className="group shine-wrap relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-full bg-white px-4 py-3 text-sm font-semibold text-slate-800 shadow-md ring-1 ring-slate-200 transition-all duration-300 hover:scale-[1.02] hover:bg-slate-50 hover:shadow-lg hover:ring-emerald-200 disabled:opacity-60 dark:bg-[#162520] dark:text-slate-100 dark:ring-[#1e332a] dark:hover:bg-[#1a382b]"
               >
                 {oauthLoading === 'google' ? (
                   <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
@@ -336,18 +336,18 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
               </button>
 
               {/* Divider */}
-              <div className="my-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                <span className="h-px flex-1 bg-slate-200" />
+              <div className="my-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-500">
+                <span className="h-px flex-1 bg-slate-200 dark:bg-[#1e332a]" />
                 or with email
-                <span className="h-px flex-1 bg-slate-200" />
+                <span className="h-px flex-1 bg-slate-200 dark:bg-[#1e332a]" />
               </div>
             </>
           )}
 
           {isReset && (
             <div className="mb-6 text-center">
-              <h2 className="text-xl font-bold text-slate-900">Reset Password</h2>
-              <p className="mt-1 text-sm text-slate-500">Enter your email to receive a reset link</p>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">Reset Password</h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Enter your email to receive a reset link</p>
             </div>
           )}
 
@@ -359,17 +359,17 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
             {step === 'signup' && (
               <>
                 <div className="space-y-1.5">
-                  <label htmlFor="reg-name" className="text-[12px] font-bold text-slate-700">
+                  <label htmlFor="reg-name" className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
                     Full name
                   </label>
                   <div
-                    className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 ${
+                    className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 dark:bg-[#162520] ${
                       nameFocus
-                        ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60'
-                        : 'border-slate-200 ring-slate-100 hover:border-emerald-300'
+                        ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60 dark:ring-emerald-500/20'
+                        : 'border-slate-200 ring-slate-100 hover:border-emerald-300 dark:border-[#1e332a] dark:ring-transparent'
                     }`}
                   >
-                    <User className={`h-4 w-4 transition-colors ${nameFocus ? 'text-emerald-600' : 'text-slate-400'}`} />
+                    <User className={`h-4 w-4 transition-colors ${nameFocus ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
                     <input
                       id="reg-name"
                       type="text"
@@ -379,23 +379,23 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                       onFocus={() => setNameFocus(true)}
                       onBlur={() => setNameFocus(false)}
                       placeholder="Your full name"
-                      className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                      className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label htmlFor="reg-company" className="text-[12px] font-bold text-slate-700">
+                  <label htmlFor="reg-company" className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
                     Company name
                   </label>
                   <div
-                    className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 ${
+                    className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 dark:bg-[#162520] ${
                       companyFocus
-                        ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60'
-                        : 'border-slate-200 ring-slate-100 hover:border-emerald-300'
+                        ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60 dark:ring-emerald-500/20'
+                        : 'border-slate-200 ring-slate-100 hover:border-emerald-300 dark:border-[#1e332a] dark:ring-transparent'
                     }`}
                   >
-                    <Building2 className={`h-4 w-4 transition-colors ${companyFocus ? 'text-emerald-600' : 'text-slate-400'}`} />
+                    <Building2 className={`h-4 w-4 transition-colors ${companyFocus ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'}`} />
                     <input
                       id="reg-company"
                       type="text"
@@ -405,13 +405,13 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                       onFocus={() => setCompanyFocus(true)}
                       onBlur={() => setCompanyFocus(false)}
                       placeholder="Organisation name"
-                      className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                      className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <p className="text-[12px] font-bold text-slate-700">I want to:</p>
+                  <p className="text-[12px] font-bold text-slate-700 dark:text-slate-300">I want to:</p>
                   <div className="grid grid-cols-2 gap-2">
                     {MODE_OPTIONS.map(({ id, label, icon: Icon }) => (
                       <button
@@ -420,11 +420,11 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                         onClick={() => setActiveMode(id)}
                         className={`flex flex-col items-center justify-center rounded-xl border p-2.5 text-center transition-all duration-300 ${
                           activeMode === id
-                            ? 'border-emerald-400 bg-emerald-50 text-emerald-700 shadow-md ring-1 ring-emerald-200'
-                            : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-300 hover:bg-slate-50'
+                            ? 'border-emerald-400 bg-emerald-50 text-emerald-700 shadow-md ring-1 ring-emerald-200 dark:border-emerald-500/60 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-500/30'
+                            : 'border-slate-200 bg-white text-slate-500 hover:border-emerald-300 hover:bg-slate-50 dark:border-[#1e332a] dark:bg-[#162520]/50 dark:text-slate-400 dark:hover:bg-[#162520]'
                         }`}
                       >
-                        <Icon size={16} className={activeMode === id ? 'text-emerald-600' : 'text-slate-400'} />
+                        <Icon size={16} className={activeMode === id ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'} />
                         <span className="mt-1.5 text-xs font-bold">{label}</span>
                       </button>
                     ))}
@@ -435,19 +435,19 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
 
             {/* Email */}
             <div className="space-y-1.5">
-              <label htmlFor="email" className="text-[12px] font-bold text-slate-700">
+              <label htmlFor="email" className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
                 Email
               </label>
               <div
-                className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 ${
+                className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 dark:bg-[#162520] ${
                   emailFocus
-                    ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60'
-                    : 'border-slate-200 ring-slate-100 hover:border-emerald-300'
+                    ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60 dark:ring-emerald-500/20'
+                    : 'border-slate-200 ring-slate-100 hover:border-emerald-300 dark:border-[#1e332a] dark:ring-transparent'
                 }`}
               >
                 <Mail
                   className={`h-4 w-4 transition-colors ${
-                    emailFocus ? 'text-emerald-600' : 'text-slate-400'
+                    emailFocus ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'
                   }`}
                 />
                 <input
@@ -459,7 +459,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                   onFocus={() => setEmailFocus(true)}
                   onBlur={() => setEmailFocus(false)}
                   placeholder="you@company.com"
-                  className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                  className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
               </div>
             </div>
@@ -468,29 +468,29 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
             {step !== 'reset' && (
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label htmlFor="password" className="text-[12px] font-bold text-slate-700">
+                  <label htmlFor="password" className="text-[12px] font-bold text-slate-700 dark:text-slate-300">
                     Password
                   </label>
                   {isSignin && (
                     <button
                       type="button"
                       onClick={() => { setStep('reset'); setError(null); setSuccessMsg(null); }}
-                      className="text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline"
+                      className="text-xs font-semibold text-emerald-700 transition hover:text-emerald-800 hover:underline dark:text-emerald-400 dark:hover:text-emerald-300"
                     >
                       Forgot password?
                     </button>
                   )}
                 </div>
                 <div
-                  className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 ${
+                  className={`group flex items-center gap-2.5 rounded-xl border bg-white px-3 py-2.5 ring-1 transition-all duration-300 dark:bg-[#162520] ${
                     pwFocus
-                      ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60'
-                      : 'border-slate-200 ring-slate-100 hover:border-emerald-300'
+                      ? 'border-emerald-400 ring-2 ring-emerald-200 shadow-lg shadow-emerald-100/60 dark:ring-emerald-500/20'
+                      : 'border-slate-200 ring-slate-100 hover:border-emerald-300 dark:border-[#1e332a] dark:ring-transparent'
                   }`}
                 >
                   <Lock
                     className={`h-4 w-4 transition-colors ${
-                      pwFocus ? 'text-emerald-600' : 'text-slate-400'
+                      pwFocus ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400'
                     }`}
                   />
                   <input
@@ -503,12 +503,12 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                     onFocus={() => setPwFocus(true)}
                     onBlur={() => setPwFocus(false)}
                     placeholder={step === 'signup' ? 'Min. 6 characters' : '••••••••'}
-                    className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400"
+                    className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPw((s) => !s)}
-                    className="rounded p-1 text-slate-400 transition hover:text-emerald-700 active:scale-90"
+                    className="rounded p-1 text-slate-400 transition hover:text-emerald-700 active:scale-90 dark:hover:text-emerald-400"
                     aria-label={showPw ? 'Hide password' : 'Show password'}
                   >
                     {showPw ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -518,23 +518,23 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
             )}
 
             {error && (
-              <div className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700">
+              <div className="flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-300">
                 <AlertCircle size={16} className="mt-0.5 shrink-0 text-rose-500" />
                 <span className="leading-relaxed">{error}</span>
               </div>
             )}
 
             {successMsg && (
-              <div className="flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+              <div className="flex flex-col gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-300">
                 <div className="flex items-start gap-2">
-                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-600" />
+                  <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
                   <span className="leading-relaxed">{successMsg}</span>
                 </div>
                 {step === 'signup' && successMsg.includes('verify your account') && (
                   <button 
                     type="button" 
                     onClick={() => void handleResendConfirmation()}
-                    className="self-start text-xs font-bold text-emerald-700 underline hover:text-emerald-800"
+                    className="self-start text-xs font-bold text-emerald-700 underline hover:text-emerald-800 dark:text-emerald-400"
                   >
                     Didn't receive it? Resend email
                   </button>
@@ -568,7 +568,7 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
                 <button
                   type="button"
                   onClick={() => { setStep('signin'); setError(null); setSuccessMsg(null); }}
-                  className="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors"
+                  className="text-sm font-bold text-slate-500 hover:text-slate-800 transition-colors dark:text-slate-400 dark:hover:text-slate-200"
                 >
                   Back to Sign In
                 </button>
@@ -577,13 +577,13 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
           </form>
 
           {/* Legal */}
-          <p className="mt-5 text-center text-[11px] text-slate-500">
+          <p className="mt-5 text-center text-[11px] text-slate-500 dark:text-slate-400">
             By continuing, you agree to our{' '}
-            <a href="#" className="font-semibold text-emerald-700 underline-offset-2 hover:text-emerald-800 hover:underline">
+            <a href="#" className="font-semibold text-emerald-700 underline-offset-2 hover:text-emerald-800 hover:underline dark:text-emerald-400 dark:hover:text-emerald-300">
               Terms of Service
             </a>{' '}
             and{' '}
-            <a href="#" className="font-semibold text-emerald-700 underline-offset-2 hover:text-emerald-800 hover:underline">
+            <a href="#" className="font-semibold text-emerald-700 underline-offset-2 hover:text-emerald-800 hover:underline dark:text-emerald-400 dark:hover:text-emerald-300">
               Privacy Policy
             </a>
             .
@@ -592,12 +592,12 @@ export function AuthPage({ onAuth, defaultStep = 'signin' }: { onAuth: () => voi
 
         {/* Footer line (mirrors landing tagline) */}
         <div
-          className="mt-8 flex animate-fade-in-up items-center gap-2 text-[11px] font-semibold text-slate-600"
+          className="mt-8 flex animate-fade-in-up items-center gap-2 text-[11px] font-semibold text-slate-600 dark:text-slate-400"
           style={{ animationDelay: '0.3s' }}
         >
-          <Leaf className="h-3 w-3 animate-pop text-emerald-600" />
+          <Leaf className="h-3 w-3 animate-pop text-emerald-600 dark:text-emerald-400" />
           <span>
-            Cleaner Industries. <span className="text-emerald-700">A Greener Tomorrow.</span>
+            Cleaner Industries. <span className="text-emerald-700 dark:text-emerald-400">A Greener Tomorrow.</span>
           </span>
         </div>
       </main>
