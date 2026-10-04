@@ -30,7 +30,7 @@ function getStoredMode(): ThemeMode {
   } catch {
     // Ignore storage errors in restricted contexts
   }
-  return 'system'
+  return 'light'
 }
 
 function resolveTheme(mode: ThemeMode): Theme {

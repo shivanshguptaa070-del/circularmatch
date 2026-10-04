@@ -13,14 +13,7 @@
       (function() {
         try {
           var m = localStorage.getItem('cm_theme_mode') || localStorage.getItem('cm_theme');
-          var isDark = false;
-          if (m === 'dark') {
-            isDark = true;
-          } else if (m === 'light') {
-            isDark = false;
-          } else {
-            isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-          }
+          var isDark = (m === 'dark');
           if (isDark) {
             document.documentElement.classList.add('dark');
             document.documentElement.setAttribute('data-theme', 'dark');
